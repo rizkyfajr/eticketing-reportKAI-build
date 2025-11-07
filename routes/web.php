@@ -112,7 +112,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('/checksheetday-results/autosave', [App\Http\Controllers\CheckSheetDayResultController::class, 'autosave'])->name('checksheetday-results.autosave');
 
     // Route::post('/checksheet-workresult/autosave', [App\Http\Controllers\ChecksheetWorkResultController::class, 'autosave'])->name('checksheet-workresult.autosave');
-    Route::resource('checksheet-workresult', App\Http\Controllers\ChecksheetWorkResultController::class);
+    Route::resource('checksheet-workresult', App\Http\Controllers\CheckSheetWorkResultController::class);
     Route::post('/checksheet-workresult/approve', [App\Http\Controllers\CheckSheetWorkResultController::class, 'approve'])->name('checksheet-workresult.approve');
 
     // Route::post('/checksheet-results/autosave', [App\Http\Controllers\CheckSheetResultController::class, 'autosave'])->name('checksheet-results.autosave');

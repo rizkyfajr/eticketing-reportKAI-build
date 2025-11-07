@@ -35,7 +35,7 @@ class WorkingReport extends Model
 
     public function checksheetday()
     {
-        return $this->hasOne(checkSheetDay::class, 'working_report_id', 'id');
+        return $this->hasOne(CheckSheetDay::class, 'working_report_id', 'id');
     }
 
     public function upload()
@@ -50,7 +50,7 @@ class WorkingReport extends Model
 
     public function checksheet()
     {
-        return $this->hasOne(checkSheet::class, 'working_report_id', 'id');
+        return $this->hasOne(CheckSheet::class, 'working_report_id', 'id');
     }
 
     public function warmingup()
