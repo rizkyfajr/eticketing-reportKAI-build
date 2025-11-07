@@ -43,7 +43,7 @@ class UserController extends Controller
     {
         $request->validated();
 
-        return User::where(function (Builder $query) use ($request) {
+        return User::where('id', '!=', 1)->where(function (Builder $query) use ($request) {
                         $search = '%' . $request->input('search') . '%';
                         $columns = ['name', 'username', 'position_id', 'division_id', 'email', 'email_verified_at', 'created_at', 'updated_at'];
 
