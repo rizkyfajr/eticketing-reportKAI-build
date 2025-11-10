@@ -5,8 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\WarmingUp;
 use App\Models\WorkingReport;
+use App\Models\MasterMachine;
+use App\Models\MasterRegion;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
+use App\Http\Requests\DataTableRequest;
+use Illuminate\Database\Eloquent\Builder;
 
 class WarmingUpController extends Controller
 {
@@ -15,9 +21,33 @@ class WarmingUpController extends Controller
   *
   * @return \Illuminate\Http\Response
   */
-  public function index()
+  public function index(WarmingUp $warmingup)
   {
-    //
+    return Inertia::render('WarmingUp/Index', [
+      'warmingup'       => $warmingup,
+      'warmingup_user'  => $warmingup->warmingup_user ?? null,
+    ]);
+  }
+
+  
+  /**
+  * Display a listing of the resource.
+  *
+  * @return \Illuminate\Http\Response
+  */
+  public function detail(DataTableRequest $request, WarmingUp $warmingup)
+  {
+    $warmingup->load([
+        'machine.region',
+        'warmingup_user.user', 
+    ]);
+    return Inertia::render('WarmingUp/Detail', [
+      'warmingup'       => $warmingup,
+      'warmingup_user'  => $warmingup->warmingup_user ?? null,
+      'machines'        => MasterMachine::with('region')->select('id', 'name', 'type', 'region_id')->get(),
+      'regions'         => MasterRegion::select('id', 'name')->get(),
+      'users'           => User::select('id', 'name')->get(),
+    ]);
   }
   
   /**
@@ -25,11 +55,17 @@ class WarmingUpController extends Controller
   *
   * @return \Illuminate\Http\Response
   */
-  public function create()
+  public function create(WarmingUp $warmingup)
   {
-    //
+    return Inertia::render('WarmingUp/Create', [
+        'warmingup'       => $warmingup,
+        'warmingup_user'  => $warmingup->warmingup_user ?? null,
+        'machines'        => MasterMachine::with('region')->select('id', 'name', 'type', 'nomor', 'no_sarana', 'region_id')->get(),
+        'regions'         => MasterRegion::select('id', 'name')->get(),
+        'users'           => User::select('id', 'name')->get(),
+    ]);
   }
-  
+
   /**
   * Store a newly created resource in storage.
   *
@@ -40,24 +76,22 @@ class WarmingUpController extends Controller
   {
     try {
         $validated = $request->validate([
-            'working_report_id'  => 'required|exists:working_reports,id',
             'machine_id'         => 'nullable|exists:master_machines,id',
             'waktu_start_engine' => 'required|date',
-            'jam_kerja'          => 'required|date_format:H:i:s',
-            'jam_mesin'          => 'required|date_format:H:i:s',
-            'jam_genset'         => 'required|date_format:H:i:s',
+            'jam_kerja'          => 'required|date_format:H:i',
+            'jam_mesin'          => 'required|date_format:H:i',
+            'jam_genset'         => 'required|date_format:H:i',
             'counter_pecok'      => 'required|integer',
             'oddometer'          => 'required|integer',
             'waktu_stop_engine'  => 'required|date',
-            'penggunaan_hsd'     => 'required|numeric',
-            'hsd_tersedia'       => 'required|numeric',
+            'penggunaan_hsd'     => 'required|integer',
+            'hsd_tersedia'       => 'required|integer',
             'note'               => 'nullable|string|max:1000',
             'user_id'            => 'nullable|array',
             'user_id.*'          => 'exists:users,id',
         ]);
 
         $warmingup = WarmingUp::create([
-            'working_report_id' => $validated['working_report_id'],
             'machine_id'        => $validated['machine_id'],
             'waktu_start_engine'=> $request->waktu_start_engine,
             'jam_kerja'         => $request->jam_kerja,
@@ -85,16 +119,9 @@ class WarmingUpController extends Controller
             DB::table('warmingup_user')->insert($crewPivotData);
         }
         
-        $workingReport = WorkingReport::find($validated['working_report_id']);
-        if ($workingReport) {
-            $workingReport->status = 'warming_up_done';
-            $workingReport->save();
-        }
-
-
         DB::commit();
 
-        return redirect()->back()->with('success', 'Data berhasil disimpan.');
+        return redirect() ->route('warming-up.index')->with('success', 'Data berhasil disimpan.');
 
     } catch (\Illuminate\Validation\ValidationException $e) {
         return redirect()->back()->withErrors($e->errors())->withInput();
@@ -122,7 +149,14 @@ class WarmingUpController extends Controller
   */
   public function edit($id)
   {
-    //
+    $warmingup = WarmingUp::findOrFail($id);
+
+    return Inertia::render('WarmingUp/Update', [
+        'warmingup' => $warmingup,
+        'machines' => MasterMachine::with('region')->select('id', 'name', 'type', 'region_id')->get(),
+        'regions' => MasterRegion::select('id', 'name')->get(),
+        'users' => User::select('id', 'name')->get(),
+    ]);
   }
   
   /**
@@ -142,14 +176,14 @@ class WarmingUpController extends Controller
         $validated = $request->validate([
             'machine_id'         => 'nullable|exists:master_machines,id',
             'waktu_start_engine' => 'required|date',
-            'jam_kerja'          => 'required|date_format:H:i:s',
-            'jam_mesin'          => 'required|date_format:H:i:s',
-            'jam_genset'         => 'required|date_format:H:i:s',
+            'jam_kerja'          => 'required|date_format:H:i',
+            'jam_mesin'          => 'required|date_format:H:i',
+            'jam_genset'         => 'required|date_format:H:i',
             'counter_pecok'      => 'required|integer',
             'oddometer'          => 'required|integer',
             'waktu_stop_engine'  => 'required|date',
-            'penggunaan_hsd'     => 'required|numeric',
-            'hsd_tersedia'       => 'required|numeric',
+            'penggunaan_hsd'     => 'required|integer',
+            'hsd_tersedia'       => 'required|integer',
             'note'               => 'nullable|string|max:1000',
             'user_id'            => 'nullable|array',
             'user_id.*'          => 'exists:users,id',
@@ -191,7 +225,7 @@ class WarmingUpController extends Controller
 
         DB::commit();
 
-        return redirect()->back()->with('success', 'Data berhasil diubah.');
+        return redirect() ->route('warming-up.index')->with('success', 'Data berhasil diubah.');
 
     } catch (\Illuminate\Validation\ValidationException $e) {
         DB::rollBack();
@@ -208,8 +242,58 @@ class WarmingUpController extends Controller
   * @param  int  $id
   * @return \Illuminate\Http\Response
   */
-  public function destroy($id)
+  public function destroy(Request $request, $id)
   {
-    //
+    $warmingup = WarmingUp::findOrFail($id);
+    $warmingup->delete();
+
+    return redirect()->back()->with('success', __(
+          'Data berhasil dihapus.'
+      ));
+  }
+
+  /**
+  * @param \App\Http\Requests\DataTableRequest $request
+  * @return \Illuminate\Http\Response
+  */
+  public function paginate(DataTableRequest $request)
+  {
+    $request->validated();
+    $user = $request->user();
+
+    $region = WarmingUp::where(function (Builder $query) use ($request) {
+        $search = '%' . $request->search . '%';
+        $model = $query->getModel();
+
+        foreach ($model->getFillable() as $column) {
+            $query->orWhere($column, 'like', $search);
+        }
+    })
+    ->orderBy($request->input('order.key') ?: 'created_at', $request->input('order.by') ?: 'desc')
+    // ->when(!$user->hasRole(['superuser', 'it', 'admin']), fn (Builder $query) => 
+    //     $query->where('created_by_id', $user->id)
+    // )
+    ->select([
+        'id',
+        'working_report_id',
+        'machine_id',
+        'waktu_start_engine',
+        'jam_kerja',
+        'jam_mesin',
+        'jam_genset',
+        'counter_pecok',
+        'oddometer',
+        'waktu_stop_engine',
+        'penggunaan_hsd',
+        'hsd_tersedia',
+        'note',
+        'approved_by',
+        'approved_at',
+        'created_by_id',
+        'updated_by_id',
+    ])
+    ->paginate($request->per_page ?: 10);
+
+    return response()->json($region);
   }
 }

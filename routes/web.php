@@ -126,6 +126,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         
     Route::post('/upload/autosave', [App\Http\Controllers\UploadController::class, 'autosave']) ->name('upload.autosave');
 
+    Route::get('/warming-up/{warmingup}/detail/', [App\Http\Controllers\WarmingUpController::class, 'detail'])->name('warming-up.detail');
     Route::resource('warming-up', App\Http\Controllers\WarmingUpController::class);
     Route::post('/warming-up/paginate', [App\Http\Controllers\WarmingUpController::class, 'paginate'])
         ->name('warming-up.paginate');

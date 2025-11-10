@@ -54,9 +54,10 @@ const form1 = useForm({
     working_report_id: props.report?.id || null,
     no_seri: props.checksheetday?.no_seri || null,
     jenis: props.checksheetday?.jenis || null,
-    jam_mesin: props.checksheetday?.jam_mesin || null,
+    jam_mesin: props.checksheetday?.jam_mesin?.slice(0, 5) || null,
     counter_pecok: props.checksheetday?.counter_pecok || null,
-    kilometer_mesin: props.checksheetday?.kilometer_mesin || null,
+    // kilometer_mesin: props.checksheetday?.kilometer_mesin || null,
+    kilometer_mesin: props.checksheetday?.kilometer_mesin ? parseFloat(props.checksheetday.kilometer_mesin) : null,
     tanggal: props.checksheetday?.tanggal || null,
     lokasi: props.checksheetday?.lokasi || null,
     wilayah: props.checksheetday?.wilayah || null,
@@ -573,78 +574,6 @@ const approvechecksheetworkresult = async () => {
   }
 }
 
-const submitwarmingup = () => {
-  Swal.fire({
-    title: 'Menyimpan data...',
-    didOpen: () => Swal.showLoading(),
-    allowOutsideClick: false,
-  })
-
-  form3.post(route('warming-up.store', props.report.id), {
-    onSuccess: () => {
-      Swal.fire({
-        icon: 'success',
-        title: 'Berhasil!',
-        text: 'Data berhasil disimpan.',
-        timer: 1500,
-        showConfirmButton: false,
-      })
-    },
-    onError: () => {
-      Swal.fire({
-        icon: 'error',
-        title: 'Gagal!',
-        text: 'Terjadi kesalahan saat menyimpan data.',
-      })
-    },
-  })
-}
-
-const updatewarmingup = async () => {
-  try {
-    const response = await Swal.fire({
-      title: 'Konfirmasi',
-      html: `Apakah anda yakin akaan ubah data ini?`,
-      icon: 'question',
-      showCancelButton: true,
-      showCloseButton: true,
-    });
-
-    if (response.isConfirmed) {
-      Swal.fire({
-        title: 'Sedang menyimpan data...',
-        didOpen: () => {
-          Swal.showLoading();
-        },
-        allowOutsideClick: false,
-      });
-
-      const result = await form3.patch(route('warming-up.update', form3.id), {
-        onSuccess: () => {
-          close();
-          Swal.showLoading();
-          Swal.fire({
-            title: 'Data berhasil diupdate!',
-            icon: 'success',
-          });
-        },
-        onError: () => {
-          Swal.showLoading();
-          Swal.fire({
-            title: 'Terjadi kesalahan!',
-            text: 'Gagal menyimpan data.',
-            icon: 'error',
-          });
-        },
-      });
-
-      return result;
-    }
-  } catch (error) {
-    console.error(error);
-  }
-};
-
 const submitworkresult = () => {
   Swal.fire({
     title: 'Menyimpan data...',
@@ -865,7 +794,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
         <div class="flex items-center justify-between p-1 bg-gradient-to-r from-white-600 to-white-400 px-4 text-white shadow">
           <div class="flex items-center">
             <Link :href="route('working-reports.index')"> 
-              <Button class="bg-gray-700 hover:bg-gray-900 rounded-md float-left text-xs"> <Icon name="caret-left" /> <p class="font-bold"> | Kembali </p></Button> 
+              <Button class="bg-gray-700 hover:bg-gray-900 rounded-md float-left text-xs px-4 py-1 mr-2"> <Icon name="caret-left" /> <p class="font-semibold text-xs"> | Kembali </p></Button> 
             </Link>
           </div>
 
@@ -873,7 +802,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
             <p class="font-bold  text-gray-900 dark:text-gray-100 text-sm">
               <span
                     :class="[
-                    'px-2 py-1 rounded-full text-[10px] font-bold',
+                    'px-2 py-1 rounded-full text-[10px] font-semibold',
                     {
                         'bg-gray-100 text-gray-800': report.status === 'draft',
                         'bg-yellow-100 text-yellow-800': report.status === 'checksheet_done',
@@ -901,7 +830,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
           </div>
 
           <div class="flex items-center justify-end">
-            <Button class="bg-red-700 text-white-800 px-4 py-2 rounded-md hover:bg-red-500 float-end"> <Icon name="warning" class="w-6 h-4"/><p class="font-bold text-xs"> | Lapor  </p></Button>
+            <Button class="bg-red-700 text-white-800 px-4 py-2 rounded-md hover:bg-red-500 float-end text-xs px-1 py-1"> <Icon name="warning" class="w-4 h-2"/><p class="font-bold text-xs"> | Lapor  </p></Button>
           </div>
         </div>
       </template> -->
@@ -910,14 +839,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
       <div class="flex flex-col space-y-2 p-1">
         <div class="flex flex-col space-y-2 p-1">
           <div class="flex flex-row overflow-x-auto md:overflow-x-visible space-x-0.5 w-full rounded">
-            <!-- <div class="border border-black p-1 w-full" :class="{ 'bg-blue-600': currentSection === 'report' }">
-              <a 
-                href="#list-report" id="list-report-list" data-toggle="list" role="tab" aria-controls="report" class="list-group-item list-group-item-action active" 
-                @click.prevent="fetch('report', report)" 
-              >
-                <p :class="{ 'text-white': currentSection === 'report' }">Working Order</p>
-              </a>
-            </div> -->
             <div 
               class="border rounded p-1 text-center text-sm flex-1 flex-shrink" 
               :class="{ 
@@ -932,17 +853,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
               </a>
             </div>
 
-            <!-- <div class="border rounded p-1 w-full" :class="{ 'bg-blue-500': currentSection === 'checksheetday' }">
-              <a 
-                href="#list-checksheetday" id="list-checksheetday-list" data-toggle="list" role="tab" aria-controls="checksheetday"  class="list-group-item list-group-item-action d-flex justify-content-between" 
-                :class="! report.sectionFiveOpen ? 'disabled' : ''"
-                @click.prevent="fetch('checksheetday', report)" 
-              >
-                <p :class="{ 'text-white': currentSection === 'checksheetday' }">Check Sheet
-                </p>
-              </a>
-            </div> -->
-
             <div 
               class="border rounded p-1 text-center text-sm flex-1 flex-shrink" 
               :class="{ 
@@ -956,42 +866,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                 <p class="text-[11px] font-bold">Check Sheet</p>
               </a>
             </div>
-
-            <!-- <div class="border rounded p-1 w-full" :class="{ 'bg-blue-500': currentSection === 'warmingup' }">
-              <a 
-                href="#list-warmingup" id="list-warmingup-list" data-toggle="list" role="tab" aria-controls="warmingup"  class="list-group-item list-group-item-action d-flex justify-content-between" 
-                :class="! report.sectionFiveOpen ? 'disabled' : ''"
-                @click.prevent="fetch('warmingup', report)" 
-              >
-                <p :class="{ 'text-white': currentSection === 'warmingup' }">Warming Up
-                </p>
-              </a>
-            </div>             -->
-
-            <div 
-              class="border rounded p-1 text-center text-sm flex-1 flex-shrink" 
-              :class="{ 
-                  'bg-blue-700 text-white font-bold': currentSection === 'warmingup',
-                  'bg-blue-500 text-white font-bold': currentSection !== 'warmingup' && report.warmingup?.id,
-                  'bg-white text-black': currentSection !== 'warmingup' && !report.warmingup?.id
-              }"
-              @click.prevent="fetch('warmingup', report)" 
-            >
-              <a href="#list-warmingup" id="list-warmingup-list" role="tab" aria-controls="warmingup" :class="! report.sectionFiveOpen ? 'disabled' : ''">
-                <p class="text-[11px] font-bold">Warming Up</p>
-              </a>
-            </div>
-
-            <!-- <div class="border rounded p-1 w-full" :class="{ 'bg-blue-500': currentSection === 'upload' }">
-              <a 
-                href="#list-upload" id="list-upload-list" data-toggle="list" role="tab" aria-controls="upload"  class="list-group-item list-group-item-action d-flex justify-content-between" 
-                :class="! report.sectionFiveOpen ? 'disabled' : ''"
-                @click.prevent="fetch('upload', report)" 
-              >
-                <p :class="{ 'text-white': currentSection === 'upload' }">Upload Foto
-                </p>
-              </a>
-            </div> -->
 
             <div
               class="border rounded p-1 text-center text-sm flex-1 flex-shrink"
@@ -1011,17 +885,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                 </div>
               </a>
             </div>
-
-            <!-- <div class="border rounded p-1 w-full" :class="{ 'bg-blue-500': currentSection === 'workresult' }">
-              <a 
-                href="#list-workresult" id="list-workresult-list" data-toggle="list" role="tab" aria-controls="workresult"  class="list-group-item list-group-item-action d-flex justify-content-between" 
-                :class="! report.sectionFiveOpen ? 'disabled' : ''"
-                @click.prevent="fetch('workresult', report)" 
-              >
-                <p>Work Result
-                </p>
-              </a>
-            </div> -->
 
             <div 
               class="border rounded p-1 text-center text-sm flex-1 flex-shrink" 
@@ -1050,8 +913,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
             
             <!-- section working report -->             
 					  <div v-if="currentSection === 'report'" class="tab-pane fade show active" id="list-report" role="tabpanel" aria-labelledby="list-report-list">
-            <!-- <div v-if="! deviation.first_section.ampr_responded_at" class="tab-pane fade show active p-2" id="list-section1" role="tabpanel" aria-labelledby="list-section1-list"> -->
-            <!-- <div class="tab-pane fade show active p-2" id="list-section1" role="tabpanel" aria-labelledby="list-section1-list"> -->
               <div class="flex flex-col space-y-4 p-2">
                 
                 <div class="flex flex-col items-start space-y-1">
@@ -1114,6 +975,38 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   </div>
                 </div>
 
+                <div class="flex flex-col items-start space-y-1">
+                    <label for="date" class="font-bold text-xs">
+                      {{ __('Status') }}
+                    </label>
+                    
+                      <div class="w-full">
+                        <span
+                          :class="[
+                          'px-2 py-1 rounded-full text-xs font-semibold',
+                          {
+                              'bg-gray-100 text-gray-800': report.status === 'draft',
+                              'bg-yellow-100 text-yellow-800': report.status === 'checksheet_done',
+                              'bg-blue-100 text-blue-800': report.status === 'photo_uploaded',
+                              'bg-green-100 text-green-800': report.status === 'selesai',
+                          },
+                          ]"
+                      >
+                          {{
+                          report.status === 'draft'
+                              ? 'Proses Draft'
+                              : report.status === 'checksheet_done'
+                              ? 'Proses Checksheet'
+                              : report.status === 'photo_uploaded'
+                              ? 'Proses Upload'
+                              : report.status === 'selesai'
+                              ? 'Selesai'
+                              : report.status
+                          }}
+                      </span>
+                  </div>
+                </div>
+
               </div>
             </div>
             <!-- section working report -->
@@ -1160,7 +1053,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   
                   <div class="flex flex-col items-start space-y-1">
                     <label class="font-bold text-xs">Jam Mesin</label>
-                    <Input v-model="form1.jam_mesin" :placeholder="__('Jam Mesin')" required type="time" step="1" class="w-full text-xs" />
+                    <Input v-model="form1.jam_mesin" :placeholder="__('Jam Mesin')" required type="time" class="w-full text-xs" />
                     <InputError :error="form1.errors.jam_mesin" />
                   </div>
 
@@ -1184,7 +1077,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
 
                   <div class="flex flex-col items-start space-y-1">
                     <label class="font-bold text-xs">Kilometer Mesin</label>
-                    <Input v-model="form1.kilometer_mesin" required type="number" :placeholder="__('Kilometer Mesin')" class="w-full text-xs"/>
+                    <Input v-model="form1.kilometer_mesin" required type="number" step="0.01" :placeholder="__('Kilometer Mesin')" class="w-full text-xs"/>
                     <InputError :error="form1.errors.kilometer_mesin" />
                   </div>
 
@@ -1586,212 +1479,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
               </div>
 						</div>
             <!-- section checksheetday -->
-
-            <!-- section warmingup -->
-            <div v-if="currentSection === 'warmingup'" class="tab-pane fade p-2" id="list-warmingup" role="tabpanel" aria-labelledby="list-warmingup-list">
-							<div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">
-                <div class="flex flex-col items-start space-y-1">
-                  <label for="machine_id"  class="font-bold text-xs">
-                    {{ __('Nama Mesin') }}
-                  </label>
-                  
-                  <Select
-                    v-model="form.machine_id"
-                    :options="machines.map(machine => ({
-                      label: `${machine.name} - ${machine.type} - ${machine.nomor} - ${machine.no_sarana} (${machine.region.name})`,
-                      value: machine.id,
-                    }))"
-                    :searchable="true"
-                    placeholder="Pilih Mesin"
-                    style="font-size: 0.7rem;"
-                    disabled
-                  />
-
-                  <InputError :error="form.errors.machine_id"/>
-                </div> 
-
-                <div class="flex flex-col items-start space-y-1">
-                  <label for="waktu_start_engine" class="font-bold text-xs">
-                    {{ __('Waktu Start Engine') }}
-                  </label>
-                  
-                  <Input
-                    v-model="form3.waktu_start_engine"
-                    :placeholder="__('Waktu Start Engine')"
-                    type="datetime-local"
-                    class="text-xs"
-                  />
-
-                  <InputError :error="form3.errors.waktu_start_engine"/>
-                </div>
-
-                <div class="flex flex-col items-start space-y-1">
-                  <label for="jam_kerja" class="font-bold text-xs">
-                    {{ __('Jam Kerja') }}
-                  </label>
-                  
-                  <Input
-                    v-model="form3.jam_kerja"
-                    :placeholder="__('Jam Kerja')"
-                    type="time"
-                    step="1"
-                    class="text-xs"
-                  />     
-
-                  <InputError :error="form3.errors.jam_kerja"/>
-                </div>
-							
-                <div class="flex flex-col items-start space-y-1">
-                  <label for="jam_mesin" class="font-bold text-xs">
-                    {{ __('Jam Mesin') }}
-                  </label>
-                  
-                  <Input
-                    v-model="form3.jam_mesin"
-                    :placeholder="__('Jam Mesin')"
-                    type="time"
-                    step="1"
-                    class="text-xs"
-                  />
-
-                  <InputError :error="form3.errors.jam_mesin"/>
-                </div>
-
-                <div class="flex flex-col items-start space-y-1">
-                  <label for="jam_genset" class="font-bold text-xs">
-                    {{ __('Jam Genset') }}
-                  </label>
-                  
-                  <Input
-                    v-model="form3.jam_genset"
-                    :placeholder="__('Jam Genset')"
-                    type="time"
-                    step="1"
-                    class="text-xs"
-                  />
-
-                  <InputError :error="form3.errors.jam_genset"/>
-                </div>
-
-                <div class="flex flex-col items-start space-y-1">
-                  <label for="counter_pecok" class="font-bold text-xs">
-                    {{ __('Counter Pecok') }}
-                  </label>
-
-                  <Input
-                    v-model="form3.counter_pecok"
-                    :placeholder="__('Counter Pecok')"
-                    type="number"
-                    class="text-xs"
-                  />
-
-                  <InputError :error="form3.errors.counter_pecok"/>
-                </div>
-
-                <div class="flex flex-col items-start space-y-1">
-                  <label for="oddometer" class="font-bold text-xs">
-                    {{ __('Oddo Meter') }}
-                  </label>
-                  
-                  <Input
-                    v-model="form3.oddometer"
-                    :placeholder="__('Oddo Meter')"
-                    type="number"
-                    class="text-xs"
-                  />
-
-                  <InputError :error="form3.errors.oddometer"/>
-                </div>
-
-                <div class="flex flex-col items-start space-y-1">
-                  <label for="waktu_stop_engine" class="font-bold text-xs">
-                    {{ __('Waktu Stop Engine') }}
-                  </label>
-                  
-                  <Input
-                    v-model="form3.waktu_stop_engine"
-                    :placeholder="__('Waktu Stop Engine')"
-                    type="datetime-local"
-                    class="text-xs"
-                  />
-                    
-                  <InputError :error="form3.errors.waktu_stop_engine"/>
-                </div>
-
-                <div class="flex flex-col items-start space-y-1">
-                  <label for="penggunaan_hsd" class="font-bold text-xs">
-                    {{ __('Penggunaan HSD') }}
-                  </label>
-                  
-                  <Input
-                    v-model="form3.penggunaan_hsd"
-                    :placeholder="__('Penggunaan HSD')"
-                    type="number"
-                    step="0.01"
-                    class="text-xs"
-                  />
-                        
-                  <InputError :error="form3.errors.penggunaan_hsd"/>
-                </div>
-
-                <div class="flex flex-col items-start space-y-1">
-                  <label for="hsd_tersedia" class="font-bold text-xs">
-                    {{ __('HSD Tersedia') }}
-                  </label>
-                  
-                  <Input
-                    v-model="form3.hsd_tersedia"
-                    :placeholder="__('HSD Tersedia')"
-                    type="number"
-                    step="0.01"
-                    class="text-xs"
-                  />
-
-                  <InputError :error="form3.errors.hsd_tersedia"/>
-                </div>
-                
-                <div class="flex flex-col items-start space-y-1">
-                  <label for="user_id" class="font-bold text-xs">
-                    {{ __('Crew') }}
-                  </label>
-                  
-                  <Select
-                    v-model="form3.user_id"
-                    :options="users.filter(user => user.id !== 1).map(user => ({
-                      label: user.name,
-                      value: user.id,
-                    }))"
-                    :searchable="true"
-                    mode="tags"
-                    placeholder="Pilih Crew"
-                    required
-                    style="font-size: 0.5rem;"
-                  />
-
-                  <InputError :error="form3.errors.user_id"/>
-                </div> 
-
-                <div class="flex flex-col items-start space-y-1">
-                  <label for="note" class="font-bold text-xs">
-                    {{ __('Keterangan') }}
-                  </label>
-                  
-                  <TextArea
-                    v-model="form3.note"
-                    :placeholder="__('Keterangan')"
-                    type="text"
-                    class="text-xs"
-                  />
-                  <InputError :error="form3.errors.note"/>
-                </div>
-              </div>
-							
-							<div class="d-flex justify-content-end mt-3">
-								<Button v-if="!report.warmingup?.id" class="bg-green-700 hover:bg-green-900 px-4 py-1 rounded float-right mr-2 text-xs" @click.prevent="submitwarmingup()">Simpan</Button>
-                <Button v-else class="bg-blue-700 hover:bg-blue-900 px-4 py-1 rounded float-right mr-2 text-xs" @click.prevent="updatewarmingup()">Edit</Button>
-							</div>
-						</div>
-            <!-- section warmingup -->
 
             <!-- section upload -->             
 					  <div v-if="currentSection === 'upload'" class="tab-pane fade show active p-1" id="list-upload" role="tabpanel" aria-labelledby="list-upload-list">

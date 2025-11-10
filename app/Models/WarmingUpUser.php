@@ -24,4 +24,9 @@ class WarmingUpUser extends Model
     return $this->belongsTo(WarmingUp::class, 'warming_up_id');
   }
 
+  public function user()
+  {
+      return $this->belongsTo(User::class);
+  }
+
 }
