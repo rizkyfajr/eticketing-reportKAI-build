@@ -75,19 +75,18 @@ const close = () => {
         <!-- Header Dashboard  -->
         <main class="p-0 py-0 mb-[1.25rem] ml-[1.25rem] mt-[1.25rem]">
             <h2 class="font-bold text-2xl">Dashboard</h2>
-           <button class="text-sm text-gray-500 font-semibold hover:text-sky-600 focus:text-sky-600">Home</button> 
-            <slot />
+            <h3 class="text-base font-semibold pl-0 leading-6 text-gray-500">
+            Selamat Datang, {{user.positions?.position}} - {{ user.name }} - ({{ user.divisions?.division_name }})
+            </h3>        
         </main>
        <!-- Content  -->
        <!-- component -->
 <div>
-  <h3 class="text-base font-semibold pl-5 leading-6 text-gray-900">Notification Ticketing</h3>
-  
 
   <!-- component -->
 <div class="min-h-screen bg-gray-50/50">
   <div class="p-4 ">
-    <div class="mt-12">
+    <div class="mt-11">
       <!-- Card Components -->
       <div class="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
         <!-- Card Feedback -->

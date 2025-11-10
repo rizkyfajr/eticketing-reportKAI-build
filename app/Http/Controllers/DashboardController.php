@@ -166,7 +166,11 @@ class DashboardController extends Controller
       'count_datalaporin' => $count_datalaporin,
       'count_assign' => $count_assign,
       'data_laporin' => $data_laporin,
-      'users' => User::get(['id', 'name']),
+      // 'users' => User::get(['id', 'name']),
+      'users' => auth()->user()->load([
+          'divisions:id,division_name',
+          'positions:id,position',
+      ]),
     ]);
   }
   public function get()
