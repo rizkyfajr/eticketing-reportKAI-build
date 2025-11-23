@@ -76,34 +76,72 @@ class WarmingUpController extends Controller
   {
     try {
         $validated = $request->validate([
-            'machine_id'         => 'nullable|exists:master_machines,id',
-            'waktu_start_engine' => 'required|date',
-            'jam_kerja'          => 'required|date_format:H:i',
-            'jam_mesin'          => 'required|date_format:H:i',
-            'jam_genset'         => 'required|date_format:H:i',
-            'counter_pecok'      => 'required|integer',
-            'oddometer'          => 'required|integer',
-            'waktu_stop_engine'  => 'required|date',
-            'penggunaan_hsd'     => 'required|integer',
-            'hsd_tersedia'       => 'required|integer',
-            'note'               => 'nullable|string|max:1000',
-            'user_id'            => 'nullable|array',
-            'user_id.*'          => 'exists:users,id',
+            'working_report_id'     => 'required|exists:working_reports,id',
+            'tanggal'               => 'nullable|date',
+            'cuaca'                 => 'nullable|string',
+            'jenis_kpjr'            => 'nullable|string',
+            'nomor_mesin'           => 'nullable|string',
+            'nomor_sarana'          => 'nullable|string',
+            'waktu_start_engine'    => 'nullable|date_format:H:i',
+            'jam_traveling_awal'    => 'nullable|string',
+            'jam_kerja_awal'        => 'nullable|date_format:H:i',
+            'jam_mesin_awal'        => 'nullable|string',
+            'jam_generator_awal'    => 'nullable|string',
+            'counter_tamping_awal'  => 'nullable|integer',
+            'oddometer_awal'        => 'nullable|integer',
+            'hsd_awal_kerja'        => 'nullable|integer',
+            'konsumsi_hsd'          => 'nullable|string',
+            'waktu_stop_engine'     => 'nullable|date_format:H:i',
+            'jam_traveling_akhir'   => 'nullable|string',
+            'jam_kerja_akhir'       => 'nullable|date_format:H:i',
+            'jam_mesin_akhir'       => 'nullable|string',
+            'jam_generator_akhir'   => 'nullable|string',
+            'counter_tamping_akhir' => 'nullable|integer',
+            'oddometer_akhir'       => 'nullable|integer',
+            'hsd_akhir_kerja'       => 'nullable|integer',
+            'operator_by1'          => 'nullable|exists:users,id',
+            'operator_by2'          => 'nullable|exists:users,id',
+            'operator_by3'          => 'nullable|exists:users,id',
+            'approved_by'           => 'nullable|exists:users,id',
+            'approved_at'           => 'nullable|date',
+            'approved_by1'          => 'nullable|exists:users,id',
+            'approved_at1'          => 'nullable|date',
+            'note'                  => 'nullable|string',
+            'user_id'               => 'nullable|array',
+            'user_id.*'             => 'exists:users,id',
         ]);
 
         $warmingup = WarmingUp::create([
-            'machine_id'        => $validated['machine_id'],
-            'waktu_start_engine'=> $request->waktu_start_engine,
-            'jam_kerja'         => $request->jam_kerja,
-            'jam_mesin'         => $request->jam_mesin,
-            'jam_genset'        => $request->jam_genset,
-            'counter_pecok'     => $request->counter_pecok,
-            'oddometer'         => $request->oddometer,
-            'waktu_stop_engine' => $request->waktu_stop_engine,
-            'penggunaan_hsd'    => $request->penggunaan_hsd,
-            'hsd_tersedia'      => $request->hsd_tersedia,
-            'note'              => $request->note,
-            'created_by_id'     => auth()->id(),
+            'working_report_id'     => $validated['working_report_id'],
+            'tanggal'               => $request->tanggal,
+            'cuaca'                 => $request->cuaca,
+            'jenis_kpjr'            => $request->jenis_kpjr,
+            'nomor_mesin'           => $request->nomor_mesin,
+            'nomor_sarana'          => $request->nomor_sarana,
+            'waktu_start_engine'    => $request->waktu_start_engine,
+            'jam_traveling_awal'    => $request->jam_traveling_awal,
+            'jam_kerja_awal'        => $request->jam_kerja_awal,
+            'jam_mesin_awal'        => $request->jam_mesin_awal,
+            'jam_generator_awal'    => $request->jam_generator_awal,
+            'counter_tamping_awal'  => $request->counter_tamping_awal,
+            'oddometer_awal'        => $request->oddometer_awal,
+            'hsd_awal_kerja'        => $request->hsd_awal_kerja,
+            'konsumsi_hsd'          => $request->konsumsi_hsd,
+            'waktu_stop_engine'     => $request->waktu_stop_engine,
+            'jam_traveling_akhir'   => $request->jam_traveling_akhir,
+            'jam_kerja_akhir'       => $request->jam_kerja_akhir,
+            'jam_mesin_akhir'       => $request->jam_mesin_akhir,
+            'jam_generator_akhir'   => $request->jam_generator_akhir,
+            'counter_tamping_akhir' => $request->counter_tamping_akhir,
+            'oddometer_akhir'       => $request->oddometer_akhir,
+            'hsd_akhir_kerja'       => $request->hsd_akhir_kerja,
+            'operator_by1'          => $request->operator_by1,
+            'operator_by2'          => $request->operator_by2,
+            'operator_by3'          => $request->operator_by3,
+            'approved_by'           => $request->approved_by,
+            'approved_by1'          => $request->approved_by1,
+            'note'                  => $request->note,
+            'created_by_id'         => auth()->id(),
         ]);
 
         if (!empty($validated['user_id'])) {
@@ -121,7 +159,7 @@ class WarmingUpController extends Controller
         
         DB::commit();
 
-        return redirect() ->route('warming-up.index')->with('success', 'Data berhasil disimpan.');
+        return redirect()->back()->with('success', 'Data berhasil disimpan.');
 
     } catch (\Illuminate\Validation\ValidationException $e) {
         return redirect()->back()->withErrors($e->errors())->withInput();
@@ -174,34 +212,71 @@ class WarmingUpController extends Controller
         $warmingup = WarmingUp::findOrFail($id);
 
         $validated = $request->validate([
-            'machine_id'         => 'nullable|exists:master_machines,id',
-            'waktu_start_engine' => 'required|date',
-            'jam_kerja'          => 'required|date_format:H:i',
-            'jam_mesin'          => 'required|date_format:H:i',
-            'jam_genset'         => 'required|date_format:H:i',
-            'counter_pecok'      => 'required|integer',
-            'oddometer'          => 'required|integer',
-            'waktu_stop_engine'  => 'required|date',
-            'penggunaan_hsd'     => 'required|integer',
-            'hsd_tersedia'       => 'required|integer',
-            'note'               => 'nullable|string|max:1000',
-            'user_id'            => 'nullable|array',
-            'user_id.*'          => 'exists:users,id',
+            'working_report_id'     => 'required|exists:working_reports,id',
+            'tanggal'               => 'nullable|date',
+            'cuaca'                 => 'nullable|string',
+            'jenis_kpjr'            => 'nullable|string',
+            'nomor_mesin'           => 'nullable|string',
+            'nomor_sarana'          => 'nullable|string',
+            'waktu_start_engine'    => 'nullable|date_format:H:i',
+            'jam_traveling_awal'    => 'nullable|string',
+            'jam_kerja_awal'        => 'nullable|date_format:H:i',
+            'jam_mesin_awal'        => 'nullable|string',
+            'jam_generator_awal'    => 'nullable|string',
+            'counter_tamping_awal'  => 'nullable|integer',
+            'oddometer_awal'        => 'nullable|integer',
+            'hsd_awal_kerja'        => 'nullable|integer',
+            'konsumsi_hsd'          => 'nullable|string',
+            'waktu_stop_engine'     => 'nullable|date_format:H:i',
+            'jam_traveling_akhir'   => 'nullable|string',
+            'jam_kerja_akhir'       => 'nullable|date_format:H:i',
+            'jam_mesin_akhir'       => 'nullable|string',
+            'jam_generator_akhir'   => 'nullable|string',
+            'counter_tamping_akhir' => 'nullable|integer',
+            'oddometer_akhir'       => 'nullable|integer',
+            'hsd_akhir_kerja'       => 'nullable|integer',
+            'operator_by1'          => 'nullable|exists:users,id',
+            'operator_by2'          => 'nullable|exists:users,id',
+            'operator_by3'          => 'nullable|exists:users,id',
+            'approved_by'           => 'nullable|exists:users,id',
+            'approved_at'           => 'nullable|date',
+            'approved_by1'          => 'nullable|exists:users,id',
+            'approved_at1'          => 'nullable|date',
+            'note'                  => 'nullable|string',
+            'user_id'               => 'nullable|array',
+            'user_id.*'             => 'exists:users,id',
         ]);
 
         $warmingup->update([
-            'machine_id'        => $validated['machine_id'],
-            'waktu_start_engine'=> $validated['waktu_start_engine'] ?? null,
-            'jam_kerja'         => $validated['jam_kerja'] ?? null,
-            'jam_mesin'         => $validated['jam_mesin'] ?? null,
-            'jam_genset'        => $validated['jam_genset'] ?? null,
-            'counter_pecok'     => $validated['counter_pecok'] ?? null,
-            'oddometer'         => $validated['oddometer'] ?? null,
-            'waktu_stop_engine' => $validated['waktu_stop_engine'] ?? null,
-            'penggunaan_hsd'    => $validated['penggunaan_hsd'] ?? null,
-            'hsd_tersedia'      => $validated['hsd_tersedia'] ?? null,
-            'note'              => $validated['note'] ?? null,
-            'updated_by_id'     => auth()->id(),
+            'working_report_id'     => $validated['working_report_id'],
+            'tanggal'               => $request->tanggal,
+            'cuaca'                 => $request->cuaca,
+            'jenis_kpjr'            => $request->jenis_kpjr,
+            'nomor_mesin'           => $request->nomor_mesin,
+            'nomor_sarana'          => $request->nomor_sarana,
+            'waktu_start_engine'    => $request->waktu_start_engine,
+            'jam_traveling_awal'    => $request->jam_traveling_awal,
+            'jam_kerja_awal'        => $request->jam_kerja_awal,
+            'jam_mesin_awal'        => $request->jam_mesin_awal,
+            'jam_generator_awal'    => $request->jam_generator_awal,
+            'counter_tamping_awal'  => $request->counter_tamping_awal,
+            'oddometer_awal'        => $request->oddometer_awal,
+            'hsd_awal_kerja'        => $request->hsd_awal_kerja,
+            'konsumsi_hsd'          => $request->konsumsi_hsd,
+            'waktu_stop_engine'     => $request->waktu_stop_engine,
+            'jam_traveling_akhir'   => $request->jam_traveling_akhir,
+            'jam_kerja_akhir'       => $request->jam_kerja_akhir,
+            'jam_mesin_akhir'       => $request->jam_mesin_akhir,
+            'jam_generator_akhir'   => $request->jam_generator_akhir,
+            'counter_tamping_akhir' => $request->counter_tamping_akhir,
+            'oddometer_akhir'       => $request->oddometer_akhir,
+            'hsd_akhir_kerja'       => $request->hsd_akhir_kerja,
+            'operator_by1'          => $request->operator_by1,
+            'operator_by2'          => $request->operator_by2,
+            'operator_by3'          => $request->operator_by3,
+            'approved_by'           => $request->approved_by,
+            'approved_by1'          => $request->approved_by1,
+            'note'                  => $request->note,
         ]);
 
         if ($request->has('user_id')) {
@@ -225,7 +300,7 @@ class WarmingUpController extends Controller
 
         DB::commit();
 
-        return redirect() ->route('warming-up.index')->with('success', 'Data berhasil diubah.');
+        return redirect()->back()->with('success', 'Data berhasil diubah.');
 
     } catch (\Illuminate\Validation\ValidationException $e) {
         DB::rollBack();
@@ -251,6 +326,30 @@ class WarmingUpController extends Controller
           'Data berhasil dihapus.'
       ));
   }
+
+  public function approve(Request $request)
+  {
+      $request->validate([
+          'id' => 'required|exists:warming_up,id',
+          'index' => 'required|in:1,2,3',
+      ]);
+
+      $result = WarmingUp::find($request->id);
+      $now = now();
+
+      if ($request->index == 1) {
+          $result->operator_at1 = $now;
+      } elseif ($request->index == 2) {
+          $result->operator_at2 = $now;
+      } elseif ($request->index == 3) {
+          $result->operator_at3 = $now;
+      }
+
+      $result->save();
+
+      return response()->json(['message' => 'Berhasil disetujui.']);
+  }
+
 
   /**
   * @param \App\Http\Requests\DataTableRequest $request
