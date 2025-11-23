@@ -103,6 +103,13 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('/master-checksheet-day/paginate', [App\Http\Controllers\CheckSheetMasterDayController::class, 'paginate'])
         ->name('master-checksheet-day.paginate');
 
+    // Route::get('/working-reports/{report}/create', [App\Http\Controllers\WorkingReportController::class, 'create'])->name('working-reports.create.withid');
+    Route::get('working-reports/{report}/download', [App\Http\Controllers\WorkingReportController::class, 'downloadReport'])->name('working-reports.download');
+    Route::post('/working-reports/approveKUPT', [App\Http\Controllers\WorkingReportController::class, 'approveKUPT'])->name('working-reports.approveKUPT');
+    Route::post('/working-reports/{report}/approvePengawal/{level}', [App\Http\Controllers\WorkingReportController::class, 'approvePengawal'])->name('working-reports.approvePengawal');
+    Route::post('/working-reports/{report}/approve/{level}', [App\Http\Controllers\WorkingReportController::class, 'approve'])->name('working-reports.approve');
+    Route::post('/working-reports/submit-form', [App\Http\Controllers\WorkingReportController::class, 'submitForm'])->name('working-reports.submit-form');
+    Route::get('/working-reports/create/{report}', [App\Http\Controllers\WorkingReportController::class, 'create'])->name('working-reports.create.withid');
     Route::post('/working-reports/{report}/fetch', [App\Http\Controllers\WorkingReportController::class, 'fetch'])->name('working-reports.fetch');
     Route::get('/working-reports/{report}/detail/', [App\Http\Controllers\WorkingReportController::class, 'detail'])->name('working-reports.detail');
     Route::resource('working-reports', App\Http\Controllers\WorkingReportController::class);
@@ -114,6 +121,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     // Route::post('/checksheet-workresult/autosave', [App\Http\Controllers\ChecksheetWorkResultController::class, 'autosave'])->name('checksheet-workresult.autosave');
     Route::resource('checksheet-workresult', App\Http\Controllers\CheckSheetWorkResultController::class);
     Route::post('/checksheet-workresult/approve', [App\Http\Controllers\CheckSheetWorkResultController::class, 'approve'])->name('checksheet-workresult.approve');
+    Route::post('/checksheet-workresult/setmode', [App\Http\Controllers\CheckSheetWorkResultController::class, 'setmode'])->name('checksheet-workresult.setmode');
 
     // Route::post('/checksheet-results/autosave', [App\Http\Controllers\CheckSheetResultController::class, 'autosave'])->name('checksheet-results.autosave');
     Route::resource('check-sheet', App\Http\Controllers\CheckSheetController::class);
@@ -126,11 +134,13 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         
     Route::post('/upload/autosave', [App\Http\Controllers\UploadController::class, 'autosave']) ->name('upload.autosave');
 
+    Route::post('/warming-up/approve', [App\Http\Controllers\WarmingUpController::class, 'approve'])->name('warming-up.approve');
     Route::get('/warming-up/{warmingup}/detail/', [App\Http\Controllers\WarmingUpController::class, 'detail'])->name('warming-up.detail');
     Route::resource('warming-up', App\Http\Controllers\WarmingUpController::class);
     Route::post('/warming-up/paginate', [App\Http\Controllers\WarmingUpController::class, 'paginate'])
         ->name('warming-up.paginate');
 
+    Route::post('/working-results/submit-form', [App\Http\Controllers\WorkResultController::class, 'submitForm'])->name('working-results.submit-form');
     Route::post('/workresult/approve', [App\Http\Controllers\WorkResultController::class, 'approve'])->name('workresult.approve');
     Route::resource('work-results', App\Http\Controllers\WorkResultController::class);
     Route::post('/work-results/paginate', [App\Http\Controllers\WorkResultController::class, 'paginate'])
