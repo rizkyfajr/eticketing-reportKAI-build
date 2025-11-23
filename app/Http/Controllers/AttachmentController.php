@@ -8,6 +8,16 @@ use App\Http\Requests\DataTableRequest;
 use App\Models\Report;
 use App\Models\Upload;
 use App\Models\WorkResult;
+use App\Models\MgLurusanAwal;
+use App\Models\MgLengkunganAwal;
+use App\Models\MgWeselAwal;
+use App\Models\PemeriksaanSilangKpjr;
+use App\Models\PemeriksaanSilangLahan;
+use App\Models\PerekamanAwal;
+use App\Models\MgLurusanAkhir;
+use App\Models\MgLengkunganAkhir;
+use App\Models\MgWeselAkhir;
+use App\Models\PerekamanAkhir;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -123,6 +133,16 @@ class AttachmentController extends Controller
       case 'Report': return Report::class; break;
       case 'Upload': return Upload::class; break;
       case 'WorkResult': return WorkResult::class; break;
+      case 'MgLurusanAwal': return MgLurusanAwal::class; break;
+      case 'MgLengkunganAwal': return MgLengkunganAwal::class; break;
+      case 'MgWeselAwal': return MgWeselAwal::class; break;
+      case 'PemeriksaanSilangKpjr': return PemeriksaanSilangKpjr::class; break;
+      case 'PemeriksaanSilangLahan': return PemeriksaanSilangLahan::class; break;
+      case 'PerekamanAwal': return PerekamanAwal::class; break;
+      case 'MgLurusanAkhir': return MgLurusanAkhir::class; break;
+      case 'MgLengkunganAkhir': return MgLengkunganAkhir::class; break;
+      case 'MgWeselAkhir': return MgWeselAkhir::class; break;
+      case 'PerekamanAkhir': return PerekamanAkhir::class; break;
       
       default: return null; break;
     }
