@@ -18,10 +18,12 @@ import ButtonRed from '@/Components/Button/Red.vue'
 import Input from '@/Components/Input.vue'
 import InputError from '@/Components/InputError.vue'
 
-const { report, machine, region, users } = defineProps({
+const { report, machine, region, users, hasPendingKUPT, hasCreatedToday} = defineProps({
     machine: Array,
     region: Array,
     users: Array,
+    hasPendingKUPT: Boolean,
+    hasCreatedToday: Boolean
 })
 
 const { user } = usePage().props.value
@@ -97,6 +99,14 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                         style="font-family: taviraj;"></span>Divison</h1> -->
                 <div class="flex items-center justify-end px-4 py-1 rounded space-x-2 p-2 pr-[1.688rem]">
                     <Link :href="route('working-reports.create')">
+                      <!-- <Button
+                          v-if="can('create working report') && !hasCreatedToday && !hasPendingKUPT"
+                          class="grid md:grid-cols text-center items-center bg-green-600 hover:bg-green-800"
+                      >
+                        <p class="font-bold text-xs">
+                          {{ __('Tambah') }}
+                        </p>
+                      </Button> -->
                       <Button
                           v-if="can('create working report')"
                           class="grid md:grid-cols text-center items-center bg-green-600 hover:bg-green-800"
@@ -116,32 +126,37 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                             <tr class="bg-gray-100 border-b border-gray-300">
                                 <Th :table="table" :sort="false" name="id"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('no') }}
+                                    {{ __('no').toUpperCase() }}
                                 </Th>
                                 
-                                <Th :table="table" :sort="true" name="machine_id"
-                                    class="border border-gray-300 px-3 py-1 text-left capitalize font-extrabold text-xs">
-                                    {{ __('mesin') }}
+                                <Th :table="table" :sort="false" name="machine_id"
+                                    class="border border-gray-300 px-3 py-1 text-left capitalize font-extrabold text-xs ">
+                                    {{ __('mesin').toUpperCase() }}
                                 </Th>
                                 
-                                <Th :table="table" :sort="true" name="region_id"
+                                <Th :table="table" :sort="false" name="region_id"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('wilayah') }}
+                                    {{ __('wilayah').toUpperCase() }}
                                 </Th>
                                 
-                                <Th :table="table" :sort="true" name="date"
+                                <Th :table="table" :sort="false" name="date"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('tanggal') }}
+                                    {{ __('tanggal').toUpperCase() }}
                                 </Th>
                                 
-                                <Th :table="table" :sort="true" name="status"
+                                <Th :table="table" :sort="false" name="status"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('status') }}
+                                    {{ __('mode').toUpperCase() }}
+                                </Th>
+                                
+                                <Th :table="table" :sort="false" name="status"
+                                    class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
+                                    {{ __('status').toUpperCase() }}
                                 </Th>
 
-                                <Th :table="table" :sort="true"
+                                <Th :table="table" :sort="false"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('Action') }}
+                                    {{ __('Action').toUpperCase() }}
                                 </Th>
                             </tr>
                         </template>
@@ -165,11 +180,11 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                     <tr v-for="(report, i) in data" :key="report.id" :class="processing ? 'bg-gray-50' : 'hover:bg-gray-50'"
                                         class="transition-all duration-300">
                                         
-                                        <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                                        <td class="border-b border-gray-300 px-4 py-3 text-center text-xs">
                                             {{ i + 1 }}
                                         </td>
                                         
-                                        <td class="border border-gray-300 px-4 py-3 text-left text-xs font-medium">
+                                        <td class="border-b border-gray-300 px-4 py-3 text-center text-xs font-medium whitespace-nowrap">
                                             {{ 
                                                 report.machine 
                                                 ? `${report.machine.name}${report.machine.type ? ' - ' + report.machine.type : ''}${report.machine.region && report.machine.region.name ? ' (' + report.machine.region.name + ')' : ''}` 
@@ -177,29 +192,22 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                             }}
                                         </td>
                                         
-                                        <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                                        <td class="border-b border-gray-300 px-4 py-3 text-center text-xs whitespace-nowrap">
                                             {{ report.region?.name ?? '-' }}
                                         </td>
                                         
-                                        <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                                        <td class="border-b border-gray-300 px-4 py-3 text-center text-xs whitespace-nowrap">
                                             {{ new Date(report?.date).toOnlyIndonesianDate() }} - {{ new Date(report?.date).toLocaleTimeString('id-ID', {
                                                 hour: '2-digit',
                                                 minute: '2-digit'
                                             }) }}
-                                        </td>
-                                                                                
-                                        <!-- <td class="border border-gray-300 px-4 py-3 text-center text-xs">
-                                            <span :class="{
-                                                'bg-green-100 text-green-800': report.status === 'draft',
-                                                'bg-yellow-100 text-yellow-800': report.status === 'checksheet_done',
-                                                'bg-red-100 text-red-800': report.status === 'warming_up_done',
-                                                'bg-blue-100 text-blue-800': report.status === 'photo_uploaded'
-                                            }" class="px-2 py-1 rounded-full text-xs font-semibold">
-                                                {{ report.status }}
-                                            </span>
-                                        </td> -->
+                                        </td>      
                                         
-                                        <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                                        <td class="border-b border-gray-300 px-4 py-3 text-center text-xs capitalize">
+                                            {{ report.mode ?? '-' }}
+                                        </td>
+                                        
+                                        <td class="border-b border-gray-300 px-4 py-3 text-center text-xs whitespace-nowrap">
                                             <span
                                                 :class="[
                                                 'px-2 py-1 rounded-full text-xs font-semibold',
@@ -208,47 +216,68 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                                     'bg-yellow-100 text-yellow-800': report.status === 'checksheet_done',
                                                     'bg-orange-100 text-orange-800': report.status === 'warming_up_done',
                                                     'bg-blue-100 text-blue-800': report.status === 'photo_uploaded',
+                                                    'bg-blue-100 text-blue-800': report.status === 'work_done',
+                                                    'bg-green-500 text-white': report.status === 'finished',
                                                     'bg-green-100 text-green-800': report.status === 'selesai',
                                                 },
                                                 ]"
                                             >
                                                 {{
                                                 report.status === 'draft'
-                                                    ? 'Proses Draft'
+                                                    ? 'Process Working Order'
                                                     : report.status === 'checksheet_done'
-                                                    ? 'Proses Checksheet'
+                                                    ? 'Process Checksheet'
                                                     : report.status === 'warming_up_done'
-                                                    ? 'Proses Warming Up'
+                                                    ? 'Process Warming Up'
                                                     : report.status === 'photo_uploaded'
-                                                    ? 'Proses Upload'
+                                                    ? 'Process Upload'
+                                                    : report.status === 'work_done'
+                                                    ? 'Process Work Result'
+                                                    : report.status === 'finished'
+                                                    ? 'Approve KUPT'
                                                     : report.status === 'selesai'
                                                     ? 'Selesai'
                                                     : report.status
                                                 }}
                                             </span>
-                                            </td>
+                                        </td>
 
-
-                                        <td class="border border-gray-300 px-1 py-1 text-center">
-                                            <div class="flex justify-center gap-1">
+                                        <td class="border-b border-gray-300 px-1 py-1 text-center">
+                                            <div class="flex justify-center gap-4">
                                                 
-                                                <Button class="bg-gray-600 text-white text-sm px-0 py-0 rounded-md hover:bg-gray-700">
+                                                <Button class="bg-gray-600 text-white text-sm px-2 py-0 rounded-md hover:bg-gray-700">
                                                     <Link :href="route('working-reports.detail', report.id)" class="bg-gray-600 text-white px-2 py-0.5 rounded hover:bg-gray-700"> 
-                                                        <Icon name="eye" class="w-4 h-4"/> 
+                                                        <!-- <Icon name="eye" class="w-4 h-4"/>  -->
+                                                        <p class="text-xs font-bold">Detail</p>
                                                     </Link>
                                                 </Button>
 
-                                                <Button class="bg-blue-600 text-white text-sm px-0 py-0 rounded-md hover:bg-blue-700">
+                                                <!-- <Button class="bg-blue-600 text-white text-sm px-2 py-0 rounded-md hover:bg-blue-700">
                                                     <Link v-if="can('update working report')" :href="route('working-reports.edit', report.id)" class="bg-blue-600 text-white px-2 py-0.5 rounded hover:bg-blue-700 transition duration-150"> 
                                                         <Icon name="pen" class="w-4 h-4"/> 
+                                                        <p class="text-xs font-bold">Edit</p>
                                                     </Link>
-                                                </Button>
+                                                </Button> -->
 
-                                                <Button v-if="can('delete working report')" @click.prevent="destroy(report)" class="bg-red-600 text-white px-0 py-0 rounded hover:bg-red-700 transition duration-150">
-                                                    <div class="bg-red-600 text-white px-2 py-0.5 rounded hover:bg-red-700">  
-                                                        <Icon name="trash" class="w-4 h-4"/> 
+                                                <Button v-if="can('delete working report') && !report?.kupt_by1" @click.prevent="destroy(report)" class="bg-red-600 text-white px-2 py-0 rounded hover:bg-red-700 transition duration-150">
+                                                    <div class="bg-red-600 text-white px-2 py-0.5 rounded-md hover:bg-red-700">  
+                                                        <!-- <Icon name="trash" class="w-4 h-4"/>  -->
+                                                        <p class="text-xs font-bold">Hapus</p>
                                                     </div>
                                                 </Button> 
+                                                
+                                                <Button v-if="report?.kupt_at1" class="bg-blue-600 text-white text-sm px-2 py-0 rounded-md hover:bg-blue-700">
+                                                    <Link :href="route('working-reports.download', report.id)" class="bg-blue-600 text-white px-2 py-0.5 rounded hover:bg-blue-700"> 
+                                                        <!-- <Icon name="eye" class="w-4 h-4"/>  -->
+                                                        <p class="text-xs font-bold">Download</p>
+                                                    </Link>
+                                                </Button>                    
+                                                
+                                                <!-- <Button v-if="report?.kupt_by1" class="bg-blue-600 text-white text-sm px-2 py-0 rounded-md hover:bg-blue-700">
+                                                    <Link :href="route('working-reports.detail', report.id)" class="bg-blue-600 text-white px-2 py-0.5 rounded-md hover:bg-blue-700"> 
+                                                        <p class="text-xs font-bold">Print</p>
+                                                    </Link>
+                                                </Button> -->
                                             </div>
                                         </td>
                                     </tr>
