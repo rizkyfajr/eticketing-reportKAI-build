@@ -14,15 +14,11 @@ class WorkResult extends Model
 
     protected $fillable = [
         'working_report_id',
-        'machine_id',
-        'region_id',
-        'tanggal',
-        'cuaca',
         'wilayah',
         'petak_jalan',
-        'jalur',
         'kelas_jalan',
-        'kecepatan_lintas',
+        'lokasi_stabling_awal',
+        'lokasi_stabling_akhir',
         'lokasi_awal1',
         'lokasi_akhir1',
         'jumlah1',
@@ -43,20 +39,21 @@ class WorkResult extends Model
         'km_hm3',
         'jumlah_wesel3',
         'total_wesel',
-        'waktu_start_engine',
-        'jam_luncuran',
-        'jam_kerja',
-        'jam_mesin',
-        'jam_genset',
         'waktu_stop_engine',
-        'counter_pecok',
-        'oddometer',
-        'penggunaan_hsd',
-        'penggunaan_hsd1',
-        'hsd_tersedia',
-        'oddometer_hsd',
-        'pengawal_id',
-        'note',
+        'jam_traveling_akhir',
+        'jam_kerja_akhir',
+        'jam_mesin_akhir',
+        'jam_generator_akhir',
+        'counter_tamping_akhir',
+        'oddometer_akhir',
+        'hsd_akhir_kerja',
+        'konsumsi_hsd',
+        'hu_hi1',
+        'hu_hi2',
+        'hu_hi3',
+        'hu_hi4',
+        'hu_hi5',
+        'hu_hi6',
         'operator_by1',
         'operator_at1',
         'operator_by2',
@@ -65,14 +62,14 @@ class WorkResult extends Model
         'operator_at3',
         'approved_by',
         'approved_at',
+        'approved_by1',
+        'approved_at1',
         'created_by_id',
-        'updated_by_id',
     ];
 
     protected $with = [
-        'machine',
-        'region',
         'pengawal',
+        'pengawal1',
         'operator1',
         'operator2',
         'operator3',
@@ -86,19 +83,14 @@ class WorkResult extends Model
         return $this->belongsTo(WorkingReport::class, 'working_report_id', 'id');
     }
 
-    public function machine()
-    {
-        return $this->belongsTo(MasterMachine::class, 'machine_id');
-    }
-
-    public function region()
-    {
-        return $this->belongsTo(MasterRegion::class, 'region_id');
-    }
-
     public function pengawal()
     {
-        return $this->belongsTo(User::class, 'pengawal_id');
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function pengawal1()
+    {
+        return $this->belongsTo(User::class, 'approved_by2');
     }
 
     public function operator1()

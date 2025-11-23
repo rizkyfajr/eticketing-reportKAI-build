@@ -13,6 +13,10 @@ use App\Models\MasterMachine;
 use App\Models\MasterRegion;
 use App\Models\WorkingReport;
 use App\Models\WorkResult;
+use App\Models\MgLurusanAkhir;
+use App\Models\MgLengkunganAkhir;
+use App\Models\MgWeselAkhir;
+use App\Models\PerekamanAkhir;
 use Illuminate\Support\Facades\DB;
 
 class WorkResultController extends Controller
@@ -124,120 +128,136 @@ class WorkResultController extends Controller
 //     }
 //   }
 
-public function store(Request $request)
-  {
-    try {
-        $validated = $request->validate([
-            'working_report_id'  => 'required|exists:working_reports,id',
-            'machine_id'         => 'required|exists:master_machines,id',
-            'region_id'          => 'nullable|exists:master_regions,id',
-            'tanggal'            => 'nullable|date',
-            'cuaca'              => 'nullable|string|max:255',
-            'wilayah'            => 'nullable|string|max:255',
-            'petak_jalan'        => 'nullable|string|max:255',
-            'jalur'              => 'nullable|string|max:255',
-            'kelas_jalan'        => 'nullable|string|max:255',
-            'kecepatan_lintas'   => 'nullable|string|max:255',
-            'lokasi_awal1'       => 'nullable|string|max:255',
-            'lokasi_akhir1'      => 'nullable|string|max:255',
-            'jumlah1'            => 'nullable|numeric',
-            'lokasi_awal2'       => 'nullable|string|max:255',
-            'lokasi_akhir2'      => 'nullable|string|max:255',
-            'jumlah2'            => 'nullable|numeric',
-            'lokasi_awal3'       => 'nullable|string|max:255',
-            'lokasi_akhir3'      => 'nullable|string|max:255',
-            'jumlah3'            => 'nullable|numeric',
-            'total_distance'     => 'nullable|numeric',
-            'no_wesel1'          => 'nullable|string|max:255',
-            'km_hm1'             => 'nullable|string|max:255',
-            'jumlah_wesel1'      => 'nullable|integer',
-            'no_wesel2'          => 'nullable|string|max:255',
-            'km_hm2'             => 'nullable|string|max:255',
-            'jumlah_wesel2'      => 'nullable|integer',
-            'no_wesel3'          => 'nullable|string|max:255',
-            'km_hm3'             => 'nullable|string|max:255',
-            'jumlah_wesel3'      => 'nullable|integer',
-            'total_wesel'        => 'nullable|integer',
-            'waktu_start_engine' => 'nullable|date',
-            'jam_luncuran'       => 'nullable|date_format:H:i:s',
-            'jam_kerja'          => 'nullable|date_format:H:i:s',
-            'jam_mesin'          => 'nullable|date_format:H:i:s',
-            'jam_genset'         => 'nullable|date_format:H:i:s',
-            'waktu_stop_engine'  => 'nullable|date',
-            'counter_pecok'      => 'nullable|integer',
-            'oddometer'          => 'nullable|integer',
-            'penggunaan_hsd'     => 'nullable|numeric',
-            'penggunaan_hsd1'    => 'nullable|numeric',
-            'hsd_tersedia'       => 'nullable|numeric',
-            'oddometer_hsd'      => 'nullable|integer',
-            'pengawal_id'        => 'nullable|exists:users,id',
-            'note'               => 'nullable|string|max:1000',
-            'operator_by1'       => 'nullable|integer',
-            'operator_by2'       => 'nullable|integer',
-            'operator_by3'       => 'nullable|integer',
-        ]);
+    public function store(Request $request)
+    {
+        try {
 
-        $workResult = WorkResult::create([
-            'working_report_id' => $validated['working_report_id'],
-            'machine_id'        => $validated['machine_id'],
-            'region_id'         => $validated['region_id'],
-            'tanggal'           => $request->tanggal,
-            'cuaca'             => $request->cuaca,
-            'wilayah'           => $request->wilayah,
-            'petak_jalan'       => $request->petak_jalan,
-            'jalur'             => $request->jalur,
-            'kelas_jalan'       => $request->kelas_jalan,
-            'kecepatan_lintas'  => $request->kecepatan_lintas,
-            'lokasi_awal1'      => $request->lokasi_awal1,
-            'lokasi_akhir1'     => $request->lokasi_akhir1,
-            'jumlah1'           => $request->jumlah1,
-            'lokasi_awal2'      => $request->lokasi_awal2,
-            'lokasi_akhir2'     => $request->lokasi_akhir2,
-            'jumlah2'           => $request->jumlah2,
-            'lokasi_awal3'      => $request->lokasi_awal3,
-            'lokasi_akhir3'     => $request->lokasi_akhir3,
-            'jumlah3'           => $request->jumlah3,
-            'total_distance'    => $request->total_distance,
-            'no_wesel1'         => $request->no_wesel1,
-            'km_hm1'            => $request->km_hm1,
-            'jumlah_wesel1'     => $request->jumlah_wesel1,
-            'no_wesel2'         => $request->no_wesel2,
-            'km_hm2'            => $request->km_hm2,
-            'jumlah_wesel2'     => $request->jumlah_wesel2,
-            'no_wesel3'         => $request->no_wesel3,
-            'km_hm3'            => $request->km_hm3,
-            'jumlah_wesel3'     => $request->jumlah_wesel3,
-            'total_wesel'       => $request->total_wesel,
-            'waktu_start_engine'=> $request->waktu_start_engine,
-            'jam_luncuran'      => $request->jam_luncuran,
-            'jam_kerja'         => $request->jam_kerja,
-            'jam_mesin'         => $request->jam_mesin,
-            'jam_genset'        => $request->jam_genset,
-            'waktu_stop_engine' => $request->waktu_stop_engine,
-            'counter_pecok'     => $request->counter_pecok,
-            'oddometer'         => $request->oddometer,
-            'penggunaan_hsd'    => $request->penggunaan_hsd,
-            'penggunaan_hsd1'   => $request->penggunaan_hsd1,
-            'hsd_tersedia'      => $request->hsd_tersedia,
-            'oddometer_hsd'     => $request->oddometer_hsd,
-            'pengawal_id'       => $request->pengawal_id,
-            'note'              => $request->note,
-            'operator_by1'      => $request->operator_by1,
-            'operator_by2'      => $request->operator_by2,
-            'operator_by3'      => $request->operator_by3,
-            'created_by_id'     => auth()->id(),
-        ]);
+            $validated = $request->validate([
+                'working_report_id'      => 'required|exists:working_reports,id',
+                'wilayah'                => 'nullable|string|max:255',
+                'petak_jalan'            => 'nullable|string|max:255',
+                'kelas_jalan'            => 'nullable|string|max:255',
+                'lokasi_stabling_awal'   => 'nullable|string|max:255',
+                'lokasi_stabling_akhir'  => 'nullable|string|max:255',
+                'lokasi_awal1'           => 'nullable|string|max:255',
+                'lokasi_akhir1'          => 'nullable|string|max:255',
+                'jumlah1'                => 'nullable|integer',
+                'lokasi_awal2'           => 'nullable|string|max:255',
+                'lokasi_akhir2'          => 'nullable|string|max:255',
+                'jumlah2'                => 'nullable|integer',
+                'lokasi_awal3'           => 'nullable|string|max:255',
+                'lokasi_akhir3'          => 'nullable|string|max:255',
+                'jumlah3'                => 'nullable|integer',
+                'total_distance'         => 'nullable|integer',
+                'no_wesel1'              => 'nullable|string|max:255',
+                'km_hm1'                 => 'nullable|string|max:255',
+                'jumlah_wesel1'          => 'nullable|integer',
+                'no_wesel2'              => 'nullable|string|max:255',
+                'km_hm2'                 => 'nullable|string|max:255',
+                'jumlah_wesel2'          => 'nullable|integer',
+                'no_wesel3'              => 'nullable|string|max:255',
+                'km_hm3'                 => 'nullable|string|max:255',
+                'jumlah_wesel3'          => 'nullable|integer',
+                'total_wesel'            => 'nullable|integer',
+                'waktu_stop_engine'      => 'nullable|date_format:H:i',
+                'jam_traveling_akhir'    => 'nullable|string|max:255',
+                'jam_kerja_akhir'        => 'nullable|date_format:H:i',
+                'jam_mesin_akhir'        => 'nullable|string|max:255',
+                'jam_generator_akhir'    => 'nullable|string|max:255',
+                'counter_tamping_akhir'  => 'nullable|integer',
+                'oddometer_akhir'        => 'nullable|integer',
+                'hsd_akhir_kerja'        => 'nullable|integer',
+                'konsumsi_hsd'           => 'nullable|string|max:255',
+                'hu_hi1'                 => 'nullable|string|max:255',
+                'hu_hi2'                 => 'nullable|string|max:255',
+                'hu_hi3'                 => 'nullable|string|max:255',
+                'hu_hi4'                 => 'nullable|string|max:255',
+                'hu_hi5'                 => 'nullable|string|max:255',
+                'hu_hi6'                 => 'nullable|string|max:255',
+                'operator_by1'           => 'nullable|exists:users,id',
+                'operator_by2'           => 'nullable|exists:users,id',
+                'operator_by3'           => 'nullable|exists:users,id',
+                'note'                   => 'nullable|string|max:255',
+            ]);
 
-        DB::commit();
+            $totalDistance =
+                ($request->jumlah1 ?? 0) +
+                ($request->jumlah2 ?? 0) +
+                ($request->jumlah3 ?? 0);
 
-        return redirect()->back()->with('success', 'Data berhasil disimpan.');
+            $totalWesel =
+                ($request->jumlah_wesel1 ?? 0) +
+                ($request->jumlah_wesel2 ?? 0) +
+                ($request->jumlah_wesel3 ?? 0);
 
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        return redirect()->back()->withErrors($e->errors())->withInput();
-    } catch (\Exception $e) {
-        return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            $workResult = WorkResult::create([
+                'working_report_id'      => $validated['working_report_id'],
+                'wilayah'                => $request->wilayah,
+                'petak_jalan'            => $request->petak_jalan,
+                'kelas_jalan'            => $request->kelas_jalan,
+                'lokasi_stabling_awal'   => $request->lokasi_stabling_awal,
+                'lokasi_stabling_akhir'  => $request->lokasi_stabling_akhir,
+                'lokasi_awal1'           => $request->lokasi_awal1,
+                'lokasi_akhir1'          => $request->lokasi_akhir1,
+                'jumlah1'                => $request->jumlah1,
+                'lokasi_awal2'           => $request->lokasi_awal2,
+                'lokasi_akhir2'          => $request->lokasi_akhir2,
+                'jumlah2'                => $request->jumlah2,
+                'lokasi_awal3'           => $request->lokasi_awal3,
+                'lokasi_akhir3'          => $request->lokasi_akhir3,
+                'jumlah3'                => $request->jumlah3,
+                'total_distance'         => $totalDistance,
+                // 'total_distance'         => $request->total_distance,
+                'no_wesel1'              => $request->no_wesel1,
+                'km_hm1'                 => $request->km_hm1,
+                'jumlah_wesel1'          => $request->jumlah_wesel1,
+                'no_wesel2'              => $request->no_wesel2,
+                'km_hm2'                 => $request->km_hm2,
+                'jumlah_wesel2'          => $request->jumlah_wesel2,
+                'no_wesel3'              => $request->no_wesel3,
+                'km_hm3'                 => $request->km_hm3,
+                'jumlah_wesel3'          => $request->jumlah_wesel3,
+                'total_wesel'            => $totalWesel,
+                // 'total_wesel'            => $request->total_wesel,
+                'waktu_stop_engine'      => $request->waktu_stop_engine,
+                'jam_traveling_akhir'    => $request->jam_traveling_akhir,
+                'jam_kerja_akhir'        => $request->jam_kerja_akhir,
+                'jam_mesin_akhir'        => $request->jam_mesin_akhir,
+                'jam_generator_akhir'    => $request->jam_generator_akhir,
+                'counter_tamping_akhir'  => $request->counter_tamping_akhir,
+                'oddometer_akhir'        => $request->oddometer_akhir,
+                'hsd_akhir_kerja'        => $request->hsd_akhir_kerja,
+                'konsumsi_hsd'           => $request->konsumsi_hsd,
+                'hu_hi1'                 => $request->hu_hi1,
+                'hu_hi2'                 => $request->hu_hi2,
+                'hu_hi3'                 => $request->hu_hi3,
+                'hu_hi4'                 => $request->hu_hi4,
+                'hu_hi5'                 => $request->hu_hi5,
+                'hu_hi6'                 => $request->hu_hi6,
+                'operator_by1'           => $request->operator_by1,
+                'operator_by2'           => $request->operator_by2,
+                'operator_by3'           => $request->operator_by3,
+                'note'                   => $request->note,
+                'created_by_id'          => auth()->id(),
+            ]);
+
+            $report = WorkingReport::findOrFail($request->working_report_id);
+
+            $report->update(['status' => 'work_done']);
+
+            $report->mglurusanakhir()->firstOrCreate(['working_report_id' => $report->id]);
+            $report->mglengkunganakhir()->firstOrCreate(['working_report_id' => $report->id]);
+            $report->mgweselakhir()->firstOrCreate(['working_report_id' => $report->id]);
+            $report->perekamanakhir()->firstOrCreate(['working_report_id' => $report->id]);
+
+            return redirect()->back()->with('success', 'Data berhasil disimpan.');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
-  }
 
   /**
   * Display the specified resource.
@@ -358,54 +378,47 @@ public function store(Request $request)
     public function update(Request $request, $id)
     {
         try {
+
             $validated = $request->validate([
-                'working_report_id'  => 'required|exists:working_reports,id',
-                'machine_id'         => 'required|exists:master_machines,id',
-                'region_id'          => 'nullable|exists:master_regions,id',
-                'tanggal'            => 'nullable|date',
-                'cuaca'              => 'nullable|string|max:255',
-                'wilayah'            => 'nullable|string|max:255',
-                'petak_jalan'        => 'nullable|string|max:255',
-                'jalur'              => 'nullable|string|max:255',
-                'kelas_jalan'        => 'nullable|string|max:255',
-                'kecepatan_lintas'   => 'nullable|string|max:255',
-                'lokasi_awal1'       => 'nullable|string|max:255',
-                'lokasi_akhir1'      => 'nullable|string|max:255',
-                'jumlah1'            => 'nullable|numeric',
-                'lokasi_awal2'       => 'nullable|string|max:255',
-                'lokasi_akhir2'      => 'nullable|string|max:255',
-                'jumlah2'            => 'nullable|numeric',
-                'lokasi_awal3'       => 'nullable|string|max:255',
-                'lokasi_akhir3'      => 'nullable|string|max:255',
-                'jumlah3'            => 'nullable|numeric',
-                'total_distance'     => 'nullable|numeric',
-                'no_wesel1'          => 'nullable|string|max:255',
-                'km_hm1'             => 'nullable|string|max:255',
-                'jumlah_wesel1'      => 'nullable|integer',
-                'no_wesel2'          => 'nullable|string|max:255',
-                'km_hm2'             => 'nullable|string|max:255',
-                'jumlah_wesel2'      => 'nullable|integer',
-                'no_wesel3'          => 'nullable|string|max:255',
-                'km_hm3'             => 'nullable|string|max:255',
-                'jumlah_wesel3'      => 'nullable|integer',
-                'total_wesel'        => 'nullable|integer',
-                'waktu_start_engine' => 'nullable|date',
-                'jam_luncuran'       => 'nullable|date_format:H:i:s',
-                'jam_kerja'          => 'nullable|date_format:H:i:s',
-                'jam_mesin'          => 'nullable|date_format:H:i:s',
-                'jam_genset'         => 'nullable|date_format:H:i:s',
-                'waktu_stop_engine'  => 'nullable|date',
-                'counter_pecok'      => 'nullable|integer',
-                'oddometer'          => 'nullable|integer',
-                'penggunaan_hsd'     => 'nullable|numeric',
-                'penggunaan_hsd1'    => 'nullable|numeric',
-                'hsd_tersedia'       => 'nullable|numeric',
-                'oddometer_hsd'      => 'nullable|integer',
-                'pengawal_id'        => 'nullable|exists:users,id',
-                'note'               => 'nullable|string|max:1000',
-                'operator_by1'       => 'nullable|integer',
-                'operator_by2'       => 'nullable|integer',
-                'operator_by3'       => 'nullable|integer',
+                'working_report_id'      => 'required|exists:working_reports,id',
+                'wilayah'                => 'nullable|string|max:255',
+                'petak_jalan'            => 'nullable|string|max:255',
+                'kelas_jalan'            => 'nullable|string|max:255',
+                'lokasi_stabling_awal'   => 'nullable|string|max:255',
+                'lokasi_stabling_akhir'  => 'nullable|string|max:255',
+                'lokasi_awal1'           => 'nullable|string|max:255',
+                'lokasi_akhir1'          => 'nullable|string|max:255',
+                'jumlah1'                => 'nullable|integer',
+                'lokasi_awal2'           => 'nullable|string|max:255',
+                'lokasi_akhir2'          => 'nullable|string|max:255',
+                'jumlah2'                => 'nullable|integer',
+                'lokasi_awal3'           => 'nullable|string|max:255',
+                'lokasi_akhir3'          => 'nullable|string|max:255',
+                'jumlah3'                => 'nullable|integer',
+                'total_distance'         => 'nullable|integer',
+                'no_wesel1'              => 'nullable|string|max:255',
+                'km_hm1'                 => 'nullable|string|max:255',
+                'jumlah_wesel1'          => 'nullable|integer',
+                'no_wesel2'              => 'nullable|string|max:255',
+                'km_hm2'                 => 'nullable|string|max:255',
+                'jumlah_wesel2'          => 'nullable|integer',
+                'no_wesel3'              => 'nullable|string|max:255',
+                'km_hm3'                 => 'nullable|string|max:255',
+                'jumlah_wesel3'          => 'nullable|integer',
+                'total_wesel'            => 'nullable|integer',
+                'waktu_stop_engine'      => 'nullable|date_format:H:i',
+                'jam_traveling_akhir'    => 'nullable|string|max:255',
+                'jam_kerja_akhir'        => 'nullable|date_format:H:i',
+                'jam_mesin_akhir'        => 'nullable|string|max:255',
+                'jam_generator_akhir'    => 'nullable|string|max:255',
+                'counter_tamping_akhir'  => 'nullable|integer',
+                'oddometer_akhir'        => 'nullable|integer',
+                'hsd_akhir_kerja'        => 'nullable|integer',
+                'konsumsi_hsd'           => 'nullable|string|max:255',
+                'operator_by1'           => 'nullable|exists:users,id',
+                'operator_by2'           => 'nullable|exists:users,id',
+                'operator_by3'           => 'nullable|exists:users,id',
+                'note'                   => 'nullable|string|max:255',
             ]);
 
             DB::beginTransaction();
@@ -413,54 +426,46 @@ public function store(Request $request)
             $workResult = WorkResult::findOrFail($id);
 
             $workResult->update([
-                'working_report_id' => $validated['working_report_id'],
-                'machine_id'        => $validated['machine_id'],
-                'region_id'         => $validated['region_id'] ?? null,
-                'tanggal'           => $request->tanggal,
-                'cuaca'             => $request->cuaca,
-                'wilayah'           => $request->wilayah,
-                'petak_jalan'       => $request->petak_jalan,
-                'jalur'             => $request->jalur,
-                'kelas_jalan'       => $request->kelas_jalan,
-                'kecepatan_lintas'  => $request->kecepatan_lintas,
-                'lokasi_awal1'      => $request->lokasi_awal1,
-                'lokasi_akhir1'     => $request->lokasi_akhir1,
-                'jumlah1'           => $request->jumlah1,
-                'lokasi_awal2'      => $request->lokasi_awal2,
-                'lokasi_akhir2'     => $request->lokasi_akhir2,
-                'jumlah2'           => $request->jumlah2,
-                'lokasi_awal3'      => $request->lokasi_awal3,
-                'lokasi_akhir3'     => $request->lokasi_akhir3,
-                'jumlah3'           => $request->jumlah3,
-                'total_distance'    => $request->total_distance,
-                'no_wesel1'         => $request->no_wesel1,
-                'km_hm1'            => $request->km_hm1,
-                'jumlah_wesel1'     => $request->jumlah_wesel1,
-                'no_wesel2'         => $request->no_wesel2,
-                'km_hm2'            => $request->km_hm2,
-                'jumlah_wesel2'     => $request->jumlah_wesel2,
-                'no_wesel3'         => $request->no_wesel3,
-                'km_hm3'            => $request->km_hm3,
-                'jumlah_wesel3'     => $request->jumlah_wesel3,
-                'total_wesel'       => $request->total_wesel,
-                'waktu_start_engine'=> $request->waktu_start_engine,
-                'jam_luncuran'      => $request->jam_luncuran,
-                'jam_kerja'         => $request->jam_kerja,
-                'jam_mesin'         => $request->jam_mesin,
-                'jam_genset'        => $request->jam_genset,
-                'waktu_stop_engine' => $request->waktu_stop_engine,
-                'counter_pecok'     => $request->counter_pecok,
-                'oddometer'         => $request->oddometer,
-                'penggunaan_hsd'    => $request->penggunaan_hsd,
-                'penggunaan_hsd1'   => $request->penggunaan_hsd1,
-                'hsd_tersedia'      => $request->hsd_tersedia,
-                'oddometer_hsd'     => $request->oddometer_hsd,
-                'pengawal_id'       => $request->pengawal_id,
-                'note'              => $request->note,
-                'operator_by1'      => $request->operator_by1,
-                'operator_by2'      => $request->operator_by2,
-                'operator_by3'      => $request->operator_by3,
-                'updated_by_id'     => auth()->id(),
+                'working_report_id'      => $validated['working_report_id'],
+                'wilayah'                => $request->wilayah,
+                'petak_jalan'            => $request->petak_jalan,
+                'kelas_jalan'            => $request->kelas_jalan,
+                'lokasi_stabling_awal'   => $request->lokasi_stabling_awal,
+                'lokasi_stabling_akhir'  => $request->lokasi_stabling_akhir,
+                'lokasi_awal1'           => $request->lokasi_awal1,
+                'lokasi_akhir1'          => $request->lokasi_akhir1,
+                'jumlah1'                => $request->jumlah1,
+                'lokasi_awal2'           => $request->lokasi_awal2,
+                'lokasi_akhir2'          => $request->lokasi_akhir2,
+                'jumlah2'                => $request->jumlah2,
+                'lokasi_awal3'           => $request->lokasi_awal3,
+                'lokasi_akhir3'          => $request->lokasi_akhir3,
+                'jumlah3'                => $request->jumlah3,
+                'total_distance'         => $request->total_distance,
+                'no_wesel1'              => $request->no_wesel1,
+                'km_hm1'                 => $request->km_hm1,
+                'jumlah_wesel1'          => $request->jumlah_wesel1,
+                'no_wesel2'              => $request->no_wesel2,
+                'km_hm2'                 => $request->km_hm2,
+                'jumlah_wesel2'          => $request->jumlah_wesel2,
+                'no_wesel3'              => $request->no_wesel3,
+                'km_hm3'                 => $request->km_hm3,
+                'jumlah_wesel3'          => $request->jumlah_wesel3,
+                'total_wesel'            => $request->total_wesel,
+                'waktu_stop_engine'      => $request->waktu_stop_engine,
+                'jam_traveling_akhir'    => $request->jam_traveling_akhir,
+                'jam_kerja_akhir'        => $request->jam_kerja_akhir,
+                'jam_mesin_akhir'        => $request->jam_mesin_akhir,
+                'jam_generator_akhir'    => $request->jam_generator_akhir,
+                'counter_tamping_akhir'  => $request->counter_tamping_akhir,
+                'oddometer_akhir'        => $request->oddometer_akhir,
+                'hsd_akhir_kerja'        => $request->hsd_akhir_kerja,
+                'konsumsi_hsd'           => $request->konsumsi_hsd,
+                'operator_by1'           => $request->operator_by1,
+                'operator_by2'           => $request->operator_by2,
+                'operator_by3'           => $request->operator_by3,
+                'note'                   => $request->note,
+                'updated_by_id'          => auth()->id(),
             ]);
 
             DB::commit();
@@ -475,6 +480,40 @@ public function store(Request $request)
         }
     }
 
+    public function submitForm(Request $request)
+    {
+        $wr_id = $request->working_report_id;
+
+        if ($request->mg1) {
+            MgLurusanAkhir::updateOrCreate(
+                ['working_report_id' => $wr_id],
+                ['ada' => $request->mg1['ada'], 'tidak' => $request->mg1['tidak']]
+            );
+        }
+
+        if ($request->mg2) {
+            MgLengkunganAkhir::updateOrCreate(
+                ['working_report_id' => $wr_id],
+                ['ada' => $request->mg2['ada'], 'tidak' => $request->mg2['tidak']]
+            );
+        }
+
+        if ($request->mg3) {
+            MgWeselAkhir::updateOrCreate(
+                ['working_report_id' => $wr_id],
+                ['ada' => $request->mg3['ada'], 'tidak' => $request->mg3['tidak']]
+            );
+        }
+
+        if ($request->perekaman) {
+            PerekamanAkhir::updateOrCreate(
+                ['working_report_id' => $wr_id],
+                ['ada' => $request->perekaman['ada'], 'tidak' => $request->perekaman['tidak']]
+            );
+        }
+
+        return redirect()->back()->with('success', 'Data berhasil disimpan.');
+    }
   
   /**
   * Remove the specified resource from storage.
