@@ -16,6 +16,7 @@ import ButtonBlue from '@/Components/Button/Blue.vue'
 import ButtonRed from '@/Components/Button/Red.vue'
 import Input from '@/Components/Input.vue'
 import InputError from '@/Components/InputError.vue'
+import Button from '@/Components/Button.vue'
 
 const self = getCurrentInstance()
 const { permissions } = defineProps({
@@ -110,27 +111,27 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
   <DashboardLayout
     :title="__('role')"
   >
-        <main class="p-0 py-0 mb-[1.25rem] ml-[1.25rem] mt-[1.25rem]">
+        <!-- <main class="p-0 py-0 mb-[1.25rem] ml-[1.25rem] mt-[1.25rem]">
             <h2 class="font-bold text-2xl">Role</h2>
            <a type="button" href="/" class="text-sm text-gray-500 font-semibold hover:text-sky-600 focus:text-sky-600">Home</a> 
            <span class="font-semibold text-sm pl-2 pr-2">-</span>
            <span class="text-sm text-gray-500 font-semibold hover:text-sky-600 focus:text-sky-700">Builtin</span> 
             <slot />
-        </main>
+        </main> -->
 
-    <Card class="bg-white pt-[1.875rem] pb-[2.5rem] shadow-lg border border-solid border-slate-200" style="border-radius: 0.625rem;">
+    <Card class="bg-white pt-[1.100rem] pb-[2.5rem] shadow-lg border border-solid border-slate-200" style="border-radius: 0.625rem;">
       <template #header>
-        <div class="flex items-center justify-end space-x-2 p-2 pr-[1.688rem]">
-          <ButtonGreen
+        <div class="flex items-center justify-end px-4 py-1 rounded space-x-2 p-2 pr-[1.688rem]">
+          <Button
             v-if="can('create role')"
             @click.prevent="form.id = null; show()"
-            class="flex items-center justify-center grid gap-1 w-auto h-11 mr-[1.313rem] rounded-md text-center bg-green-600 hover:bg-green-700 active:bg-green-800 h-[35px] text-center pr-[30px] pl-[30px] w-full flex items-center justify-center space-x-2 ml-[20px] mr-[20px]"
+            class="grid md:grid-cols text-center items-center bg-green-600 hover:bg-green-800"
           >
             <!-- <Icon name="plus" /> -->
-            <p class="capitalize font-semibold text-[0.938rem]">
-              {{ __('create') }}
+            <p class="font-bold text-xs">
+              {{ __('Tambah') }}
             </p>
-          </ButtonGreen>
+          </Button>
         </div>
       </template>
 
@@ -146,16 +147,16 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                 <Th
                   :table="table"
                   :sort="false"
-                  class="border px-3 py-2 text-center capitalize font-bold pl-[44px] pb-[24px]"
+                  class="border px-3 py-2 text-center capitalize font-bold pl-[44px] pb-[24px] text-xs"
                 >
                   {{ __('no') }}
                 </Th>
 
                 <Th
                   :table="table"
-                  :sort="true"
+                  :sort="false"
                   name="name"
-                  class="border px-3 py-2 text-center whitespace-nowrap capitalize font-bold pl-[44px] pb-[24px]"
+                  class="border px-3 py-2 text-center whitespace-nowrap capitalize font-bold pl-[44px] pb-[24px] text-xs"
                 >
                   {{ __('name') }}
                 </Th>
@@ -163,7 +164,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                 <Th
                   :table="table"
                   :sort="false"
-                  class="border px-3 py-2 text-center whitespace-nowrap capitalize font-bold pl-[44px] pb-[24px]"
+                  class="border px-3 py-2 text-center whitespace-nowrap capitalize font-bold pl-[44px] pb-[24px] text-xs"
                 >
                   {{ __('permissions') }}
                 </Th>
@@ -171,7 +172,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                 <Th
                   :table="table"
                   :sort="false"
-                  class="border px-3 py-2 text-center whitespace-nowrap capitalize font-bold pl-[44px] pb-[24px]"
+                  class="border px-3 py-2 text-center whitespace-nowrap capitalize font-bold pl-[44px] pb-[24px] text-xs"
                 >
                   {{ __('Aksi') }}
                 </Th>
@@ -183,7 +184,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                 <Th
                   :table="table"
                   :sort="false"
-                  class="border px-3 py-2 text-center  capitalize font-bold pl-[44px] pb-[24px]"
+                  class="border px-3 py-2 text-center  capitalize font-bold pl-[44px] pb-[24px] text-xs"
                 >
                   {{ __('no') }}
                 </Th>
@@ -191,7 +192,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                 <Th
                   :table="table"
                   :sort="false"
-                  class="border px-3 py-2 text-center whitespace-nowrap  capitalize font-bold pl-[44px] pb-[24px]"
+                  class="border px-3 py-2 text-center whitespace-nowrap  capitalize font-bold pl-[44px] pb-[24px] text-xs"
                 >
                   {{ __('name') }}
                 </Th>
@@ -199,7 +200,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                 <Th
                   :table="table"
                   :sort="false"
-                  class="border px-3 py-2 text-center whitespace-nowrap  capitalize font-bold pl-[44px] pb-[24px]"
+                  class="border px-3 py-2 text-center whitespace-nowrap  capitalize font-bold pl-[44px] pb-[24px] text-xs"
                 >
                   {{ __('permissions') }}
                 </Th>
@@ -207,7 +208,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                 <Th
                   :table="table"
                   :sort="false"
-                  class="border px-3 py-2 text-center whitespace-nowrap  capitalize font-bold pl-[44px] pb-[24px]"
+                  class="border px-3 py-2 text-center whitespace-nowrap  capitalize font-bold pl-[44px] pb-[24px] text-xs"
                 >
                   {{ __('Aksi') }}
                 </Th>
@@ -223,7 +224,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
               >
                 <template v-if="empty">
                   <tr>
-                    <td class="text-5xl text-center p-4" colspan="1000">
+                    <td class="text-5xl text-center p-4 text-sm" colspan="1000">
                       <p class="lowercase first-letter:capitalize font-semibold">
                         {{ __('there are no data available') }}
                       </p>
@@ -238,15 +239,15 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     :class="processing && 'bg-gray-100'"
                     class="transition-all duration-300"
                   >
-                    <td class="px-2 py-1 border-b text-center">
+                    <td class="px-2 py-1 border-b text-sm text-center">
                       {{ i + 1 }}
                     </td>
 
-                    <td class="px-2 py-1 border-b uppercase">
+                    <td class="px-2 py-1 border-b text-sm uppercase">
                       {{ __(role.name) }}
                     </td>
 
-                    <td class="px-2 py-1 border-b">
+                    <td class="px-2 py-1 border-b text-sm">
                       <div class="flex-wrap">
                         <div
                           v-for="(permission, j) in role.permissions"
@@ -254,7 +255,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                           class="inline-block bg-gray-200 hover:bg-gray-100 border rounded-md px-3 py-1 m-[1px] text-sm"
                         >
                           <div class="flex items-center justify-between space-x-2">
-                            <p class="uppercase font-semibold">
+                            <p class="uppercase font-semibold text-sm">
                               {{ __(permission.name) }}
                             </p>
 
@@ -269,14 +270,14 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       </div>
                     </td>
 
-                    <td class="px-2 py-1 border-b">
+                    <td class="px-2 py-1 border-b text-sm">
                       <div class="flex items-center space-x-2">
                         <ButtonBlue
                           v-if="can('update role')"
                           @click.prevent="edit(role)"
                         >
                           <Icon name="edit" />
-                          <p class="uppercase">
+                          <p class="uppercase text-sm">
                             {{ __('edit') }}
                           </p>
                         </ButtonBlue>
@@ -286,7 +287,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                           @click.prevent="destroy(role)"
                         >
                           <Icon name="trash" />
-                          <p class="uppercase">
+                          <p class="uppercase text-sm">
                             {{ __('delete') }}
                           </p>
                         </ButtonRed>

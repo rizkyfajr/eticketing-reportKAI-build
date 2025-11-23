@@ -122,12 +122,12 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
 <style src="@/multiselect.css"></style>
 
 <template>
-    <DashboardLayout :title="__('Bagian')">
+    <DashboardLayout :title="__('Kedudukan')">
         <!-- <div class="transition-all duration-300" :class="{
             'pl-1 md:pl-64': open,
         }">
         <main class="p-0 py-0 mb-[1.25rem] ml-[1.25rem] mt-[1.25rem]">
-            <h2 class="font-bold text-2xl">Master Data Bagian</h2>
+            <h2 class="font-bold text-2xl">Master Data Kedudukan</h2>
            <a type="button" href="/" class="text-sm text-gray-500 font-semibold hover:text-sky-600 focus:text-sky-600">Home</a> 
            <span class="font-semibold text-sm pl-2 pr-2">-</span>
            <span class="text-sm text-gray-500 font-semibold hover:text-sky-600 focus:text-sky-700">Master</span> 
@@ -157,8 +157,8 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                         <template #thead="table">
                             <tr class="bg-gray-200 border-gray-300">
                                 <Th :table="table" :sort="false" name="id"
-                                    class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('no') }}
+                                    class="border border-gray-300 px-3 py-1 text-center uppercase capitalize font-extrabold text-xs">
+                                    {{ __('no').toUpperCase() }}
                                 </Th>
 
                                 <!-- <Th :table="table" :sort="true" name="division_number"
@@ -166,14 +166,14 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                     {{ __('division number') }}
                                 </Th> -->
 
-                                <Th :table="table" :sort="true" name="division_name"
-                                    class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('Nama Bagian') }}
+                                <Th :table="table" :sort="false" name="division_name"
+                                    class="border border-gray-300 px-3 py-1 text-center uppercase capitalize font-extrabold text-xs">
+                                    {{ __('Nama Kedudukan').toUpperCase() }}
                                 </Th>
 
-                                <Th :table="table" :sort="true"
-                                    class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('Action') }}
+                                <Th :table="table" :sort="false"
+                                    class="border border-gray-300 px-3 py-1 text-center uppercase capitalize font-extrabold text-xs">
+                                    {{ __('Action').toUpperCase() }}
                                 </Th>
                             </tr>
                         </template>
@@ -196,7 +196,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                     <tr v-for="(division, i) in data" :key="division.id" :class="processing && 'bg-gray-100'"
                                         class="transition-all duration-300">
                                         
-                                        <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                                        <td class="border-b border-gray-300 px-1 py-1 text-center uppercase text-xs">
                                             {{ i + 1 }}
                                         </td>
 
@@ -204,11 +204,11 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                             {{ __(division.division_number) }}
                                         </td> -->
 
-                                        <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                                        <td class="border-b border-gray-300 px-1 py-1 text-center uppercase text-xs">
                                             {{ __(division.division_name) }}
                                         </td>
 
-                                        <td class="border border-gray-300 px-1 py-1 text-center">
+                                        <td class="border-b border-gray-300 px-1 py-1 text-center uppercase">
                                             <div class="flex justify-center gap-1">
                                                 <ButtonBlue
                                                     v-if="can('update division')"
@@ -258,11 +258,11 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                 <div class="flex flex-col space-y-2">
                                     <div class="flex items-center space-x-2">
                                         <label for="division_name" class="w-1/3 capitalize text-sm">
-                                            {{ __('Nama Bagian') }}
+                                            {{ __('Nama Kedudukan') }}
                                         </label>
 
                                         <Input v-model="form.division_name"
-                                            :placeholder="__('Nama Bagian')" 
+                                            :placeholder="__('Nama Kedudukan')" 
                                             type="text"
                                             required 
                                             class="w-full text-sm"

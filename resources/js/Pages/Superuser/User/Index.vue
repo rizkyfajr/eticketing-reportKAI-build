@@ -179,105 +179,105 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                 <Th
                   :table="table"
                   :sort="false"
-                  class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs"
+                  class="uppercase font-semibold border border-gray-300 px-3 py-1 text-left font-extrabold text-xs"
                 >
-                  {{ __('no') }}
-                </Th>
-
-                <Th
-                  :table="table"
-                  :sort="true"
-                  name="name"
-                  class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs"
-                >
-                  {{ __('name') }}
-                </Th>
-
-                <Th
-                  :table="table"
-                  :sort="true"
-                  name="username"
-                  class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs"
-                >
-                  {{ __('nipp') }}
-                </Th>
-
-                <Th
-                  :table="table"
-                  :sort="true"
-                  name="postion_id"
-                  class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs"
-                >
-                  {{ __('jabatan') }}
-                </Th>
-
-                <Th
-                  :table="table"
-                  :sort="true"
-                  name="division_id"
-                  class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs"
-                >
-                  {{ __('bagian') }}
-                </Th>
-
-                <Th
-                  :table="table"
-                  :sort="true"
-                  name="email"
-                  class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs"
-                >
-                  {{ __('email') }}
+                  {{ __('no').toUpperCase() }}
                 </Th>
 
                 <Th
                   :table="table"
                   :sort="false"
-                  class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs"
+                  name="username"
+                  class="uppercase font-semibold border border-gray-300 px-3 py-1 text-left font-extrabold text-xs"
+                >
+                  {{ __('nipp').toUpperCase() }}
+                </Th>
+
+                <Th
+                  :table="table"
+                  :sort="false"
+                  name="name"
+                  class="uppercase font-semibold border border-gray-300 px-3 py-1 text-left font-extrabold text-xs"
+                >
+                  {{ __('name').toUpperCase() }}
+                </Th>
+
+                <Th
+                  :table="table"
+                  :sort="false"
+                  name="postion_id"
+                  class="uppercase font-semibold border border-gray-300 px-3 py-1 text-left font-extrabold text-xs"
+                >
+                  {{ __('jabatan').toUpperCase() }}
+                </Th>
+
+                <Th
+                  :table="table"
+                  :sort="false"
+                  name="division_id"
+                  class="uppercase font-semibold border border-gray-300 px-3 py-1 text-left font-extrabold text-xs"
+                >
+                  {{ __('Posisi').toUpperCase() }}
+                </Th>
+
+                <!-- <Th
+                  :table="table"
+                  :sort="false"
+                  name="email"
+                  class="uppercase font-semibold border border-gray-300 px-3 py-1 text-left capitalize font-extrabold text-xs"
+                >
+                  {{ __('email').toUpperCase() }}
+                </Th> -->
+
+                <!-- <Th
+                  :table="table"
+                  :sort="false"
+                  class="uppercase font-semibold border border-gray-300 px-3 py-1 text-left capitalize font-extrabold text-xs"
                 >
                   {{ __('permissions') }}
-                </Th>
+                </Th> -->
 
                 <Th
                   :table="table"
                   :sort="false"
-                  class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs"
+                  class="uppercase font-semibold border border-gray-300 px-3 py-1 text-left font-extrabold text-xs"
                 >
-                  {{ __('roles') }}
+                  {{ __('roles').toUpperCase() }}
                 </Th>
 
-                <Th
+                <!-- <Th
                   :table="table"
-                  :sort="true"
+                  :sort="false"
                   name="email_verified_at"
-                  class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs"
+                  class="uppercase font-semibold border border-gray-300 px-3 py-1 text-left capitalize font-extrabold text-xs"
                 >
                   {{ __('verified at') }}
                 </Th>
 
                 <Th
                   :table="table"
-                  :sort="true"
+                  :sort="false"
                   name="created_at"
-                  class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs"
+                  class="uppercase font-semibold border border-gray-300 px-3 py-1 text-left capitalize font-extrabold text-xs"
                 >
                   {{ __('created at') }}
                 </Th>
 
                 <Th
                   :table="table"
-                  :sort="true"
+                  :sort="false"
                   name="updated_at"
-                  class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs"
+                  class="uppercase font-semibold border border-gray-300 px-3 py-1 text-left capitalize font-extrabold text-xs"
                 >
                   {{ __('updated at') }}
-                </Th>
+                </Th> -->
 
                 <Th
                   :table="table"
                   :sort="false"
-                  class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs"
+                  class="uppercase font-semibold border border-gray-300 px-3 py-1 text-left font-extrabold text-xs"
                 >
-                  {{ __('Aksi') }}
+                  {{ __('Aksi').toUpperCase() }}
                 </Th>
               </tr>
             </template>
@@ -306,32 +306,32 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     :class="processing && 'bg-gray-100'"
                     class="transition-all duration-300"
                   >
-                    <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                    <td class="uppercase font-semibold border-b border-gray-300 px-4 py-3 text-left text-xs">
                       {{ i + 1 }}
                     </td>
 
-                    <td class="border border-gray-300 px-4 py-3 text-center text-xs">
-                      {{ user.name }}
-                    </td>
-
-                    <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                    <td class="uppercase font-semibold text-xs border-b border-gray-300 px-4 py-3 text-left text-xs">
                       {{ user.username }}
                     </td>
 
-                    <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                    <td class="uppercase font-semibold border-b border-gray-300 px-4 py-3 text-left text-xs">
+                      {{ user.name }}
+                    </td>
+
+                    <td class="uppercase font-semibold border-b border-gray-300 px-4 py-3 text-left text-xs">
                       {{ user.positions ? user.positions.position : '' }}
                       <!-- {{ user}} -->
                     </td>
 
-                    <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                    <td class="uppercase font-semibold border-b border-gray-300 px-4 py-3 text-left text-xs">
                       {{ user.divisions ? user.divisions.division_name : '' }}
                     </td>
 
-                    <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                    <!-- <td class="uppercase font-semibold border-b border-gray-300 px-4 py-3 text-left text-xs">
                       {{ user.email }}
-                    </td>
+                    </td> -->
 
-                    <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                    <!-- <td class="uppercase font-semibold border-b border-gray-300 px-4 py-3 text-left text-xs">
                       <div class="flex-wrap">
                         <div
                           v-for="(permission, j) in user.permissions"
@@ -352,9 +352,9 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                           </div>
                         </div>
                       </div>
-                    </td>
+                    </td> -->
 
-                    <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                    <td class="uppercase font-semibold border-b border-gray-300 px-4 py-3 text-left text-xs">
                       <div class="flex-wrap">
                         <div
                           v-for="(role, j) in user.roles"
@@ -377,19 +377,19 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       </div>
                     </td>
 
-                    <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                    <!-- <td class="border border-gray-300 px-4 py-3 text-left text-xs">
                       {{ new Date(user.email_verified_at).toLocaleString('id') }}
                     </td>
 
-                    <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                    <td class="border border-gray-300 px-4 py-3 text-left text-xs">
                       {{ new Date(user.created_at).toLocaleString('id') }}
                     </td>
 
-                    <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                    <td class="border border-gray-300 px-4 py-3 text-left text-xs">
                       {{ new Date(user.updated_at).toLocaleString('id') }}
-                    </td>
+                    </td> -->
 
-                    <td class="px-2 py-1 border-b text-center">
+                    <td class="px-2 py-1 uppercase font-semibold border-b text-center">
                       <div class="flex justify-center gap-2">
                         <ButtonBlue
                           v-if="can('update user')"

@@ -126,16 +126,16 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                             <tr class="bg-gray-200 border-gray-300">
                                 <Th :table="table" :sort="false" name="id"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('no') }}
+                                    {{ __('no').toUpperCase() }}
                                 </Th>
-                                <Th :table="table" :sort="true" name="name"
+                                <Th :table="table" :sort="false" name="name"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('name') }}
+                                    {{ __('name').toUpperCase() }}
                                 </Th>
 
-                                <Th :table="table" :sort="true"
+                                <Th :table="table" :sort="false"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('Action') }}
+                                    {{ __('Action').toUpperCase() }}
                                 </Th>
                             </tr>
                         </template>
@@ -157,15 +157,15 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                 <template v-else>
                                     <tr v-for="(region, i) in data" :key="region.id" :class="processing && 'bg-gray-100'"
                                         class="transition-all duration-300">
-                                        <td class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
+                                        <td class="border-b uppercase border-gray-300 px-3 py-1 text-center font-seminbold text-xs">
                                             {{ i + 1 }}
                                         </td>
                                         
-                                        <td class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
+                                        <td class="border-b uppercase border-gray-300 px-3 py-1 text-center font-seminbold text-xs">
                                             {{ __(region.name) }}
                                         </td>
 
-                                        <td class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
+                                        <td class="border-b uppercase border-gray-300 px-3 py-1 text-center font-seminbold text-xs">
                                         <div class="flex justify-center gap-2">
 
                                                 <ButtonBlue
@@ -173,7 +173,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                                     @click.prevent="edit(region)">
                                                     <Icon name="edit" />
                                                     <p class="font-bold text-xs">
-                                                        {{ __('ubah') }}
+                                                        {{ __('Ubah') }}
                                                     </p>
                                                 </ButtonBlue>
 
@@ -182,7 +182,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                                     @click.prevent="destroy(region)">
                                                     <Icon name="trash" />
                                                     <p class="font-bold text-xs">
-                                                        {{ __('hapus') }}
+                                                        {{ __('Hapus') }}
                                                     </p>
                                                 </ButtonRed>
 

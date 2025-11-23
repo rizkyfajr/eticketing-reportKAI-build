@@ -136,47 +136,47 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                             <tr class="bg-gray-100 border-b border-gray-300">
                                 <Th :table="table" :sort="false" name="id"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('no') }}
+                                    {{ __('no').toUpperCase() }}
                                 </Th>
 
-                                <Th :table="table" :sort="true" name="group_name"
+                                <Th :table="table" :sort="false" name="group_name"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('nama grup') }}
+                                    {{ __('nama grup').toUpperCase() }}
                                 </Th>                       
 
-                                <Th :table="table" :sort="true" name="urutan"
+                                <Th :table="table" :sort="false" name="urutan"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('urutan') }}
+                                    {{ __('urutan').toUpperCase() }}
                                 </Th>  
 
-                                <Th :table="table" :sort="true" name="komponen"
+                                <Th :table="table" :sort="false" name="komponen"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('komponen') }}
+                                    {{ __('komponen').toUpperCase() }}
                                 </Th>    
 
-                                <Th :table="table" :sort="true" name="rujukan"
+                                <Th :table="table" :sort="false" name="rujukan"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('rujukan') }}
+                                    {{ __('rujukan').toUpperCase() }}
                                 </Th>   
 
-                                <Th :table="table" :sort="true" name="nilai_rujukan"
+                                <Th :table="table" :sort="false" name="nilai_rujukan"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('nilai rujukan') }}
+                                    {{ __('nilai rujukan').toUpperCase() }}
                                 </Th>  
 
-                                <Th :table="table" :sort="true" name="satuan"
+                                <Th :table="table" :sort="false" name="satuan"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('satuan') }}
+                                    {{ __('satuan').toUpperCase() }}
                                 </Th>    
 
-                                <Th :table="table" :sort="true" name="jenis_mesin"
+                                <Th :table="table" :sort="false" name="jenis_mesin"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('jenis mesin') }}
+                                    {{ __('jenis mesin').toUpperCase() }}
                                 </Th>                       
 
-                                <Th :table="table" :sort="true"
+                                <Th :table="table" :sort="false"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('Action') }}
+                                    {{ __('Action').toUpperCase() }}
                                 </Th>
                             </tr>
                         </template>
@@ -205,35 +205,35 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                 :class="processing && 'bg-gray-100'"
                                 class="transition-all duration-300"
                               >
-                                <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                                <td class="border-b uppercase border-gray-300 px-4 py-1 text-center text-xs">
                                   {{ i + 1 }}
                                 </td>
 
-                                <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                                <td class="border-b uppercase border-gray-300 px-4 py-1 text-center text-xs">
                                   {{ check_sheet_master_day.group_name }}
                                 </td>
 
-                                <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                                <td class="border-b uppercase border-gray-300 px-4 py-1 text-center text-xs">
                                   {{ check_sheet_master_day.urutan}}
                                 </td>
 
-                                <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                                <td class="border-b uppercase border-gray-300 px-4 py-1 text-center text-xs">
                                   {{ check_sheet_master_day.komponen }}
                                 </td>
 
-                                <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                                <td class="border-b uppercase border-gray-300 px-4 py-1 text-center text-xs">
                                   {{ check_sheet_master_day.rujukan}}
                                 </td>
 
-                                <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                                <td class="border-b uppercase border-gray-300 px-4 py-1 text-center text-xs">
                                   {{ check_sheet_master_day.nilai_rujukan}}
                                 </td>
 
-                                <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                                <td class="border-b uppercase border-gray-300 px-4 py-1 text-center text-xs">
                                   {{ check_sheet_master_day.satuan}}
                                 </td>
 
-                                <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                                <td class="border-b uppercase border-gray-300 px-4 py-1 text-center text-xs">
                                   {{ check_sheet_master_day.jenis_mesin}}
                                 </td>
 

@@ -1,5 +1,5 @@
 <script setup>
-import { getCurrentInstance, nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { getCurrentInstance, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { Inertia } from '@inertiajs/inertia'
 import { useForm, Link, usePage } from '@inertiajs/inertia-vue3'
 import DashboardLayout from '@/Layouts/DashboardLayout.vue'
@@ -49,6 +49,16 @@ const close = () => {
         nextTick(() => open.value = false)
     })
 }
+
+watch(() => form.tahun_md, (value) => {
+    if (!value) {
+        form.umur = '';
+        return;
+    }
+
+    const currentYear = new Date().getFullYear();
+    form.umur = currentYear - parseInt(value);
+});
 
 const store = () => {
     return form.post(route('master-machines.store'), {
@@ -141,52 +151,52 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                             <tr class="bg-gray-100 border-b border-gray-300">
                                 <Th :table="table" :sort="false" name="id"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('no') }}
+                                    {{ __('no').toUpperCase() }}
                                 </Th>
 
-                                <Th :table="table" :sort="true" name="region_id"
+                                <Th :table="table" :sort="false" name="region_id"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('Daop') }}
+                                    {{ __('Daop').toUpperCase() }}
                                 </Th>   
 
-                                <Th :table="table" :sort="true" name="name"
+                                <Th :table="table" :sort="false" name="name"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('Jenis') }}
+                                    {{ __('Jenis').toUpperCase() }}
                                 </Th>    
 
-                                <Th :table="table" :sort="true" name="type"
+                                <Th :table="table" :sort="false" name="type"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('type') }}
+                                    {{ __('type').toUpperCase() }}
                                 </Th>  
 
-                                <Th :table="table" :sort="true" name="nomor"
+                                <Th :table="table" :sort="false" name="nomor"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('nomor') }}
+                                    {{ __('nomor').toUpperCase() }}
                                 </Th>  
 
-                                <Th :table="table" :sort="true" name="tahun_md"
+                                <Th :table="table" :sort="false" name="tahun_md"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('tahun md') }}
+                                    {{ __('tahun mulai dinas').toUpperCase() }}
                                 </Th>     
 
-                                <Th :table="table" :sort="true" name="umur"
+                                <Th :table="table" :sort="false" name="umur"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('umur') }}
+                                    {{ __('umur').toUpperCase() }}
                                 </Th>     
 
-                                <Th :table="table" :sort="true" name="nomor_sarana"
+                                <Th :table="table" :sort="false" name="nomor_sarana"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('nomor sarana') }}
+                                    {{ __('nomor sarana').toUpperCase() }}
                                 </Th>      
 
-                                <Th :table="table" :sort="true" name="keterangan"
+                                <Th :table="table" :sort="false" name="keterangan"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('keterangan') }}
+                                    {{ __('keterangan').toUpperCase() }}
                                 </Th>                         
 
-                                <Th :table="table" :sort="true"
+                                <Th :table="table" :sort="false"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('Action') }}
+                                    {{ __('Action').toUpperCase() }}
                                 </Th>
                             </tr>
                         </template>
@@ -215,39 +225,39 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                 :class="processing && 'bg-gray-100'"
                                 class="transition-all duration-300"
                               >
-                                <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                                <td class="border-b uppercase border-gray-300 px-4 py-1 text-center text-xs">
                                   {{ i + 1 }}
                                 </td>
 
-                                <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                                <td class="border-b uppercase border-gray-300 px-4 py-1 text-center text-xs">
                                   {{ machine.region?.name }}
                                 </td>
 
-                                <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                                <td class="border-b uppercase border-gray-300 px-4 py-1 text-center text-xs">
                                   {{ machine.name }}
                                 </td>
 
-                                <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                                <td class="border-b uppercase border-gray-300 px-4 py-1 text-center text-xs">
                                   {{ machine.type || '-' }}
                                 </td>
 
-                                <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                                <td class="border-b uppercase border-gray-300 px-4 py-1 text-center text-xs">
                                   {{ machine.nomor || '-' }}
                                 </td>
 
-                                <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                                <td class="border-b uppercase border-gray-300 px-4 py-1 text-center text-xs">
                                   {{ machine.tahun_md || '-' }}
                                 </td>
 
-                                <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                                <td class="border-b uppercase border-gray-300 px-4 py-1 text-center text-xs">
                                   {{ machine.umur || '-' }}
                                 </td>
 
-                                <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                                <td class="border-b uppercase border-gray-300 px-4 py-1 text-center text-xs">
                                   {{ machine.no_sarana || '-' }}
                                 </td>
 
-                                <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                                <td class="border-b uppercase border-gray-300 px-4 py-1 text-center text-xs">
                                   {{ machine.keterangan || '-' }}
                                 </td>
 
@@ -369,11 +379,11 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                 <div class="flex flex-col space-y-2">
                                     <div class="flex items-center space-x-2">
                                         <label for="tahun_md" class="w-1/3 capitalize text-sm">
-                                            {{ __('tahun md') }}
+                                            {{ __('tahun mulai dinas') }}
                                         </label>
 
                                         <Input v-model="form.tahun_md"
-                                            :placeholder="__('tahun md')" 
+                                            :placeholder="__('tahun mulai dinas')" 
                                             type="number"
                                             required 
                                             class="text-sm"

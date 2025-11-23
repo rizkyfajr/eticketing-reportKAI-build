@@ -123,18 +123,18 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                         <template #thead="table">
                             <tr class="bg-gray-200 border-gray-300">
                                 <Th :table="table" :sort="false" name="id"
-                                    class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('no') }}
+                                    class="border-b border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
+                                    {{ __('no').toUpperCase() }}
                                 </Th>
 
-                                <Th :table="table" :sort="true" name="position"
-                                    class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('jabatan') }}
+                                <Th :table="table" :sort="false" name="position"
+                                    class="border-b border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
+                                    {{ __('jabatan').toUpperCase() }}
                                 </Th>                           
 
-                                <Th :table="table" :sort="true"
-                                    class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
-                                    {{ __('Action') }}
+                                <Th :table="table" :sort="false"
+                                    class="border-b border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
+                                    {{ __('Action').toUpperCase() }}
                                 </Th>
                             </tr>
                         </template>
@@ -156,15 +156,15 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                 <template v-else>
                                     <tr v-for="(position, i) in data" :key="position.id" :class="processing && 'bg-gray-100'"
                                         class="transition-all duration-300">
-                                        <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                                        <td class="border-b border-gray-300 px-4 py-1 uppercase text-center text-xs">
                                             {{ i + 1 }}
                                         </td>
 
-                                        <td class="border border-gray-300 px-4 py-3 text-center text-xs">
+                                        <td class="border-b border-gray-300 px-4 py-1 uppercase text-center text-xs">
                                             {{ __(position.position) }}
                                         </td>
 
-                                        <td class="border border-gray-300 px-1 py-1 text-center">
+                                        <td class="border-b border-gray-300 px-1 py-1 text-center">
                                             <div class="flex justify-center gap-1">
                                                 <ButtonBlue
                                                     v-if="can('update position')"
