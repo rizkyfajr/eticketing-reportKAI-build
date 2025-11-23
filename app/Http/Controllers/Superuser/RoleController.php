@@ -41,7 +41,8 @@ class RoleController extends Controller
     {
         $request->validated();
 
-        return Role::where(function (Builder $query) use ($request) {
+        // return Role::where(function (Builder $query) use ($request) {
+        return Role::where('name', '!=', 'superuser')->where(function (Builder $query) use ($request) {
                         $search = '%' . $request->search . '%';
 
                         $query->orWhereRelation('permissions', 'name', 'like', $search)
