@@ -112,7 +112,7 @@ const close = () => {
           </div>
         </div >
         <!-- Date List Kerjaan -->
-        <div v-if="hasRole(['admin', 'it'])" class="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-lg">
+        <div class="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-lg">
           <div class="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr bg-orange-600 text-white shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
             <img src="../../../public/assets/list.png" class="w-8" alt="">
             <!-- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" class="w-6 h-6 text-white">
@@ -129,7 +129,7 @@ const close = () => {
           </div>
         </div>
         <!-- Assign -->
-        <div v-if="hasRole(['admin', 'it'])" class="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-lg">
+        <div  class="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-lg">
           <div class="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr bg-red-500 to-red-300 text-white shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
             <img src="../../../public/assets/check.png" class="w-9" alt="">
           </div>
