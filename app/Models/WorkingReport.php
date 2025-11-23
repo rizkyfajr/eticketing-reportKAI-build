@@ -96,7 +96,7 @@ class WorkingReport extends Model
 
     public function pemeriksaansilanglahan()
     {
-        return $this->hasOne(PemeriksaanSilanglahan::class, 'working_report_id', 'id');
+        return $this->hasOne(PemeriksaanSilangLahan::class, 'working_report_id', 'id');
     }
 
     public function perekamanawal()
