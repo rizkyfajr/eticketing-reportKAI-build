@@ -390,5 +390,6 @@
     "data berhasil disimpan.": "Data berhasil disimpan.",
     "the :attribute must be at least :length characters.": "The :attribute must be at least :length characters.",
     "gagal menambahkan data.": "Gagal menambahkan Data.",
-    "permission `:permission from user `:user` has been detached`": "permission `:permission from user `:user` has been detached`"
+    "permission `:permission from user `:user` has been detached`": "permission `:permission from user `:user` has been detached`",
+    "user does not have the right permissions.": "User does not have the right permissions."
 }
