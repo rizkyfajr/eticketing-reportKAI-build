@@ -112,7 +112,35 @@ class CheckSheetWorkResultController extends Controller
         return redirect()->back()->with('success', __('Data berhasil diperbarui.'));
     }
 
-    public function approve(Request $request)
+//     public function approve(Request $request)
+// {
+//     $user = auth()->user();
+//     $result = CheckSheetWorkResult::find($request->id);
+
+//     if (!$result) {
+//         return response()->json(['message' => 'Data tidak ditemukan.'], 404);
+//     }
+
+//     $now = now();
+
+//     if ($result->operator_by1 == $user->id) {
+//         $result->operator_at1 = $now;
+//     } elseif ($result->operator_by2 == $user->id) {
+//         $result->operator_at2 = $now;
+//     } elseif ($result->operator_by3 == $user->id) {
+//         $result->operator_at3 = $now;
+//     } elseif ($result->operator_by4 == $user->id) {
+//         $result->operator_at4 = $now;
+//     } else {
+//         return response()->json(['message' => 'Anda tidak memiliki akses untuk approve data ini.'], 403);
+//     }
+
+//     $result->save();
+
+//     return response()->json(['message' => 'Data berhasil disetujui.']);
+// }
+
+public function approve(Request $request)
 {
     $user = auth()->user();
     $result = CheckSheetWorkResult::find($request->id);
@@ -121,24 +149,54 @@ class CheckSheetWorkResultController extends Controller
         return response()->json(['message' => 'Data tidak ditemukan.'], 404);
     }
 
+    $report = $result->workingreport;
+
+    if (!$report || $report->created_by_id !== $user->id) {
+        return response()->json([
+            'message' => 'Anda tidak memiliki akses untuk approve data ini.'
+        ], 403);
+    }
+
     $now = now();
 
-    if ($result->operator_by1 == $user->id) {
+    if (!$result->operator_at1) {
         $result->operator_at1 = $now;
-    } elseif ($result->operator_by2 == $user->id) {
+    } elseif (!$result->operator_at2) {
         $result->operator_at2 = $now;
-    } elseif ($result->operator_by3 == $user->id) {
+    } elseif (!$result->operator_at3) {
         $result->operator_at3 = $now;
-    } elseif ($result->operator_by4 == $user->id) {
+    } elseif (!$result->operator_at4) {
         $result->operator_at4 = $now;
     } else {
-        return response()->json(['message' => 'Anda tidak memiliki akses untuk approve data ini.'], 403);
+        return response()->json([
+            'message' => 'Semua level sudah di-approve.'
+        ], 400);
     }
 
     $result->save();
 
     return response()->json(['message' => 'Data berhasil disetujui.']);
 }
+
+
+public function setMode(Request $request)
+{
+    $request->validate([
+        'id' => 'required|exists:check_sheet_work_results,id',
+        'mode' => 'required|in:working,warmingup',
+    ]);
+
+    $result = CheckSheetWorkResult::findOrFail($request->id);
+    $result->mode = $request->mode;
+    $result->save();
+
+    return response()->json([
+        'message' => 'Mode berhasil diperbarui.',
+        'mode' => $result->mode
+    ]);
+}
+
+
 
 
 

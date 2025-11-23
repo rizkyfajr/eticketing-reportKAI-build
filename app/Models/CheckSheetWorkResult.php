@@ -36,6 +36,7 @@ class CheckSheetWorkResult extends Model
         'operator_by4',
         'operator_at4',
         'validasi4',
+        'mode',
     ];
 
     protected $with = [
