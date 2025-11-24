@@ -27,7 +27,7 @@ class MasterMachineController extends Controller
       'regions'     => MasterRegion::select('id', 'name')->get(),
     ]);
   }
-  
+
   /**
   * Show the form for creating a new resource.
   *
@@ -37,7 +37,7 @@ class MasterMachineController extends Controller
   {
     //
   }
-  
+
   /**
   * Store a newly created resource in storage.
   *
@@ -55,12 +55,15 @@ class MasterMachineController extends Controller
         'umur'      => 'nullable|integer|',
         'no_sarana' => 'nullable|string|max:255',
         'keterangan'=> 'nullable|string|max:255',
+        'hierarchy_code' => 'nullable|string|max:255',
+
     ]);
 
     $machine = MasterMachine::create([
         'region_id' => $request['region_id'],
         'name'      => $request->name,
         'type'      => $request->type,
+        'hierarchy_code' => $request->hierarchy_code,
         'nomor'     => $request->nomor,
         'tahun_md'  => $request->tahun_md,
         'umur'      => $request->umur,
@@ -77,7 +80,7 @@ class MasterMachineController extends Controller
 
       return redirect()->back()->with('error', __('Gagal menambahkan mesin.'));
   }
-  
+
   /**
   * Display the specified resource.
   *
@@ -88,7 +91,7 @@ class MasterMachineController extends Controller
   {
     //
   }
-  
+
   /**
   * Show the form for editing the specified resource.
   *
@@ -99,7 +102,7 @@ class MasterMachineController extends Controller
   {
     //
   }
-  
+
   /**
   * Update the specified resource in storage.
   *
@@ -129,7 +132,7 @@ class MasterMachineController extends Controller
             ['name' => $request->name]
       ));
   }
-  
+
   /**
   * Remove the specified resource from storage.
   *
@@ -173,7 +176,7 @@ class MasterMachineController extends Controller
         }
     })
     ->orderBy($request->input('order.key') ?: 'created_at', $request->input('order.by') ?: 'desc')
-    ->when(!$user->hasRole(['superuser', 'it', 'admin']), fn (Builder $query) => 
+    ->when(!$user->hasRole(['superuser', 'it', 'admin']), fn (Builder $query) =>
         $query->where('created_by_id', $user->id)
     )
     ->select(['id', 'region_id', 'name', 'type', 'nomor', 'tahun_md', 'umur', 'umur', 'no_sarana', 'keterangan'])

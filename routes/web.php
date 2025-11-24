@@ -131,7 +131,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::resource('check-sheet-day', App\Http\Controllers\CheckSheetDayController::class);
     Route::post('/check-sheet-day/paginate', [App\Http\Controllers\CheckSheetDayController::class, 'paginate'])
         ->name('check-sheet-day.paginate');
-        
+
     Route::post('/upload/autosave', [App\Http\Controllers\UploadController::class, 'autosave']) ->name('upload.autosave');
 
     Route::post('/warming-up/approve', [App\Http\Controllers\WarmingUpController::class, 'approve'])->name('warming-up.approve');
@@ -159,6 +159,40 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::resource('maintenance-orders', App\Http\Controllers\MaintenanceOrderController::class);
     Route::post('maintenance-orders/paginate', [App\Http\Controllers\MaintenanceOrderController::class, 'paginate'])
     ->name('maintenance-orders.paginate');
+
+
+    Route::post('/maintenance-orders/{maintenanceOrder}/results', [App\Http\Controllers\MaintenanceOrderController::class, 'storeResults'])
+    ->name('maintenance-orders.storeResults');
+
+    Route::post('/maintenance-orders/{maintenanceOrder}/complete', [App\Http\Controllers\MaintenanceOrderController::class, 'complete'])
+    ->name('maintenance-orders.complete');
+
+    Route::get('api/machine-components', [App\Http\Controllers\MachineComponentController::class, 'index'])
+        ->name('api.machine-components.index');
+
+    Route::post('/maintenance-orders/{maintenanceOrder}/follow-up', [App\Http\Controllers\MaintenanceOrderController::class, 'followUp'])
+        ->name('maintenance-orders.followUp');
+
+    Route::post('/maintenance-orders/{maintenanceOrder}/start-repair', [App\Http\Controllers\MaintenanceOrderController::class, 'startRepair'])
+        ->name('maintenance-orders.startRepair');
+
+    Route::post('/maintenance-orders/{maintenanceOrder}/save-checklist', [App\Http\Controllers\MaintenanceOrderController::class, 'storeResults'])
+        ->name('maintenance-orders.saveChecklist');
+
+    Route::get('/maintenance-orders/{maintenanceOrder}/print-pdf', [App\Http\Controllers\MaintenanceOrderController::class, 'printPDF'])
+        ->name('maintenance-orders.printPDF');
+
+    Route::get('machine-components', [App\Http\Controllers\MachineComponentController::class, 'index'])->name('machine-components.index');
+    Route::post('machine-components', [App\Http\Controllers\MachineComponentController::class, 'store'])->name('machine-components.store');
+
+    Route::get('/machine-components', [App\Http\Controllers\MachineComponentController::class, 'indexPage'])->name('machine-components.index');
+    Route::get('/machine-components/create', [App\Http\Controllers\MachineComponentController::class, 'create'])->name('machine-components.create');
+    Route::post('/machine-components', [App\Http\Controllers\MachineComponentController::class, 'store'])->name('machine-components.store');
+
+    Route::get('/api/machine-components', [App\Http\Controllers\MachineComponentController::class, 'index'])->name('api.machine-components');
+
+    Route::resource('master-pedoman', App\Http\Controllers\MasterPedomanController::class);
+
 
     Route::prefix('/superuser')->name('superuser.')->group(function () {
         Route::resource('permission', App\Http\Controllers\Superuser\PermissionController::class)->only([

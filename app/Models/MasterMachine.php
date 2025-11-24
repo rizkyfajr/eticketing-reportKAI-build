@@ -17,6 +17,7 @@ class MasterMachine extends Model
         'type',
         'nomor',
         'tahun_md',
+        'hierarchy_code',
         'umur',
         'no_sarana',
         'keterangan',
@@ -25,7 +26,7 @@ class MasterMachine extends Model
     protected $with = [
         'region',
     ];
-    
+
 
     public function region()
     {
