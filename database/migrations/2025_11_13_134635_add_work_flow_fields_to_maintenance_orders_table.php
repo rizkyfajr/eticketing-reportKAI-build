@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -13,11 +14,10 @@ return new class extends Migration
   */
     public function up(): void
     {
+        // Modify status column tanpa ->change() (tanpa DBAL)
+        DB::statement("ALTER TABLE maintenance_orders MODIFY status VARCHAR(255) NOT NULL DEFAULT 'BARU' COMMENT 'BARU, DIPROSES, DIKERJAKAN, SELESAI'");
+
         Schema::table('maintenance_orders', function (Blueprint $table) {
-
-            $table->string('status')->default('BARU')
-                ->comment('BARU, DIPROSES, DIKERJAKAN, SELESAI')->change();
-
             $table->foreignId('follow_up_by_id')->nullable()->constrained('users');
             $table->timestamp('follow_up_at')->nullable();
             $table->text('follow_up_plan')->nullable();
