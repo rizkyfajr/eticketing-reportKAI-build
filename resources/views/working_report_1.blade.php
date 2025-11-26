@@ -492,7 +492,7 @@
             <td style="width: 20%; font-weight: bold;">Pengawal 1</td>
             <td style="width: 1%; text-align: center;">:</td>
             <td style="width: 33%; border-bottom: 1px solid black;">
-                {{ ucwords(strtolower(optional($report->pengawal)->name ?? '-')) }}
+                {{ ucwords(strtolower($report->nama_pengawal) ?? '-') }}
             </td>
         </tr>
 
@@ -507,7 +507,7 @@
             <td style="font-weight: bold;">Pengawal 2</td>
             <td style="text-align: center;">:</td>
             <td style="border-bottom: 1px solid black;">
-                {{ ucwords(strtolower(optional($report->pengawal1)->name ?? '-')) }}
+                {{ ucwords(strtolower($report->nama_pengawal1) ?? '-') }}
             </td>
         </tr>
 
@@ -716,7 +716,7 @@
             <td style="width: 20%; font-weight: bold;">Pengawal 1</td>
             <td style="width: 1%; text-align: center;">:</td>
             <td style="width: 33%; border-bottom: 1px solid black;">
-                {{ ucwords(strtolower(optional($report->pengawal)->name ?? '-')) }}
+                {{ ucwords(strtolower($report->nama_pengawal) ?? '-') }}
             </td>
         </tr>
 
@@ -731,7 +731,7 @@
             <td style="font-weight: bold;">Pengawal 2</td>
             <td style="text-align: center;">:</td>
             <td style="border-bottom: 1px solid black;">
-                {{ ucwords(strtolower(optional($report->pengawal1)->name ?? '-')) }}
+                {{ ucwords(strtolower($report->nama_pengawal1) ?? '-') }}
             </td>
         </tr>
 

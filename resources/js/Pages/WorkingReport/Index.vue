@@ -134,10 +134,10 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                     {{ __('mesin').toUpperCase() }}
                                 </Th>
                                 
-                                <Th :table="table" :sort="false" name="region_id"
+                                <!-- <Th :table="table" :sort="false" name="region_id"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
                                     {{ __('wilayah').toUpperCase() }}
-                                </Th>
+                                </Th> -->
                                 
                                 <Th :table="table" :sort="false" name="date"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
@@ -192,9 +192,9 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                             }}
                                         </td>
                                         
-                                        <td class="border-b border-gray-300 px-4 py-3 text-center text-xs whitespace-nowrap">
+                                        <!-- <td class="border-b border-gray-300 px-4 py-3 text-center text-xs whitespace-nowrap">
                                             {{ report.region?.name ?? '-' }}
-                                        </td>
+                                        </td> -->
                                         
                                         <td class="border-b border-gray-300 px-4 py-3 text-center text-xs whitespace-nowrap">
                                             {{ new Date(report?.date).toOnlyIndonesianDate() }} - {{ new Date(report?.date).toLocaleTimeString('id-ID', {

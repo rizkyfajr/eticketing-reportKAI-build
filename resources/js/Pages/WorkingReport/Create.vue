@@ -55,6 +55,10 @@ const form = useForm({
   approved_by1: props.report?.approved_by1 || '',
   note: props.report?.note || '',
   mode: props.report?.mode || '',
+  nama_pengawal: props.report?.nama_pengawal || '',
+  nipp: props.report?.nipp || '',
+  nama_pengawal1: props.report?.nama_pengawal1 || '',
+  nipp1: props.report?.nipp1 || '',
 })
 
 const form1 = useForm({
@@ -106,6 +110,7 @@ watch(
       form.jenis_kpjr = ''
       form.nomor_mesin = ''
       form.nomor_sarana = ''
+      form.region_id = ''
       return
     }
 
@@ -115,6 +120,7 @@ watch(
       form.jenis_kpjr = `${selected.name} ${selected.type}`
       form.nomor_mesin = selected.nomor || ''
       form.nomor_sarana = selected.no_sarana || ''
+      form.region_id = selected.region_id || ''
     }
   }
 )
@@ -369,6 +375,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       :searchable="true"
                       placeholder="Pilih Mesin"
                       style="font-size: 0.7rem;"
+                      disabled
                     >
                       <template #option="{ option }">
                         <span class="text-xs antialiased">
@@ -581,7 +588,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <InputError :error="form.errors.operator_by3" />
                   </div>
 
-                  <div class="flex flex-col">
+                  <!-- <div class="flex flex-col">
                     <label for="approved_by" class="block text-xs font-semibold">
                       {{ __('Pengawal 1') }}
                     </label>
@@ -627,7 +634,47 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       </template>
                     </Select>
                     <InputError :error="form.errors.approved_by1" />
-                  </div>                 
+                  </div>                  -->                  
+
+                  <div class="flex flex-col">
+                    <label class="block text-xs font-semibold">NIPP Pengawal 1</label>
+                    <Input
+                      v-model="form.nipp"
+                      type="number"
+                      class="w-full border rounded-md px-2 py-2 text-xs"
+                      placeholder="Isi NIPP Pengawal 1"
+                    />
+                  </div>
+                  
+                  <div class="flex flex-col">
+                    <label class="block text-xs font-semibold">Nama Pengawal 1</label>
+                    <Input
+                      v-model="form.nama_pengawal"
+                      type="text"
+                      class="w-full border rounded-md px-2 py-2 text-xs"
+                      placeholder="Isi Nama Pengawal 1"
+                    />
+                  </div>       
+
+                  <div class="flex flex-col">
+                    <label class="block text-xs font-semibold">NIPP Pengawal 2</label>
+                    <Input
+                      v-model="form.nipp1"
+                      type="number"
+                      class="w-full border rounded-md px-2 py-2 text-xs"
+                      placeholder="Isi NIPP Pengawal 2"
+                    />
+                  </div>
+                  
+                  <div class="flex flex-col">
+                    <label class="block text-xs font-semibold">Nama Pengawal 2</label>
+                    <Input
+                      v-model="form.nama_pengawal1"
+                      type="text"
+                      class="w-full border rounded-md px-2 py-2 text-xs"
+                      placeholder="Isi Nama Pengawal 2"
+                    />
+                  </div>
 
                 </div>
 

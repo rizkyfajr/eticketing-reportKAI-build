@@ -45,6 +45,10 @@ class WorkingReport extends Model
         'kupt_at1',
         'created_by_id',
         'updated_by_id',
+        'nama_pengawal',
+        'nipp',
+        'nama_pengawal1',
+        'nipp1',
     ];
 
     protected $with = [

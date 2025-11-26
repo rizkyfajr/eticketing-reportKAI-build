@@ -256,7 +256,7 @@ class WorkingReportController extends Controller
   {
       $validated = $request->validate([
           'machine_id'  => 'required|exists:master_machines,id',
-          'region_id'   => 'required|exists:master_regions,id',
+          'region_id'   => 'nullable|exists:master_regions,id',
           'date'        => 'nullable|date',
           'has_trouble' => 'nullable',
           'status'      => 'nullable|in:draft,checksheet_done,warming_up_done,photo_uploaded,work_done,verification,finished',
@@ -284,6 +284,10 @@ class WorkingReportController extends Controller
           'approved_by1'         => 'nullable|exists:users,id',
           'approved_at1'         => 'nullable|date',
           'note'                 => 'nullable|string',
+          'nama_pengawal'        => 'nullable|string',
+          'nipp'                 => 'nullable|integer',
+          'nama_pengawal1'       => 'nullable|string',
+          'nipp1'                => 'nullable|integer',
       ]);
 
       $validated['created_by_id'] = auth()->id();
@@ -516,7 +520,7 @@ class WorkingReportController extends Controller
 
       $validated = $request->validate([
           'machine_id'        => 'required|exists:master_machines,id',
-          'region_id'         => 'required|exists:master_regions,id',
+          'region_id'         => 'nullable|exists:master_regions,id',
           'date'              => 'nullable|date',
           'has_trouble'       => 'nullable',
           'status'            => 'nullable|in:draft,checksheet_done,warming_up_done,photo_uploaded,work_done,verification,finished',
@@ -544,6 +548,10 @@ class WorkingReportController extends Controller
           'approved_by1'         => 'nullable|exists:users,id',
           'approved_at1'         => 'nullable|date',
           'note'                 => 'nullable|string',
+          'nama_pengawal'        => 'nullable|string',
+          'nipp'                 => 'nullable|integer',
+          'nama_pengawal1'       => 'nullable|string',
+          'nipp1'                => 'nullable|integer',
       ]);
 
       $report->update($validated);
