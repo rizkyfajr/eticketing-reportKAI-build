@@ -347,7 +347,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       v-model="form.machine_id"
                       class="w-full border rounded-md px-2 py-2 bg-white text-xs"
                       :options="machines.map(machine => ({
-                        label: `[${machine.nomor}] ${machine.name} ${machine.type} - ${machine.no_sarana} (${machine.region.name})`,
+                        label: `[${machine.nomor}] ${machine.name} - ${machine.type} - ${machine.no_sarana} (${machine.region.name})`,
                         value: machine.id,
                       }))"
                       :searchable="true"

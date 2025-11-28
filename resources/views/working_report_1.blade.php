@@ -391,12 +391,12 @@
           <tr>
               <td style="width: 20%; font-weight: bold;">Waktu Start Engine</td>
               <td style="width: 1%; text-align: center;">:</td>
-              <td style="width: 33%; border-bottom: 1px solid black;">{{ substr($report->waktu_start_engine ?? ' - : - : - ', 0, 5) }} Wib</td>
+              <td style="width: 33%; border-bottom: 1px solid black;">{{ substr($report->waktu_start_engine ?? ' - : - : - ', 0, 5) }} WIB</td>
               <td style="width: 5px;"></td>
               
               <td style="width: 20%; font-weight: bold;">Waktu Stop Engine</td>
               <td style="width: 1%; text-align: center;">:</td>
-              <td style="width: 33%; border-bottom: 1px solid black;">{{ optional($report->workresult)->waktu_stop_engine ? date('H:i', strtotime(optional($report->workresult)->waktu_stop_engine)): '-' }} Wib</td>
+              <td style="width: 33%; border-bottom: 1px solid black;">{{ optional($report->workresult)->waktu_stop_engine ? date('H:i', strtotime(optional($report->workresult)->waktu_stop_engine)): '-' }} WIB</td>
           </tr>
           <tr>
               <td style="font-weight: bold;">Jam Travelling Awal</td>
@@ -411,12 +411,12 @@
           <tr>
               <td style="font-weight: bold;">Jam Kerja Awal</td>
               <td style="text-align: center;">:</td>
-              <td style="border-bottom: 1px solid black;">{{ substr($report->jam_kerja_awal ?? ' - : - : - ', 0, 5) }}</td>
+              <td style="border-bottom: 1px solid black;">{{ substr($report->jam_kerja_awal ?? ' - : - : - ', 0, 5) }} WIB</td>
               <td></td>
               
               <td style="font-weight: bold;">Jam Kerja Akhir</td>
               <td style="text-align: center;">:</td>
-              <td style="border-bottom: 1px solid black;">{{ optional($report->workresult)->jam_kerja_akhir ? date('H:i', strtotime(optional($report->workresult)->jam_kerja_akhir)): '-' }} </td>
+              <td style="border-bottom: 1px solid black;">{{ optional($report->workresult)->jam_kerja_akhir ? date('H:i', strtotime(optional($report->workresult)->jam_kerja_akhir)): '-' }} WIB</td>
           </tr>
           <tr>
               <td style="font-weight: bold;">Jam Mesin Awal</td>
@@ -615,12 +615,12 @@
           <tr>
               <td style="width: 20%; font-weight: bold;">Waktu Start Engine</td>
               <td style="width: 1%; text-align: center;">:</td>
-              <td style="width: 33%; border-bottom: 1px solid black;">{{ substr($report->waktu_start_engine ?? ' - : - : - ', 0, 5) }} Wib</td>
+              <td style="width: 33%; border-bottom: 1px solid black;">{{ substr($report->waktu_start_engine ?? ' - : - : - ', 0, 5) }} WIB</td>
               <td style="width: 5px;"></td>
               
               <td style="width: 20%; font-weight: bold;">Waktu Stop Engine</td>
               <td style="width: 1%; text-align: center;">:</td>
-              <td style="width: 33%; border-bottom: 1px solid black;">{{ optional($report->warmingup)->waktu_stop_engine ? date('H:i', strtotime(optional($report->warmingup)->waktu_stop_engine)): '-' }} Wib</td>
+              <td style="width: 33%; border-bottom: 1px solid black;">{{ optional($report->warmingup)->waktu_stop_engine ? date('H:i', strtotime(optional($report->warmingup)->waktu_stop_engine)): '-' }} WIB</td>
           </tr>
           <tr>
               <td style="font-weight: bold;">Jam Travelling Awal</td>
@@ -635,12 +635,12 @@
           <tr>
               <td style="font-weight: bold;">Jam Kerja Awal</td>
               <td style="text-align: center;">:</td>
-              <td style="border-bottom: 1px solid black;">{{ substr($report->jam_kerja_awal ?? ' - : - : - ', 0, 5) }}</td>
+              <td style="border-bottom: 1px solid black;">{{ substr($report->jam_kerja_awal ?? ' - : - : - ', 0, 5) }} WIB</td>
               <td></td>
               
               <td style="font-weight: bold;">Jam Kerja Akhir</td>
               <td style="text-align: center;">:</td>
-              <td style="border-bottom: 1px solid black;">{{ optional($report->warmingup)->jam_kerja_akhir ? date('H:i', strtotime(optional($report->warmingup)->jam_kerja_akhir)): '-' }} </td>
+              <td style="border-bottom: 1px solid black;">{{ optional($report->warmingup)->jam_kerja_akhir ? date('H:i', strtotime(optional($report->warmingup)->jam_kerja_akhir)): '-' }} WIB</td>
           </tr>
           <tr>
               <td style="font-weight: bold;">Jam Mesin Awal</td>

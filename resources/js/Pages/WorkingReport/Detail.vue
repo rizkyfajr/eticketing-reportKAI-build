@@ -84,6 +84,10 @@ const form = useForm({
     approved_by1: props.report?.approved_by1 || '',
     note: props.report?.note || '',
     mode: props.report?.mode || '',
+    nipp: props.report?.nipp || '',
+    nama_pengawal: props.report?.nama_pengawal || '',
+    nipp1: props.report?.nipp1 || '',
+    nama_pengawal1: props.report?.nama_pengawal1 || '',
 });
 
 const form1 = useForm({
@@ -473,43 +477,6 @@ const approve = (level) => {
             icon: 'success',
             title: 'Berhasil!',
             text: `Approve Operator ${level} berhasil.`,
-            timer: 1200,
-            showConfirmButton: false,
-        });
-    })
-    .catch(() => {
-        Swal.fire({
-            icon: 'error',
-            title: 'Gagal!',
-            text: 'Terjadi kesalahan saat approve.',
-        });
-    });
-}
-
-const approvePengawal = (level) => {
-    Swal.fire({
-        title: 'Memproses...',
-        didOpen: () => Swal.showLoading(),
-        allowOutsideClick: false,
-    });
-
-    axios.post(route('working-reports.approvePengawal', {
-        report: props.report.id,
-        level: level
-    }))
-    .then(() => {
-        const now = new Date().toISOString();
-
-        if (level === 1) {
-            localReport.value.approved_at = now;
-        } else if (level === 2) {
-            localReport.value.approved_at1 = now;
-        }
-
-        Swal.fire({
-            icon: 'success',
-            title: 'Berhasil!',
-            text: `Approve Pengawal ${level} berhasil.`,
             timer: 1200,
             showConfirmButton: false,
         });
@@ -1445,11 +1412,23 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
 
 <style src="@vueform/multiselect/themes/default.css"></style>
 <style src="@/multiselect.css"></style>
+<style>
+  .step-wrapper {
+    @apply flex flex-col items-center text-center px-2;
+  }
+  .step-circle {
+    @apply w-8 h-8 flex items-center justify-center rounded-full text-xs font-bold;
+  }
+  .step-line {
+    @apply flex-1 h-[2px] bg-gray-300 mx-1;
+  }
+</style>
+
 
 <template>
 
   <DashboardLayout :title="__('Working Order')">
-    <div class="flex flex-col space-y-2 border rounded bg-white dark:bg-white dark:text-black">
+    <!-- <div class="flex flex-col space-y-2 border rounded bg-white dark:bg-white dark:text-black">
       <div class="flex flex-row overflow-x-auto md:overflow-x-visible space-x-0.5 w-full rounded">
         <div
           class="border rounded p-1 text-center text-sm flex-1 flex-shrink"
@@ -1503,25 +1482,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
           </a>
         </div>
 
-        <!-- <div
-          class="border rounded p-1 text-center text-sm flex-1 flex-shrink"
-          :class="{
-            'bg-blue-700 text-white font-bold': currentSection === 'upload' && hasCheckSheet,
-            'bg-blue-500 text-white font-bold': currentSection !== 'upload' && report.upload?.id && hasCheckSheet,
-            'bg-red-500 text-black cursor-not-allowed': !hasCheckSheet,
-            'bg-red-500 text-black': currentSection !== 'upload' && !report.upload?.id && hasCheckSheet
-          }"
-          @click.prevent="hasCheckSheet && fetch('upload', report)"
-        >
-          <a href="#list-upload" id="list-upload-list" role="tab" aria-controls="upload" :class="!report.sectionFiveOpen || !hasCheckSheet "
-          >
-            <div class="flex items-center justify-center space-x-0.5 md:space-x-1">
-              <Icon v-if="!hasCheckSheet" name="lock" class="w-3 h-4 md:w-3 md:h-3 text-black" />
-              <p class="text-[11px] font-bold">Upload</p>
-            </div>
-          </a>
-        </div> -->
-
         <div
           class="border rounded p-1 text-center text-sm flex-1 flex-shrink"
             :class="{
@@ -1539,27 +1499,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
             </div>
           </a>
         </div>
-
-        <!-- <div
-            v-if="isWorkResult"
-            class="border rounded p-1 text-center text-sm flex-1 flex-shrink"
-            :class="{
-              'bg-blue-700 text-white font-bold': currentSection === 'workresultok',
-              'bg-blue-500 text-white font-bold': currentSection !== 'workresultok' && (report.workresult?.id || warmingup?.id),
-              'bg-red-500 text-white font-bold': currentSection !== 'workresultok' && (!report.workresult?.id || warmingup?.id),
-            }"
-            @click.prevent="fetch('workresultok', report)"
-        >
-          <a
-            href="#list-workresultok"
-            id="list-workresultok-list"
-            role="tab"
-            aria-controls="workresultok">
-            <div class="flex items-center justify-center space-x-0.5 md:space-x-1">
-              <p class="text-[11px] font-bold">Work Result</p>
-            </div>
-          </a>
-        </div>         -->
 
         <div
           v-if="isWorkResult"
@@ -1582,10 +1521,106 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
             </div>
           </a>
         </div>
-        <!-- END -->
 
       </div>
+    </div> -->
+
+    <div class="flex items-center w-full overflow-x-auto py-2  rounded">
+
+      <!-- STEP 1 - WORKING ORDER -->
+      <div class="step-wrapper"
+          @click.prevent="fetch('report', report)"
+          :class="{ 'cursor-pointer': report.id }">
+
+        <div class="step-circle"
+            :class="{
+              'bg-blue-700 text-white': currentSection === 'report',
+              'bg-blue-500 text-white': currentSection !== 'report' && report.id,
+              'bg-red-300 text-white': !report.id
+            }">
+          1
+        </div>
+        <p class="text-[11px] mt-1 font-bold">Working Order</p>
+      </div>
+
+      <div class="step-line"></div>
+
+      <!-- STEP 2 - DAILY CHECK -->
+      <div class="step-wrapper"
+          @click.prevent="hasWorkingOrder && fetch('checksheetday', report)"
+          :class="{ 'cursor-pointer': hasWorkingOrder }">
+
+        <div class="step-circle"
+            :class="{
+              'bg-blue-700 text-white font-bold': currentSection === 'checksheetday' && hasWorkingOrder,
+              'bg-blue-500 text-white font-bold': currentSection !== 'checksheetday' && report.checksheetday?.checksheetworkresult?.id && hasWorkingOrder,
+              'bg-gray-500 text-white cursor-not-allowed': !hasWorkingOrder,
+              'bg-gray-500 text-white': currentSection !== 'checksheetday' && !report.checksheetday?.checksheetworkresult?.id && hasWorkingOrder
+            }">
+          2
+        </div>
+        <p class="text-[11px] mt-1 font-bold">Daily Check</p>
+      </div>
+
+      <div class="step-line"></div>
+
+      <!-- STEP 3 - WARMING UP -->
+      <div class="step-wrapper"
+          @click.prevent="isWarmingUpMode && fetch('warmingup', report)"
+          :class="{ 'cursor-pointer': isWarmingUpMode }">
+
+        <div class="step-circle"
+            :class="{
+              'bg-blue-700 text-white font-bold': currentSection === 'warmingup' && isWarmingUpMode,
+              'bg-blue-500 text-white font-bold': currentSection !== 'warmingup' && report.warmingup?.id && isWarmingUpMode,
+              'bg-red-500 text-white cursor-not-allowed': !isWarmingUpMode,
+              'bg-gray-500 text-white': currentSection !== 'warmingup' && !report.warmingup?.id && isWarmingUpMode
+            }">
+          3
+        </div>
+        <p class="text-[11px] mt-1 font-bold">Warming Up</p>
+      </div>
+
+      <div class="step-line"></div>
+
+      <!-- STEP 4 - WORKING -->
+      <div class="step-wrapper"
+          @click.prevent="isWorkingOrderMode && fetch('workresult', report)"
+          :class="{ 'cursor-pointer': isWorkingOrderMode }">
+
+        <div class="step-circle"
+            :class="{
+              'bg-blue-700 text-white font-bold': currentSection === 'workresult',
+              'bg-blue-500 text-white font-bold': currentSection !== 'workresult' && report.workresult?.id && isWorkingOrderMode,
+              'bg-red-500 text-white cursor-not-allowed': !isWorkingOrderMode,
+              'bg-gray-500 text-white': currentSection !== 'workresult' && !report.workresult?.id && isWorkingOrderMode
+            }">
+          4
+        </div>
+        <p class="text-[11px] mt-1 font-bold">Working</p>
+      </div>
+
+      <div class="step-line"></div>
+
+      <!-- STEP 5 - WORK RESULT -->
+      <div class="step-wrapper"
+          v-if="isWorkResult"
+          @click.prevent="(report.workresult?.id || warmingup?.id) && fetch('workresultok', report)"
+          :class="{ 'cursor-pointer': report.workresult?.id || warmingup?.id }">
+
+        <div class="step-circle"
+            :class="{
+              'bg-blue-700 text-white': currentSection === 'workresultok',
+              'bg-blue-500 text-white': currentSection !== 'workresultok' && (report.workresult?.id || warmingup?.id),
+              'bg-red-500 text-white': !report.workresult?.id && !warmingup?.id
+            }">
+          5
+        </div>
+        <p class="text-[11px] mt-1 font-bold">Work Result</p>
+      </div>
+
     </div>
+
     <Card class="border bg-white dark:bg-white dark:text-black">
       <template #body>
       <div class="flex flex-col space-y-2 p-1">
@@ -1594,6 +1629,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
           <div class="flex flex-col space-y-2">
 
             <!-- section working report -->
+             
 					  <div v-if="currentSection === 'report'" class="tab-pane fade show active" id="list-report" role="tabpanel" aria-labelledby="list-report-list">
                 <!-- <div class="grid grid-cols-1 gap-2 mb-4 md:grid-cols-2"> -->
                 <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">
@@ -1608,7 +1644,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       <Select
                         v-model="form.machine_id"
                         :options="machines.map(machine => ({
-                          label: `${machine.name} - ${machine.type} - ${machine.nomor} - ${machine.no_sarana} (${machine.region.name})`,
+                          label: `[${machine.nomor}] ${machine.name} ${machine.type} - ${machine.no_sarana} (${machine.region.name})`,
                           value: machine.id,
                         }))"
                         :searchable="true"
@@ -1630,7 +1666,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <div> {{ report?.machine.name }} - {{ report?.machine.type }}- {{ report?.machine.nomor }} - {{ report?.machine.no_sarana }} ({{ report?.machine?.region.name }})</div> -->
                   </div>
 
-                  <div class="flex flex-col items-start space-y-1">
+                  <!-- <div class="flex flex-col items-start space-y-1">
                     <label for="region_id" class="font-bold text-xs">
                       {{ __('Nama Wilayah') }}
                     </label>
@@ -1655,10 +1691,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       </Select>
                       <InputError :error="form.errors.region_id"/>
                     </div>
-                    <!-- <div class="w-32 font-bold text-xs">Nama Wilayah</div>
-                    <div class="pr-2 text-xs">:</div>
-                    <div> {{ report?.machine?.region.name || report?.region.name || '-' }}</div> -->
-                  </div>
+                  </div> -->
 
                   <div class="flex flex-col items-start space-y-1">
                     <label for="date" class="font-bold text-xs">
@@ -1755,7 +1788,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <div> {{ report?.nomor_sarana || '-' }}</div> -->
                   </div>
 
-                  <div class="flex flex-col items-start space-y-1">
+                  <!-- <div class="flex flex-col items-start space-y-1">
                       <div class="w-32 font-bold text-xs">Status</div>
                       <div :class="[
                           'px-1 py-1 rounded text-xs font-semibold',
@@ -1784,7 +1817,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                               ? 'Selesai'
                               : report.status
                           }}</div>
-                  </div>
+                  </div> -->
                 </div>
 
                 <div v-if="form.mode === 'working'" class="p-1">
@@ -2288,18 +2321,9 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                         </template>
                       </Select>
                       <InputError :error="form.errors.operator_by1" />
-                      <!-- <div class="w-32 font-bold text-xs">Operator 1</div>
-                      <div class="pr-2 text-xs">:</div>
-                      <div class="lowercase first-letter:capitalize">
-                        {{ report?.operator1?.name || '-' }} - {{ report?.operator1?.username }}
-
-                        <span class="bg-blue-100 text-black" v-if="report?.operator_at1">
-                            (Disetujui Tanggal : {{ formatDate(report.operator_at1) }})
-                        </span>
-                      </div> -->
                     </div>
 
-                    <div class="flex flex-col items-start space-y-1">
+                    <!-- <div class="flex flex-col items-start space-y-1">
                       <label for="approved_by" class="block text-xs font-semibold">
                         {{ __('Pengawal 1') }}
                       </label>
@@ -2322,16 +2346,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                         </template>
                       </Select>
                       <InputError :error="form.errors.approved_by" />
-                      <!-- <div class="w-32 font-bold text-xs">Pengawal 1</div>
-                      <div class="pr-2 text-xs">:</div>
-                      <div class="lowercase first-letter:capitalize">
-                        {{ report?.pengawal?.name || '-' }} - {{ report?.pengawal?.username }}
-
-                        <span class="bg-blue-100 text-black" v-if="report?.approved_at">
-                            (Disetujui Tanggal : {{ formatDate(report.approved_at) }})
-                        </span>
-                      </div> -->
-                    </div>
+                    </div> -->
 
                     <div class="flex flex-col items-start space-y-1">
                       <label for="operator_by2" class="block text-xs font-semibold">
@@ -2356,18 +2371,9 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                         </template>
                       </Select>
                       <InputError :error="form.errors.operator_by2" />
-                      <!-- <div class="w-32 font-bold text-xs">Operator 2</div>
-                      <div class="pr-2 text-xs">:</div>
-                      <div class="lowercase first-letter:capitalize">
-                        {{ report?.operator2?.name || '-' }} - {{ report?.operator2?.username }}
-
-                        <span class="bg-blue-100 text-black" v-if="report?.operator_at2">
-                            (Disetujui Tanggal : {{ formatDate(report.operator_at2) }})
-                        </span>
-                      </div> -->
                     </div>
 
-                    <div class="flex flex-col items-start space-y-1">
+                    <!-- <div class="flex flex-col items-start space-y-1">
                       <label for="approved_by1" class="block text-xs font-semibold">
                         {{ __('Pengawal 2') }}
                       </label>
@@ -2390,16 +2396,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                         </template>
                       </Select>
                       <InputError :error="form.errors.approved_by1" />
-                      <!-- <div class="w-32 font-bold text-xs">Pengawal 2</div>
-                      <div class="pr-2 text-xs">:</div>
-                      <div class="lowercase first-letter:capitalize">
-                        {{ report?.pengawal1?.name || '-' }} - {{ report?.pengawal1?.username }}
-
-                        <span class="bg-blue-100 text-black" v-if="report?.approved_at1">
-                            (Disetujui Tanggal : {{ formatDate(report.approved_at1) }})
-                        </span>
-                      </div> -->
-                    </div>
+                    </div> -->
 
                     <div class="flex flex-col items-start space-y-1">
                       <label for="operator_by3" class="block text-xs font-semibold">
@@ -2424,49 +2421,73 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                         </template>
                       </Select>
                       <InputError :error="form.errors.operator_by3" />
-                      <!-- <div class="w-32 font-bold text-xs">Operator 3</div>
-                      <div class="pr-2 text-xs">:</div>
-                      <div class="lowercase first-letter:capitalize">
-                        {{ report?.operator3?.name || '-' }} - {{ report?.operator3?.username }}
+                    </div>
+                    
+                    <div class="flex flex-col items-start space-y-1">
+                      <label for="hsd_awal_kerja" class="font-semibold text-xs">
+                        {{ __('NIPP Pengawal 1') }}
+                      </label>
 
-                        <span class="bg-blue-100 text-black" v-if="report?.operator_at3">
-                            (Disetujui Tanggal : {{ formatDate(report.operator_at3) }})
-                        </span>
-                      </div> -->
+                      <div class="w-full">
+                        <Input
+                          v-model="form.nipp"
+                          :placeholder="__('NIPP Pengawal 1')"
+                          type="number"
+                          class="text-xs"
+                        />
+                        <InputError :error="form.errors.hsd_awal_kerja"/>
+                      </div>
+                    </div>
+                    
+                    <div class="flex flex-col items-start space-y-1">
+                      <label for="hsd_awal_kerja" class="font-semibold text-xs">
+                        {{ __('Nama Pengawal 1') }}
+                      </label>
+
+                      <div class="w-full">
+                        <Input
+                          v-model="form.nama_pengawal"
+                          :placeholder="__('Nama Pengawal 1')"
+                          type="text"
+                          class="text-xs"
+                        />
+                        <InputError :error="form.errors.hsd_awal_kerja"/>
+                      </div>
+                    </div>
+                    
+                    <div class="flex flex-col items-start space-y-1">
+                      <label for="hsd_awal_kerja" class="font-semibold text-xs">
+                        {{ __('NIPP Pengawal 2') }}
+                      </label>
+
+                      <div class="w-full">
+                        <Input
+                          v-model="form.nipp1"
+                          :placeholder="__('NIPP Pengawal 2')"
+                          type="number"
+                          class="text-xs"
+                        />
+                        <InputError :error="form.errors.hsd_awal_kerja"/>
+                      </div>
+                    </div>
+                    
+                    <div class="flex flex-col items-start space-y-1">
+                      <label for="hsd_awal_kerja" class="font-semibold text-xs">
+                        {{ __('Nama Pengawal 2') }}
+                      </label>
+
+                      <div class="w-full">
+                        <Input
+                          v-model="form.nama_pengawal1"
+                          :placeholder="__('Nama Pengawal 2')"
+                          type="text"
+                          class="text-xs"
+                        />
+                        <InputError :error="form.errors.hsd_awal_kerja"/>
+                      </div>
                     </div>
                   </div>
                 </div>
-
-                <!-- <p v-if="report?.operator_at1" class="text-xs font-bold text-blue-600">Operator 1 telah menyetujui pada tanggal : {{ formatDate(report?.operator_at1)}}</p>
-                <p v-if="report?.operator_at2" class="text-xs font-bold text-blue-600">Operator 2 telah menyetujui pada tanggal : {{ formatDate(report?.operator_at2)}}</p>
-                <p v-if="report?.operator_at3" class="text-xs font-bold text-blue-600">Operator 3 telah menyetujui pada tanggal : {{ formatDate(report?.operator_at3)}}</p>
-
-                <div v-if="report.operator_by1 && !report.operator_at1" class="d-flex justify-content-end mt-3">
-                    <Button
-                        class="bg-blue-700 hover:bg-blue-900 float-right mr-2 text-xs"
-                        @click.prevent="approve(1)"
-                    >
-                        Approve Operator 1
-                    </Button>
-                </div>
-
-                <div v-if="report.operator_by2 && report.operator_at1 && !report.operator_at2" class="d-flex justify-content-end mt-2">
-                    <Button
-                        class="bg-blue-700 hover:bg-blue-900 float-right mr-2 text-xs"
-                        @click.prevent="approve(2)"
-                    >
-                        Approve Operator 2
-                    </Button>
-                </div>
-
-                <div v-if="report.operator_by3 && report.operator_at2 && !report.operator_at3" class="d-flex justify-content-end mt-2">
-                    <Button
-                        class="bg-blue-700 hover:bg-blue-900 float-right mr-2 text-xs"
-                        @click.prevent="approve(3)"
-                    >
-                        Approve Operator 3
-                    </Button>
-                </div>                 -->
             </div>
             <!-- section working report -->
 
@@ -2486,7 +2507,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                         <Select
                           v-model="form.machine_id"
                           :options="machines.map(machine => ({
-                            label: `${machine.name} - ${machine.type} - ${machine.nomor} - ${machine.no_sarana} (${machine.region.name})`,
+                            label: `[${machine.nomor}] ${machine.name} ${machine.type} - ${machine.no_sarana} (${machine.region.name})`,
                             value: machine.id,
                           }))"
                           :searchable="true"
@@ -2667,11 +2688,11 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                 <div v-else-if="currentStep === 3">
                   <table class="w-full table-auto">
                     <tfoot>
-                      <tr class="flex flex-col lg:flex-row"> <td colspan="9" class="border border-black align-top px-2 py-2 font-semibold text-sm w-full lg:w-1/2">
+                      <tr class="flex flex-col lg:flex-row"> <td colspan="9" class="border border-black align-top px-2 py-2 font-semibold text-sm w-full lg:w-1/2 bg-white">
                               Catatan riwayat gangguan :
                               <textarea
                                   v-model="form2.catatan_gangguan"
-                                  class="w-full border-none text-sm resize-none mt-1 p-1"
+                                  class="w-full border text-sm resize-none mt-1 p-1"
                                   rows="5"
                                   placeholder="Tuliskan catatan riwayat gangguan di sini..."
                                   @change="saveWorkResult"
@@ -2682,19 +2703,19 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                               <table class="w-full border-collapse">
                                   <thead>
                                       <tr>
-                                          <th colspan="5" class="border border-black bg-gray-200 text-center font-bold py-1 text-sm">
+                                          <th colspan="5" class="border border-black bg-white text-center font-bold py-1 text-sm">
                                               Hasil Kerja:
                                           </th>
                                       </tr>
-                                      <tr class="bg-gray-100 text-center font-semibold text-xs">
-                                          <th colspan="3" class="border border-black px-1 py-1 w-[70%]">Lokasi dan Jam beroperasi</th>
-                                          <th class="border border-black px-1 py-1 w-[15%]">hu / hi</th>
-                                          <th class="border border-black px-1 py-1 w-[15%]">Jumlah</th>
+                                      <tr class="bg-white text-center font-semibold text-xs bg-white">
+                                          <th colspan="3" class="border bg-white border-black px-1 py-1 w-[70%]">Lokasi dan Jam beroperasi</th>
+                                          <th class="border bg-white border-black px-1 py-1 w-[15%]">hu / hi</th>
+                                          <th class="border bg-white border-black px-1 py-1 w-[15%]">Jumlah</th>
                                       </tr>
                                   </thead>
                                   <tbody>
                                       <tr>
-                                          <td colspan="3" class="border border-black px-1 py-0 text-left">
+                                          <td colspan="3" class="border border-black px-1 py-0 text-left bg-white">
                                               <input
                                                   v-model="form2.lokasi_dan_jam1"
                                                   type="text"
@@ -2703,18 +2724,17 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                                   @change="saveWorkResult"
                                               />
                                           </td>
-                                          <td class="border border-black px-1 py-0 text-center">
+                                          <td class="border border-black px-1 py-0 text-center bg-white">
                                             <select
                                                 v-model="form2.hu_hi_1"
                                                 class="w-full border-none text-center text-xs p-0.5"
                                                 @change="saveWorkResult"
                                             >
-                                                <!-- <option value="" disabled selected>Pilih</option>  -->
                                                 <option value="Hulu">Hulu</option>
                                                 <option value="Hilir">Hilir</option>
                                             </select>
                                           </td>
-                                          <td class="border border-black px-1 py-0 text-center">
+                                          <td class="border border-black px-1 py-0 text-center bg-white">
                                               <input
                                                   v-model="form2.jumlah_1"
                                                   type="text"
@@ -2725,7 +2745,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                           </td>
                                       </tr>
                                       <tr>
-                                          <td colspan="3" class="border border-black px-1 py-0 text-left">
+                                          <td colspan="3" class="border border-black px-1 py-0 text-left bg-white">
                                               <input
                                                   v-model="form2.lokasi_dan_jam2"
                                                   type="text"
@@ -2734,18 +2754,17 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                                   @change="saveWorkResult"
                                               />
                                           </td>
-                                          <td class="border border-black px-1 py-0 text-center">
+                                          <td class="border border-black px-1 py-0 text-center bg-white">
                                             <select
                                                 v-model="form2.hu_hi_2"
                                                 class="w-full border-none text-center text-xs p-0.5"
                                                 @change="saveWorkResult"
                                             >
-                                                <!-- <option value="" disabled selected>Pilih</option>  -->
                                                 <option value="Hulu">Hulu</option>
                                                 <option value="Hilir">Hilir</option>
                                             </select>
                                           </td>
-                                          <td class="border border-black px-1 py-0 text-center">
+                                          <td class="border border-black px-1 py-0 text-center bg-white">
                                               <input
                                                   v-model="form2.jumlah_2"
                                                   type="text"
@@ -2756,7 +2775,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                           </td>
                                       </tr>
                                       <tr>
-                                          <td colspan="3" class="border border-black px-1 py-0 text-left">
+                                          <td colspan="3" class="border border-black px-1 py-0 text-left bg-white">
                                               <input
                                                   v-model="form2.lokasi_dan_jam3"
                                                   type="text"
@@ -2765,18 +2784,17 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                                   @change="saveWorkResult"
                                               />
                                           </td>
-                                          <td class="border border-black px-1 py-0 text-center">
+                                          <td class="border border-black px-1 py-0 text-center bg-white">
                                             <select
                                                 v-model="form2.hu_hi_3"
                                                 class="w-full border-none text-center text-xs p-0.5"
                                                 @change="saveWorkResult"
                                             >
-                                                <!-- <option value="" disabled selected>Pilih</option>  -->
                                                 <option value="Hulu">Hulu</option>
                                                 <option value="Hilir">Hilir</option>
                                             </select>
                                           </td>
-                                          <td class="border border-black px-1 py-0 text-center">
+                                          <td class="border border-black px-1 py-0 text-center bg-white">
                                               <input
                                                   v-model="form2.jumlah_3"
                                                   type="text"
@@ -2787,13 +2805,13 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                           </td>
                                       </tr>
 
-                                      <tr class="bg-gray-200 text-center font-bold text-xs">
+                                      <tr class="bg-white text-center font-bold text-xs">
                                           <td colspan="2" class="border border-black py-1">Operator</td>
                                           <td class="border border-black py-1">Paraf</td>
                                           <td colspan="2" class="border border-black py-1">Validasi</td>
                                       </tr>
 
-                                      <tr class="bg-gray-200 text-center font-semibold text-xs">
+                                      <tr class="bg-white text-center font-semibold text-xs">
                                           <td colspan="2" class="border border-black text-left w-64">
                                               <Select
                                                   v-model="form2.operator_by1"
@@ -2829,7 +2847,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                           </td>
                                       </tr>
 
-                                      <tr class="bg-gray-200 text-center font-semibold text-xs">
+                                      <tr class="bg-white text-center font-semibold text-xs">
                                           <td colspan="2" class="border border-black text-left w-64">
                                               <Select
                                                   v-model="form2.operator_by2"
@@ -2865,7 +2883,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                           </td>
                                       </tr>
 
-                                      <tr class="bg-gray-200 text-center font-semibold text-xs">
+                                      <tr class="bg-white text-center font-semibold text-xs">
                                           <td colspan="2" class="border border-black text-left w-64">
                                               <Select
                                                   v-model="form2.operator_by3"
@@ -2901,7 +2919,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                           </td>
                                       </tr>
 
-                                      <tr class="bg-gray-200 text-center font-semibold text-xs">
+                                      <tr class="bg-white text-center font-semibold text-xs">
                                           <td colspan="2" class="border border-black text-left w-64">
                                               <Select
                                                   v-model="form2.operator_by4"
@@ -2970,7 +2988,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <Select
                       v-model="form.machine_id"
                       :options="machines.map(machine => ({
-                        label: `${machine.name} - ${machine.type} - ${machine.nomor} - ${machine.no_sarana} (${machine.region.name})`,
+                        label: `[${machine.nomor}] ${machine.name} ${machine.type} - ${machine.no_sarana} (${machine.region.name})`,
                         value: machine.id,
                       }))"
                       :searchable="true"
@@ -3630,7 +3648,8 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                             class="border border-gray-300 rounded-md px-2 py-1 h-9 text-xs bg-white focus:ring-blue-500 focus:border-blue-500 shadow-sm"
                           >
                             <option value="" disabled>Pilih</option>
-                            <option value="Hu/Hi">Hulu/Hiilir</option>
+                            <option value="Hulu">Hulu</option>
+                            <option value="Hilir">Hiilir</option>
                             <option value="Tunggal">Tunggal</option>
                           </select>
                       </div>
@@ -3657,7 +3676,8 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                             class="border border-gray-300 rounded-md px-2 py-1 h-9 text-xs bg-white focus:ring-blue-500 focus:border-blue-500 shadow-sm"
                           >
                             <option value="" disabled>Pilih</option>
-                            <option value="Hu/Hi">Hulu/Hiilir</option>
+                            <option value="Hulu">Hulu</option>
+                            <option value="Hilir">Hiilir</option>
                             <option value="Tunggal">Tunggal</option>
                           </select>
                       </div>
@@ -3684,7 +3704,8 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                             class="border border-gray-300 rounded-md px-2 py-1 h-9 text-xs bg-white focus:ring-blue-500 focus:border-blue-500 shadow-sm"
                           >
                             <option value="" disabled>Pilih</option>
-                            <option value="Hu/Hi">Hulu/Hiilir</option>
+                            <option value="Hulu">Hulu</option>
+                            <option value="Hilir">Hiilir</option>
                             <option value="Tunggal">Tunggal</option>
                           </select>
                       </div>
@@ -3721,7 +3742,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <label class="md:col-span-2 text-xs font-bold">No Wesel</label>
                     <div class="md:col-span-6 flex flex-wrap items-center gap-1 w-full">
                       <div class="flex items-center gap-1 flex-wrap flex-grow">
-                        <Input v-model="form4.no_wesel1" :placeholder="__('Km/Hm')" type="text" class="dot-input flex-1 min-w-[120px] text-xs" />
+                        <Input v-model="form4.no_wesel1" :placeholder="__('No Wesel')" type="text" class="dot-input flex-1 min-w-[120px] text-xs" />
                         <span class="text-center text-xs">Km/Hm : </span>
                         <Input v-model="form4.km_hm1" :placeholder="__('Km/Hm')" type="text" class="dot-input flex-1 min-w-[120px] text-xs" />
                          <select
@@ -3729,7 +3750,8 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                             class="border border-gray-300 rounded-md px-2 py-1 h-9 text-xs bg-white focus:ring-blue-500 focus:border-blue-500 shadow-sm"
                           >
                             <option value="" disabled>Pilih</option>
-                            <option value="Hu/Hi">Hulu/Hiilir</option>
+                            <option value="Hulu">Hulu</option>
+                            <option value="Hilir">Hiilir</option>
                             <option value="Tunggal">Tunggal</option>
                           </select>
                       </div>
@@ -3747,7 +3769,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   <div class="flex flex-col items-start space-y-1">
                     <div class="md:col-span-6 flex flex-wrap items-center gap-1 w-full">
                       <div class="flex items-center gap-1 flex-wrap flex-grow">
-                        <Input v-model="form4.no_wesel2" :placeholder="__('Km/Hm')" type="text" class="dot-input flex-1 min-w-[120px] text-xs" />
+                        <Input v-model="form4.no_wesel2" :placeholder="__('No Wesel')" type="text" class="dot-input flex-1 min-w-[120px] text-xs" />
                         <span class="text-center text-xs">Km/Hm : </span>
                         <Input v-model="form4.km_hm2" :placeholder="__('Km/Hm')" type="text" class="dot-input flex-1 min-w-[120px] text-xs" />
                          <select
@@ -3755,7 +3777,8 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                             class="border border-gray-300 rounded-md px-2 py-1 h-9 text-xs bg-white focus:ring-blue-500 focus:border-blue-500 shadow-sm"
                           >
                             <option value="" disabled>Pilih</option>
-                            <option value="Hu/Hi">Hulu/Hiilir</option>
+                            <option value="Hulu">Hulu</option>
+                            <option value="Hilir">Hiilir</option>
                             <option value="Tunggal">Tunggal</option>
                           </select>
                       </div>
@@ -3774,7 +3797,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <!-- <label class="md:col-span-2 text-xs invisible">Lokasi (Km/Hm)</label> -->
                     <div class="md:col-span-6 flex flex-wrap items-center gap-1 w-full">
                       <div class="flex items-center gap-1 flex-wrap flex-grow">
-                        <Input v-model="form4.no_wesel3" :placeholder="__('Km/Hm')" type="text" class="dot-input flex-1 min-w-[120px] text-xs" />
+                        <Input v-model="form4.no_wesel3" :placeholder="__('No Wesel')" type="text" class="dot-input flex-1 min-w-[120px] text-xs" />
                         <span class="text-center text-xs">Km/Hm : </span>
                         <Input v-model="form4.km_hm3" :placeholder="__('Km/Hm')" type="text" class="dot-input flex-1 min-w-[120px] text-xs" />
                          <select
@@ -3782,7 +3805,8 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                             class="border border-gray-300 rounded-md px-2 py-1 h-9 text-xs bg-white focus:ring-blue-500 focus:border-blue-500 shadow-sm"
                           >
                             <option value="" disabled>Pilih</option>
-                            <option value="Hu/Hi">Hulu/Hiilir</option>
+                            <option value="Hulu">Hulu</option>
+                            <option value="Hilir">Hiilir</option>
                             <option value="Tunggal">Tunggal</option>
                           </select>
                       </div>
@@ -4971,13 +4995,13 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   <div class="flex items-center text-xs border-b border-gray-200 py-1">
                     <div class="w-48 font-semibold text-xs">Waktu Start Engine</div>
                     <div class="pr-2 text-xs">:</div>
-                    <div class="lowercase first-letter:capitalize"> {{ report?.waktu_start_engine?.slice(0, 5) || '-' }} Wib</div>
+                    <div class="lowercase first-letter:capitalize"> {{ report?.waktu_start_engine?.slice(0, 5) || '-' }} WIB</div>
                   </div>
 
                   <div class="flex items-center text-xs border-b border-gray-200 py-1">
                     <div class="w-48 font-semibold text-xs">Waktu Stop Engine</div>
                     <div class="pr-2 text-xs">:</div>
-                    <div class="lowercase first-letter:capitalize"> {{ report?.workresult?.waktu_stop_engine.slice(0, 5) || '-' }} Wib</div>
+                    <div class="lowercase first-letter:capitalize"> {{ report?.workresult?.waktu_stop_engine.slice(0, 5) || '-' }} WIB</div>
                   </div>
 
                   <div class="flex items-center text-xs border-b border-gray-200 py-1">
@@ -4995,13 +5019,13 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   <div class="flex items-center text-xs border-b border-gray-200 py-1">
                     <div class="w-48 font-semibold text-xs">Jam Kerja Awal</div>
                     <div class="pr-2 text-xs">:</div>
-                    <div class="lowercase first-letter:capitalize"> {{ report?.jam_kerja_awal?.slice(0, 5) || '-' }}</div>
+                    <div class="lowercase first-letter:capitalize"> {{ report?.jam_kerja_awal?.slice(0, 5) || '-' }} WIB</div>
                   </div>
 
                   <div class="flex items-center text-xs border-b border-gray-200 py-1">
                     <div class="w-48 font-semibold text-xs">Jam Kerja Akhir</div>
                     <div class="pr-2 text-xs">:</div>
-                    <div class="lowercase first-letter:capitalize"> {{ report?.workresult?.jam_kerja_akhir?.slice(0, 5) || '-' }}</div>
+                    <div class="lowercase first-letter:capitalize"> {{ report?.workresult?.jam_kerja_akhir?.slice(0, 5) || '-' }} WIB</div>
                   </div>
 
                   <div class="flex items-center text-xs border-b border-gray-200 py-1">
@@ -5083,7 +5107,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <div class="flex items-center text-xs border-b border-gray-200 py-1">
                       <div class="w-48 font-semibold text-xs">Pengawal 1</div>
                       <div class="pr-2 text-xs">:</div>
-                      <div class="uppercase">[{{ report?.pengawal?.username }}] {{ report?.pengawal?.name || '-' }}  </div>
+                      <div class="uppercase">[{{ report?.nipp }}] {{ report?.nama_pengawal || '-' }}  </div>
                     </div>
 
                     <div class="flex items-center text-xs border-b border-gray-200 py-1">
@@ -5095,7 +5119,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <div class="flex items-center text-xs border-b border-gray-200 py-1">
                       <div class="w-48 font-semibold text-xs">Pengawal 2</div>
                       <div class="pr-2 text-xs">:</div>
-                      <div class="uppercase">[{{ report?.pengawal1?.username }}] {{ report?.pengawal1?.name || '-' }}  </div>
+                      <div class="uppercase">[{{ report?.nipp1 }}] {{ report?.nama_pengawal1 || '-' }}  </div>
                     </div>
 
                     <div class="flex items-center text-xs border-b border-gray-200 py-1">
@@ -5108,8 +5132,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                 <p v-if="report?.operator_at1" class="text-xs font-bold text-blue-600">Operator 1 telah menyetujui pada tanggal : {{ formatDate(report?.operator_at1)}}</p>
                 <p v-if="report?.operator_at2" class="text-xs font-bold text-blue-600">Operator 2 telah menyetujui pada tanggal : {{ formatDate(report?.operator_at2)}}</p>
                 <p v-if="report?.operator_at3" class="text-xs font-bold text-blue-600">Operator 3 telah menyetujui pada tanggal : {{ formatDate(report?.operator_at3)}}</p>
-                <p v-if="report?.approved_at" class="text-xs font-bold text-blue-600">Pengawal 1 telah menyetujui pada tanggal : {{ formatDate(report?.approved_at)}}</p>
-                <p v-if="report?.approved_at1" class="text-xs font-bold text-blue-600">Pengawal 2 telah menyetujui pada tanggal : {{ formatDate(report?.approved_at1)}}</p>
                 <p v-if="report?.kupt_at1" class="text-xs font-bold text-green-600">KUPT telah menyetujui pada tanggal : {{ formatDate(report?.kupt_at1)}}</p>
                 <div></div>
 
@@ -5140,26 +5162,8 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     </Button>
                 </div>
 
-                <div v-if="report.approved_by === user.id && report.operator_at3 && !report.approved_at" class="d-flex justify-content-end mt-3">
-                    <Button
-                        class="bg-blue-700 hover:bg-blue-900 float-right mr-2 text-xs"
-                        @click.prevent="approvePengawal(1)"
-                    >
-                        Approve Pengawal 1
-                    </Button>
-                </div>
-
-                <div v-if="report.approved_by === user.id && report.approved_at && !report.approved_at1" class="d-flex justify-content-end mt-3">
-                    <Button
-                        class="bg-blue-700 hover:bg-blue-900 float-right mr-2 text-xs"
-                        @click.prevent="approvePengawal(2)"
-                    >
-                        Approve Pengawal 2
-                    </Button>
-                </div>
-
                 <div class="flex justify-end mt-4 w-full">
-                  <Button v-if="hasRole(['admin', 'Kepala UPT Mekanik']) && report.approved_at && !report.kupt_at1" class="bg-blue-700 hover:bg-blue-900 px-4 py-1 rounded float-right mr-2 text-xs" @click.prevent="approveKUPT()">Approve KUPT</Button>
+                  <Button v-if="hasRole(['admin', 'Kepala UPT Mekanik']) && report.operator_at3 && !report.kupt_at1" class="bg-blue-700 hover:bg-blue-900 px-4 py-1 rounded float-right mr-2 text-xs" @click.prevent="approveKUPT()">Approve KUPT</Button>
                 </div>
 
             </div>
@@ -5249,13 +5253,13 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   <div class="flex items-center text-xs border-b border-gray-200 py-1">
                     <div class="w-48 font-semibold text-xs">Waktu Start Engine</div>
                     <div class="pr-2 text-xs">:</div>
-                    <div class="capitalize"> {{ report?.waktu_start_engine?.slice(0, 5) || '-' }} Wib</div>
+                    <div class="capitalize"> {{ report?.waktu_start_engine?.slice(0, 5) || '-' }} WIB</div>
                   </div>
 
                   <div class="flex items-center text-xs border-b border-gray-200 py-1">
                     <div class="w-48 font-semibold text-xs">Waktu Stop Engine</div>
                     <div class="pr-2 text-xs">:</div>
-                    <div class="capitalize"> {{ report?.warmingup?.waktu_stop_engine?.slice(0, 5) || '-' }} Wib</div>
+                    <div class="capitalize"> {{ report?.warmingup?.waktu_stop_engine?.slice(0, 5) || '-' }} WIB</div>
                   </div>
 
                   <div class="flex items-center text-xs border-b border-gray-200 py-1">
@@ -5273,13 +5277,13 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   <div class="flex items-center text-xs border-b border-gray-200 py-1">
                     <div class="w-48 font-semibold text-xs">Jam Kerja Awal</div>
                     <div class="pr-2 text-xs">:</div>
-                    <div class="capitalize"> {{ report?.jam_kerja_awal?.slice(0, 5) || '-' }}</div>
+                    <div class="capitalize"> {{ report?.jam_kerja_awal?.slice(0, 5) || '-' }} WIB</div>
                   </div>
 
                   <div class="flex items-center text-xs border-b border-gray-200 py-1">
                     <div class="w-48 font-semibold text-xs">Jam Kerja Akhir</div>
                     <div class="pr-2 text-xs">:</div>
-                    <div class="capitalize"> {{ report?.warmingup?.jam_kerja_akhir?.slice(0, 5) || '-' }}</div>
+                    <div class="capitalize"> {{ report?.warmingup?.jam_kerja_akhir?.slice(0, 5) || '-' }} WIB</div>
                   </div>
 
                   <div class="flex items-center text-xs border-b border-gray-200 py-1">
@@ -5362,7 +5366,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <div class="flex items-center text-xs border-b border-gray-200 py-1">
                       <div class="w-48 font-semibold text-xs">Pengawal 1</div>
                       <div class="pr-2 text-xs">:</div>
-                      <div class="uppercase">[{{ report?.pengawal?.username }}] {{ report?.pengawal?.name || '-' }}  </div>
+                      <div class="uppercase">[{{ report?.nipp }}] {{ report?.nama_pengawal || '-' }}  </div>
                     </div>
 
                     <div class="flex items-center text-xs border-b border-gray-200 py-1">
@@ -5374,7 +5378,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <div class="flex items-center text-xs border-b border-gray-200 py-1">
                       <div class="w-48 font-semibold text-xs">Pengawal 2</div>
                       <div class="pr-2 text-xs">:</div>
-                      <div class="uppercase">[{{ report?.pengawal1?.username }}] {{ report?.pengawal1?.name || '-' }}  </div>
+                      <div class="uppercase">[{{ report?.nipp1 }}] {{ report?.nama_pengawal1 || '-' }}  </div>
                     </div>
 
                     <div class="flex items-center text-xs border-b border-gray-200 py-1">
@@ -5387,8 +5391,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                 <p v-if="report?.operator_at1" class="text-xs font-bold text-blue-600">Operator 1 telah menyetujui pada tanggal : {{ formatDate(report?.operator_at1)}}</p>
                 <p v-if="report?.operator_at2" class="text-xs font-bold text-blue-600">Operator 2 telah menyetujui pada tanggal : {{ formatDate(report?.operator_at2)}}</p>
                 <p v-if="report?.operator_at3" class="text-xs font-bold text-blue-600">Operator 3 telah menyetujui pada tanggal : {{ formatDate(report?.operator_at3)}}</p>
-                <p v-if="report?.approved_at" class="text-xs font-bold text-blue-600">Pengawal 1 telah menyetujui pada tanggal : {{ formatDate(report?.approved_at)}}</p>
-                <p v-if="report?.approved_at1" class="text-xs font-bold text-blue-600">Pengawal 2 telah menyetujui pada tanggal : {{ formatDate(report?.approved_at1)}}</p>
                 <p v-if="report?.kupt_at1" class="text-xs font-bold text-green-600">KUPT telah menyetujui pada tanggal : {{ formatDate(report?.kupt_at1)}}</p>
                 <div></div>
 
@@ -5419,26 +5421,8 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     </Button>
                 </div>
 
-                <div v-if="report.approved_by === user.id && report.operator_at3 && !report.approved_at" class="d-flex justify-content-end mt-3">
-                    <Button
-                        class="bg-blue-700 hover:bg-blue-900 float-right mr-2 text-xs"
-                        @click.prevent="approvePengawal(1)"
-                    >
-                        Approve Pengawal 1
-                    </Button>
-                </div>
-
-                <div v-if="report.approved_by === user.id && report.approved_at && !report.approved_at1" class="d-flex justify-content-end mt-3">
-                    <Button
-                        class="bg-blue-700 hover:bg-blue-900 float-right mr-2 text-xs"
-                        @click.prevent="approvePengawal(2)"
-                    >
-                        Approve Pengawal 2
-                    </Button>
-                </div>
-
                 <div class="flex justify-end mt-4 w-full">
-                  <Button v-if="hasRole(['admin', 'Kepala UPT Mekanik']) && report.approved_at && !report.kupt_at1" class="bg-blue-700 hover:bg-blue-900 px-4 py-1 rounded float-right mr-2 text-xs" @click.prevent="approveKUPT()">Approve KUPT</Button>
+                  <Button v-if="hasRole(['admin', 'Kepala UPT Mekanik']) && report.operator_at3 && !report.kupt_at1" class="bg-blue-700 hover:bg-blue-900 px-4 py-1 rounded float-right mr-2 text-xs" @click.prevent="approveKUPT()">Approve KUPT</Button>
                 </div>
 
             </div>

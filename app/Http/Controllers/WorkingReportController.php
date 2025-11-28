@@ -70,7 +70,6 @@ class WorkingReportController extends Controller
 
   public function detail(DataTableRequest $request, WorkingReport $report, WorkResult $workresult)
   {
-    //   $report->load('checksheetday.dayresults');
         $report->load(
             'checksheetday.dayresults', 
             'checksheetday.checksheetworkresult', 
@@ -89,9 +88,27 @@ class WorkingReportController extends Controller
 
         $machineType = $report->machine?->name;
 
-        $masters = CheckSheetMasterDay::when($machineType, function ($query, $machineType) {
-            $query->where('jenis_mesin', $machineType);
+        $machineType = $report->machine?->name;
+        $filterType = $machineType; // Default: gunakan nama mesin asli
+
+        // Logika Penyesuaian Filter Jenis Mesin
+        if ($machineType === 'Tamping Machine') {
+            // Jika Tamping Machine, filter master dengan 'MTT'
+            $filterType = 'MTT';
+        } elseif ($machineType === 'Ballast Regulator Machine') {
+            // Jika Ballast Regulator Machine, filter master dengan 'PBR'
+            $filterType = 'PBR';
+        }
+
+
+        $masters = CheckSheetMasterDay::when($filterType, function ($query, $filterType) {
+            // Menggunakan $filterType yang sudah disesuaikan ('MTT', 'PBR', atau nama asli)
+            $query->where('jenis_mesin', $filterType);
         })
+
+        // $masters = CheckSheetMasterDay::when($machineType, function ($query, $machineType) {
+        //     $query->where('jenis_mesin', $machineType);
+        // })
         ->orderByRaw("
             CASE 
                 WHEN LOWER(group_name) LIKE 'engine%' THEN 1
@@ -136,7 +153,6 @@ class WorkingReportController extends Controller
       if ($user->division_id) {
           $userQuery->where('division_id', $user->division_id);
       }
-      // Menampilkan data user yang login sesuai daop division
 
       return Inertia::render('WorkingReport/Detail')->with([
           'report'      => $report,
@@ -152,7 +168,6 @@ class WorkingReportController extends Controller
           'workresult_user'  => $report->workresult_user ?? null,    
           'machines'    => MasterMachine::with('region')->select('id', 'name', 'type', 'nomor', 'no_sarana', 'region_id')->get(),
           'regions'     => MasterRegion::select('id', 'name')->get(),
-        //   'users'       => User::select('id', 'name', 'username')->get(),
           'users' => $userQuery->get(),
           'mglurusanawal' => $report->mglurusanawal,
           'mglengkunganawal' => $report->mglengkunganawal,
