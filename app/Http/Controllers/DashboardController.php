@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
 use App\Models\Report;
+use App\Models\WorkingReport;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\FeedbackModels;
-use App\Models\Joblist;
+use App\Models\ReadinessAssessmentMaster;
+use App\Models\ReadinessAssessment;
 use App\Models\ReportUser;
+use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 class DashboardController extends Controller
 {
@@ -19,160 +22,242 @@ class DashboardController extends Controller
   public function index(Report $report)
   {
 
-    $report = Report::all();
-    $count_drafting = $report->where('status', '0')->count();
-    // $count_terkirim = $report->where('status', '1')->count();
-    // $count_perbaikan = $report->where('status', '2')->count();
-    // $count_pending = $report->where('status', '4')->count();
-    // $count_selesai = $report->where('status', '3')->count();
-    // $count_joblist = $report->where('status', '5')->count();
-    // $joblist = Joblist::all();
-    // $count_joblist = $joblist->count();
-
     $user = auth()->user();
+    $isSuperuserOrAdmin = $this->hasRole($user, ['superuser', 'admin']);
+    $today = Carbon::today()->toDateString();
 
-    if ($this->hasRole($user,['superuser', 'admin'])) {
-      $count_feedback = FeedbackModels::whereHas('report', function ($query) {
-        $query->where('status', '!=', 3);
-      })->count();
-    } else {
-      $count_feedback = FeedbackModels::whereHas('report', function ($query) use ($user) {
-        $query->where('created_by_id', $user->id)
-          ->where('status', '!=', 3);
-      })->count();
+    // Cek apakah user sudah mengisi assessment hari ini (Raidnes Assessments)
+    $hasCompletedAssessment = ReadinessAssessment::where('user_id', $user->id)
+        ->whereDate('assessment_date', $today)
+        ->count() === ReadinessAssessmentMaster::count();
+
+    $assessmentData = null;
+
+    if (!$hasCompletedAssessment) {
+        $masterQuestions = ReadinessAssessmentMaster::orderBy('urutan')
+            ->orderBy('group_name') 
+            ->get();
+
+        $existingAssessments = ReadinessAssessment::where('user_id', $user->id)
+            ->whereDate('assessment_date', $today)
+            ->get()
+            ->keyBy('assessment_master_id');
+
+        $groupedQuestions = $masterQuestions->groupBy('group_name')->map(function ($group) use ($existingAssessments) {
+            return $group->map(function ($question) use ($existingAssessments) {
+                $assessment = $existingAssessments->get($question->id);
+                $question->ya = $assessment ? $assessment->ya : null;
+                $question->tidak = $assessment ? $assessment->tidak : null;
+                return $question;
+            });
+        });
+
+        $assessmentData = [
+            'groupedQuestions' => $groupedQuestions,
+            'today' => $today,
+        ];
+    }
+    // Cek apakah user sudah mengisi assessment hari ini (Raidnes Assessments)
+
+    // Dashboard Working Order
+    $reports = WorkingReport::with([
+        'machine:id,name,nomor,type',
+        'warmingup',
+        'workresult',
+    ])->get();
+
+    $totalPerMesin = [];
+    $totalJamGenerator = [];
+    $totalCounterTamping = [];
+    $totalOdometer = [];
+    $totalHSD = [];
+
+    foreach ($reports as $wr) {
+
+        $machine = $wr->machine;
+
+        if ($machine) {
+            $machineName = ' [' . $machine->nomor .'] ' . $machine->name . ' - ' . $machine->type . '';
+        } else {
+            $machineName = 'UNKNOWN';
+        }
+
+        $start = $wr->waktu_start_engine;
+        $stopWarm = $wr->warmingup?->waktu_stop_engine;
+        $stopWork = $wr->workresult?->waktu_stop_engine;
+
+        $stop = null;
+        if ($stopWarm && $stopWork) {
+            $stop = max($stopWarm, $stopWork);
+        } elseif ($stopWarm) {
+            $stop = $stopWarm;
+        } elseif ($stopWork) {
+            $stop = $stopWork;
+        }
+
+       if ($start && $stop) {
+            try {
+                $startTime = Carbon::createFromTimeString($start);
+                $stopTime  = Carbon::createFromTimeString($stop);
+
+                if ($stopTime->lessThan($startTime)) {
+                    $stopTime->addDay();
+                }
+
+                $diffMinutes = $stopTime->diffInMinutes($startTime);
+
+                if (!isset($totalPerMesin[$machineName])) {
+                    $totalPerMesin[$machineName] = 0;
+                }
+                $totalPerMesin[$machineName] += $diffMinutes;
+
+            } catch (\Exception $e) {
+            }
+        }
+
+        $genStart = $wr->jam_generator_awal;
+        $genStopWarm = $wr->warmingup?->jam_generator_akhir;
+        $genStopWork = $wr->workresult?->jam_generator_akhir;
+
+        $genStop = null;
+        if ($genStopWarm !== null && $genStopWork !== null) {
+            $genStop = max($genStopWarm, $genStopWork);
+        } elseif ($genStopWarm !== null) {
+            $genStop = $genStopWarm;
+        } elseif ($genStopWork !== null) {
+            $genStop = $genStopWork;
+        }
+
+        if (!isset($totalJamGenerator[$machineName])) {
+            $totalJamGenerator[$machineName] = 0;
+        }
+
+        if ($genStart !== null && is_numeric($genStart)) {
+            $totalJamGenerator[$machineName] += $genStart;
+        }
+
+        if ($genStop !== null && is_numeric($genStop)) {
+            $totalJamGenerator[$machineName] += $genStop;
+        }
+
+        $tampStart = $wr->counter_tamping_awal;
+        $tampStopWarm = $wr->warmingup?->counter_tamping_akhir;
+        $tampStopWork = $wr->workresult?->counter_tamping_akhir;
+
+        $tampStop = null;
+        if ($tampStopWarm !== null && $tampStopWork !== null) {
+            $tampStop = max($tampStopWarm, $tampStopWork);
+        } elseif ($tampStopWarm !== null) {
+            $tampStop = $tampStopWarm;
+        } elseif ($tampStopWork !== null) {
+            $tampStop = $tampStopWork;
+        }
+
+        if (!isset($totalCounterTamping[$machineName])) {
+            $totalCounterTamping[$machineName] = 0;
+        }
+
+        if ($tampStart !== null && is_numeric($tampStart)) {
+            $totalCounterTamping[$machineName] += $tampStart;
+        }
+
+        if ($tampStop !== null && is_numeric($tampStop)) {
+            $totalCounterTamping[$machineName] += $tampStop;
+        }
+
+        $odoStart = $wr->oddometer_awal;
+        $odoStopWarm = $wr->warmingup?->oddometer_akhir;
+        $odoStopWork = $wr->workresult?->oddometer_akhir;
+
+        $odoStop = null;
+        if ($odoStopWarm !== null && $odoStopWork !== null) {
+            $odoStop = max($odoStopWarm, $odoStopWork);
+        } elseif ($odoStopWarm !== null) {
+            $odoStop = $odoStopWarm;
+        } elseif ($odoStopWork !== null) {
+            $odoStop = $odoStopWork;
+        }
+
+        if (!isset($totalOdometer[$machineName])) {
+            $totalOdometer[$machineName] = 0;
+        }
+
+        if ($odoStart !== null && is_numeric($odoStart)) {
+            $totalOdometer[$machineName] += $odoStart;
+        }
+
+        if ($odoStop !== null && is_numeric($odoStop)) {
+            $totalOdometer[$machineName] += $odoStop;
+        }
+
+        $hsdStart = $wr->hsd_awal_kerja;
+        $hsdStopWarm = $wr->warmingup?->hsd_akhir_kerja;
+        $hsdStopWork = $wr->workresult?->hsd_akhir_kerja;
+
+        $hsdStop = null;
+        if ($hsdStopWarm !== null && $hsdStopWork !== null) {
+            $hsdStop = max($hsdStopWarm, $hsdStopWork);
+        } elseif ($hsdStopWarm !== null) {
+            $hsdStop = $hsdStopWarm;
+        } elseif ($hsdStopWork !== null) {
+            $hsdStop = $hsdStopWork;
+        }
+
+        if (!isset($totalHSD[$machineName])) {
+            $totalHSD[$machineName] = 0;
+        }
+
+        if ($hsdStart !== null && is_numeric($hsdStart)) {
+            $totalHSD[$machineName] += $hsdStart;
+        }
+
+        if ($hsdStop !== null && is_numeric($hsdStop)) {
+            $totalHSD[$machineName] += $hsdStop;
+        }
     }
     
-
-    $count_pending = $report->where('status', '4')->count();
-
-    if ($this->hasRole($user, ['superuser'])) {
-      $count_datalaporin = Report::count();
-    } else {
-      $count_datalaporin = Report::where('created_by_id', $user->id)
-            ->orWhereExists(function ($query) use ($user) {
-                $query->select(DB::raw(1))
-                    ->from('report_user')
-                    ->whereColumn('report_user.report_id', 'reports.id')
-                    ->where('report_user.user_id', $user->id);
-            })
-            ->count();
+    $formatted = [];
+    foreach ($totalPerMesin as $mesin => $menit) {
+        $formatted[$mesin] = floor($menit / 60) . " Jam " . ($menit % 60) . " Menit";
     }
 
-    if ($this->hasRole($user, ['superuser', 'admin'])) {
-        $count_joblist = JobList::whereHas('report', function ($query) {
-            $query->where('status', '!=', 3)
-                  ->where('status', '!=', 0);
-        })->count();
-    } else {
-        $count_joblist = JobList::join('reports', 'job_lists.report_id', '=', 'reports.id')
-                      ->join('report_user', 'reports.id', '=', 'report_user.report_id')
-                      ->where('report_user.user_id', $user->id)
-                      ->where('reports.status', '!=', 3)
-                      ->where('reports.status', '!=', 0)
-                      ->count();
+    $formattedGenerator = [];
+    foreach ($totalJamGenerator as $mesin => $jam) {
+        $formattedGenerator[$mesin] = $jam . " Jam";
     }
 
-    if ($this->hasRole($user, ['superuser', 'admin'])) {
-      $count_terkirim = Report::where('status', 1)->count();
-    } else {
-        $count_terkirim = Report::where(function ($query) use ($user) {
-            $query->where('created_by_id', $user->id)
-                ->orWhereExists(function ($subquery) use ($user) {
-                    $subquery->select(DB::raw(1))
-                        ->from('report_user')
-                        ->whereColumn('report_user.report_id', 'reports.id')
-                        ->where('report_user.user_id', $user->id);
-                });
-        })->where('status', 1)->count();
+    $formattedTamping = [];
+    foreach ($totalCounterTamping as $mesin => $counter) {
+        $formattedTamping[$mesin] = number_format($counter, 0, ',', '.') . " Counter "; 
     }
 
-    if ($this->hasRole($user, ['superuser', 'admin'])) {
-      $count_perbaikan = Report::where('status', 2)->count();
-    } else {
-        $count_perbaikan = Report::where(function ($query) use ($user) {
-            $query->where('created_by_id', $user->id)
-                ->orWhereExists(function ($subquery) use ($user) {
-                    $subquery->select(DB::raw(1))
-                        ->from('report_user')
-                        ->whereColumn('report_user.report_id', 'reports.id')
-                        ->where('report_user.user_id', $user->id);
-                });
-        })->where('status', 2)->count();
-    }
-    
-    if ($this->hasRole($user, ['superuser', 'admin'])) {
-      $count_selesai = Report::where('status', 3)->count();
-    } else {
-        $count_selesai = Report::where(function ($query) use ($user) {
-            $query->where('created_by_id', $user->id)
-                ->orWhereExists(function ($subquery) use ($user) {
-                    $subquery->select(DB::raw(1))
-                        ->from('report_user')
-                        ->whereColumn('report_user.report_id', 'reports.id')
-                        ->where('report_user.user_id', $user->id);
-                });
-        })->where('status', 3)->count();
-    }
-    
-    if ($this->hasRole($user, ['superuser', 'admin'])) {
-      $count_pending = Report::where('status', 4)->count();
-    } else {
-        $count_pending = Report::where(function ($query) use ($user) {
-            $query->where('created_by_id', $user->id)
-                ->orWhereExists(function ($subquery) use ($user) {
-                    $subquery->select(DB::raw(1))
-                        ->from('report_user')
-                        ->whereColumn('report_user.report_id', 'reports.id')
-                        ->where('report_user.user_id', $user->id);
-                });
-        })->where('status', 4)->count();
-    }
-    
-    if ($this->hasRole($user, ['superuser', 'admin'])) {
-      $count_assign = ReportUser::whereHas('report', function ($query) {
-          $query->whereColumn('reports.id', 'report_user.report_id');
-          $query->where('user_id', '!=', 3);
-      })->count();
-    } else {
-        $count_assign = Report::where(function ($query) use ($user) {
-            $query->where('created_by_id', $user->id)
-                ->orWhereExists(function ($subquery) use ($user) {
-                    $subquery->select(DB::raw(1))
-                        ->from('report_user')
-                        ->whereColumn('report_user.report_id', 'reports.id')
-                        ->where('report_user.user_id', $user->id);
-                });
-        })->count();
+    $formattedOdometer = [];
+    foreach ($totalOdometer as $mesin => $odo) {
+        $formattedOdometer[$mesin] = number_format($odo, 0, ',', '.') . " Km "; 
     }
 
-    // $count_assign = User::count();
+    $formattedHSD = [];
+    foreach ($totalHSD as $mesin => $hsd) {
+        $formattedHSD[$mesin] = number_format($hsd, 2, ',', '.') . " % "; 
+    }
 
-    // dd($count_joblist);
-
-    // modal data laporin 
-    $data_laporin =  Report::limit(5)->get();
-
-    // dd($report);
+    // dd($formatted, $formattedGenerator, $formattedTamping, $formattedOdometer, $formattedHSD);
 
     return Inertia::render('Dashboard', [
-      'report' => $report,
-      'count_drafting' => $count_drafting,
-      'count_terkirim' => $count_terkirim,
-      'count_perbaikan' => $count_perbaikan,
-      'count_feedback' => $count_feedback,
-      'count_pending' => $count_pending,
-      'count_selesai' => $count_selesai,
-      'count_joblist' => $count_joblist,
-      'count_datalaporin' => $count_datalaporin,
-      'count_assign' => $count_assign,
-      'data_laporin' => $data_laporin,
-      // 'users' => User::get(['id', 'name']),
+      'formatted_mesin_total' => $formatted,
+      'formatted_generator_total' => $formattedGenerator,
+      'formatted_counter_total' => $formattedTamping,
+      'formatted_oddometer_total' => $formattedOdometer,
+      'formatted_hsd_total' => $formattedHSD,
+      'hasCompletedAssessment' => $hasCompletedAssessment,
+      'assessmentData' => $assessmentData,
       'users' => auth()->user()->load([
           'divisions:id,division_name',
           'positions:id,position',
       ]),
     ]);
   }
+
   public function get()
   {
     return Report::get();

@@ -89,20 +89,15 @@ class WorkingReportController extends Controller
         $machineType = $report->machine?->name;
 
         $machineType = $report->machine?->name;
-        $filterType = $machineType; // Default: gunakan nama mesin asli
+        $filterType = $machineType;
 
-        // Logika Penyesuaian Filter Jenis Mesin
         if ($machineType === 'Tamping Machine') {
-            // Jika Tamping Machine, filter master dengan 'MTT'
             $filterType = 'MTT';
         } elseif ($machineType === 'Ballast Regulator Machine') {
-            // Jika Ballast Regulator Machine, filter master dengan 'PBR'
             $filterType = 'PBR';
         }
 
-
         $masters = CheckSheetMasterDay::when($filterType, function ($query, $filterType) {
-            // Menggunakan $filterType yang sudah disesuaikan ('MTT', 'PBR', atau nama asli)
             $query->where('jenis_mesin', $filterType);
         })
 

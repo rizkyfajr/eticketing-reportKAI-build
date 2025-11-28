@@ -328,11 +328,11 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                 <div class="flex flex-col space-y-2">
                                     <div class="flex items-center space-x-2">
                                         <label for="name" class="w-1/3 capitalize text-sm">
-                                            {{ __('name') }}
+                                            {{ __('Jenis') }}
                                         </label>
 
                                         <Input v-model="form.name"
-                                            :placeholder="__('name')" 
+                                            :placeholder="__('Jenis')" 
                                             type="text"
                                             required 
                                             class="text-sm"
@@ -340,6 +340,23 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                     </div>
 
                                     <InputError :error="form.errors.name" />
+                                </div>
+
+                                <div class="flex flex-col space-y-2">
+                                    <div class="flex items-center space-x-2">
+                                        <label for="nomor" class="w-1/3 capitalize text-sm">
+                                            {{ __('nomor mesin') }}
+                                        </label>
+
+                                        <Input v-model="form.nomor"
+                                            :placeholder="__('nomor mesin')" 
+                                            type="text"
+                                            required 
+                                            class="text-sm"
+                                        />
+                                    </div>
+
+                                    <InputError :error="form.errors.nomor" />
                                 </div>
 
                                 <div class="flex flex-col space-y-2">
@@ -361,23 +378,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
 
                                 <div class="flex flex-col space-y-2">
                                     <div class="flex items-center space-x-2">
-                                        <label for="nomor" class="w-1/3 capitalize text-sm">
-                                            {{ __('nomor') }}
-                                        </label>
-
-                                        <Input v-model="form.nomor"
-                                            :placeholder="__('nomor')" 
-                                            type="text"
-                                            required 
-                                            class="text-sm"
-                                        />
-                                    </div>
-
-                                    <InputError :error="form.errors.nomor" />
-                                </div>
-
-                                <div class="flex flex-col space-y-2">
-                                    <div class="flex items-center space-x-2">
                                         <label for="tahun_md" class="w-1/3 capitalize text-sm">
                                             {{ __('tahun mulai dinas') }}
                                         </label>
@@ -385,7 +385,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                         <Input v-model="form.tahun_md"
                                             :placeholder="__('tahun mulai dinas')" 
                                             type="number"
-                                            required 
                                             class="text-sm"
                                         />
                                     </div>
@@ -402,7 +401,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                         <Input v-model="form.umur"
                                             :placeholder="__('umur')" 
                                             type="number"
-                                            required 
                                             class="text-sm"
                                         />
                                     </div>
@@ -419,7 +417,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                         <Input v-model="form.no_sarana"
                                             :placeholder="__('Nomor Sarana')" 
                                             type="text"
-                                            required 
                                             class="text-sm"
                                         />
                                     </div>

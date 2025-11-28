@@ -103,6 +103,11 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('/master-checksheet-day/paginate', [App\Http\Controllers\CheckSheetMasterDayController::class, 'paginate'])
         ->name('master-checksheet-day.paginate');
 
+    Route::post('/readiness-store', [App\Http\Controllers\MasterReadinessAssessment::class, 'storeassessment'])->name('readiness.store');
+    Route::resource('master-readiness-assessment', App\Http\Controllers\MasterReadinessAssessment::class);
+    Route::post('/master-readiness-assessment/paginate', [App\Http\Controllers\MasterReadinessAssessment::class, 'paginate'])
+        ->name('master-readiness-assessment.paginate');
+
     // Route::get('/working-reports/{report}/create', [App\Http\Controllers\WorkingReportController::class, 'create'])->name('working-reports.create.withid');
     Route::get('working-reports/{report}/download', [App\Http\Controllers\WorkingReportController::class, 'downloadReport'])->name('working-reports.download');
     Route::post('/working-reports/approveKUPT', [App\Http\Controllers\WorkingReportController::class, 'approveKUPT'])->name('working-reports.approveKUPT');
