@@ -1629,8 +1629,30 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
           <div class="flex flex-col space-y-2">
 
             <!-- section working report -->
-             
+
 					  <div v-if="currentSection === 'report'" class="tab-pane fade show active" id="list-report" role="tabpanel" aria-labelledby="list-report-list">
+
+                <!-- Header dengan button Create Maintenance Order -->
+                <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-200">
+                  <h3 class="text-lg font-bold text-gray-800">Working Report Detail</h3>
+                  <div class="flex items-center space-x-2">
+                    <!-- Badge jumlah MO -->
+                    <span v-if="report.maintenance_orders && report.maintenance_orders.length > 0"
+                          class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
+                      {{ report.maintenance_orders.length }} Maintenance Order
+                    </span>
+
+                    <!-- Button Create MO -->
+                    <Link :href="`/maintenance-orders/create-from-wr/${report.id}`"
+                          class="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-semibold transition flex items-center space-x-2">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                      </svg>
+                      <span>Create Maintenance Order</span>
+                    </Link>
+                  </div>
+                </div>
+
                 <!-- <div class="grid grid-cols-1 gap-2 mb-4 md:grid-cols-2"> -->
                 <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">
 
@@ -2422,7 +2444,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       </Select>
                       <InputError :error="form.errors.operator_by3" />
                     </div>
-                    
+
                     <div class="flex flex-col items-start space-y-1">
                       <label for="hsd_awal_kerja" class="font-semibold text-xs">
                         {{ __('NIPP Pengawal 1') }}
@@ -2438,7 +2460,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                         <InputError :error="form.errors.hsd_awal_kerja"/>
                       </div>
                     </div>
-                    
+
                     <div class="flex flex-col items-start space-y-1">
                       <label for="hsd_awal_kerja" class="font-semibold text-xs">
                         {{ __('Nama Pengawal 1') }}
@@ -2454,7 +2476,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                         <InputError :error="form.errors.hsd_awal_kerja"/>
                       </div>
                     </div>
-                    
+
                     <div class="flex flex-col items-start space-y-1">
                       <label for="hsd_awal_kerja" class="font-semibold text-xs">
                         {{ __('NIPP Pengawal 2') }}
@@ -2470,7 +2492,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                         <InputError :error="form.errors.hsd_awal_kerja"/>
                       </div>
                     </div>
-                    
+
                     <div class="flex flex-col items-start space-y-1">
                       <label for="hsd_awal_kerja" class="font-semibold text-xs">
                         {{ __('Nama Pengawal 2') }}
@@ -2488,6 +2510,70 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     </div>
                   </div>
                 </div>
+
+                <!-- Tab Maintenance Orders dari Working Report ini -->
+                <div v-if="report.maintenance_orders && report.maintenance_orders.length > 0" class="mt-6 border-t pt-4">
+                  <h4 class="text-md font-bold mb-3 text-gray-800 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                    Maintenance Orders Terkait ({{ report.maintenance_orders.length }})
+                  </h4>
+
+                  <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-200 rounded-lg text-xs">
+                      <thead class="bg-gray-100">
+                        <tr>
+                          <th class="px-4 py-2 text-left font-semibold">ID</th>
+                          <th class="px-4 py-2 text-left font-semibold">Kategori</th>
+                          <th class="px-4 py-2 text-left font-semibold">Judul</th>
+                          <th class="px-4 py-2 text-left font-semibold">Mesin</th>
+                          <th class="px-4 py-2 text-left font-semibold">Status</th>
+                          <th class="px-4 py-2 text-left font-semibold">Severity</th>
+                          <th class="px-4 py-2 text-center font-semibold">Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="mo in report.maintenance_orders" :key="mo.id" class="border-t hover:bg-gray-50">
+                          <td class="px-4 py-2">#{{ mo.id }}</td>
+                          <td class="px-4 py-2">
+                            <span :class="mo.category === 'planned' ? 'px-2 py-1 bg-blue-100 text-blue-700 rounded' : 'px-2 py-1 bg-red-100 text-red-700 rounded'">
+                              {{ mo.category === 'planned' ? 'Planned' : 'Unplanned' }}
+                            </span>
+                          </td>
+                          <td class="px-4 py-2 font-medium">{{ mo.title }}</td>
+                          <td class="px-4 py-2">{{ mo.machine?.name }}</td>
+                          <td class="px-4 py-2">
+                            <span :class="{
+                              'px-2 py-1 bg-yellow-100 text-yellow-700 rounded': mo.status === 'pending',
+                              'px-2 py-1 bg-blue-100 text-blue-700 rounded': mo.status === 'in_progress',
+                              'px-2 py-1 bg-green-100 text-green-700 rounded': mo.status === 'completed'
+                            }">
+                              {{ mo.status || 'pending' }}
+                            </span>
+                          </td>
+                          <td class="px-4 py-2">
+                            <span :class="{
+                              'px-2 py-1 bg-gray-100 text-gray-700 rounded': mo.severity === 'low',
+                              'px-2 py-1 bg-yellow-100 text-yellow-700 rounded': mo.severity === 'medium',
+                              'px-2 py-1 bg-orange-100 text-orange-700 rounded': mo.severity === 'high',
+                              'px-2 py-1 bg-red-100 text-red-700 rounded': mo.severity === 'critical'
+                            }">
+                              {{ mo.severity }}
+                            </span>
+                          </td>
+                          <td class="px-4 py-2 text-center">
+                            <Link :href="`/maintenance-orders/${mo.id}/edit`"
+                                  class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs">
+                              Detail
+                            </Link>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
             </div>
             <!-- section working report -->
 

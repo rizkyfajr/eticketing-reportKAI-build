@@ -18,6 +18,8 @@ const props = defineProps({
   reports: Array,
   pedoman: Array,
   users: Array, // tambahan untuk form follow up & repair
+  workingReport: Object, // Working Report yang jadi sumber (jika create dari WR)
+  prefillData: Object, // Data pre-fill dari WR
 })
 
 // === STATE WIZARD ===
@@ -29,6 +31,8 @@ const savedOrderData = ref(props.order || props.newOrder || null)
 // Debug - hapus setelah selesai
 console.log('Props order:', props.order)
 console.log('Props newOrder:', props.newOrder)
+console.log('Props workingReport:', props.workingReport)
+console.log('Props prefillData:', props.prefillData)
 console.log('Saved Order ID:', savedOrderId.value)
 
 // Jika ada newOrder dari response, mark step 1 as completed
@@ -38,23 +42,17 @@ if (props.newOrder && !props.order) {
   console.log('NewOrder detected, moving to step 2')
 }
 
-// Computed untuk cek apakah step sudah unlocked
-const isStep1Unlocked = computed(() => true) // Step 1 selalu unlocked
-const isStep2Unlocked = computed(() => savedOrderId.value !== null || completedSteps.value.includes(1))
-const isStep3Unlocked = computed(() => completedSteps.value.includes(2))
-const isStep4Unlocked = computed(() => completedSteps.value.includes(3))
-
 const form = useForm({
-  working_report_id: props.order?.working_report_id ?? (props.reports?.[0]?.id ?? null),
-  master_machine_id: props.order?.master_machine_id ?? null,
-  category: props.order?.category ?? 'unplanned',
+  working_report_id: props.prefillData?.working_report_id ?? props.order?.working_report_id ?? (props.reports?.[0]?.id ?? null),
+  master_machine_id: props.prefillData?.master_machine_id ?? props.order?.master_machine_id ?? null,
+  category: props.prefillData?.category ?? props.order?.category ?? 'unplanned',
   title: props.order?.title ?? '',
 
   lampiran: null, // <-- TAMBAHAN UNTUK FITUR LAMPIRAN
 
   // unplanned
-  trouble_at: props.order?.trouble_at ?? '',
-  location: props.order?.location ?? '',
+  trouble_at: props.prefillData?.trouble_at ?? props.order?.trouble_at ?? '',
+  location: props.prefillData?.location ?? props.order?.location ?? '',
   problem_note: props.order?.problem_note ?? '',
   severity: props.order?.severity ?? 'medium',
   // planned
@@ -71,7 +69,7 @@ const form = useForm({
 })
 
 // === Logika hierarki (sudah benar) ===
-const selectedMachineId = ref(form.master_machine_id)
+const selectedMachineId = ref(props.prefillData?.master_machine_id ?? form.master_machine_id)
 const selectedLv1 = ref(form.component_lv1_id)
 const selectedLv2 = ref(form.component_lv2_id)
 const selectedLv3 = ref(form.component_lv3_id)
@@ -564,6 +562,42 @@ function finishLater() {
           :class="currentStep === 1 ? 'border-blue-500' : 'border-slate-200 opacity-60'"
           style="border-radius:.625rem; margin-bottom: 1rem;">
       <template #body>
+        <!-- Alert jika dibuat dari Working Report -->
+        <div v-if="props.workingReport" class="mb-4 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
+          <div class="flex items-start">
+            <svg class="w-5 h-5 text-blue-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+            </svg>
+            <div class="flex-1">
+              <h4 class="font-semibold text-blue-800 text-sm">Dibuat dari Working Report #{{ props.workingReport.id }}</h4>
+              <p class="text-blue-700 text-xs mt-1">
+                Mesin: <strong>{{ props.workingReport.machine?.name }}</strong> |
+                Tanggal: <strong>{{ props.workingReport.date }}</strong>
+              </p>
+              <p class="text-blue-600 text-xs mt-1">Data mesin dan lokasi sudah otomatis terisi</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Badge jika MO terkait dengan Working Report (mode edit) -->
+        <div v-if="props.order && props.order.working_report" class="mb-4 p-3 bg-green-50 border-l-4 border-green-500 rounded flex items-center justify-between">
+          <div class="flex items-start">
+            <svg class="w-5 h-5 text-green-600 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            </svg>
+            <div>
+              <h4 class="font-semibold text-green-800 text-sm">Terkait dengan Working Report #{{ props.order.working_report.id }}</h4>
+              <p class="text-green-700 text-xs mt-1">
+                Tanggal WR: <strong>{{ props.order.working_report.date }}</strong>
+              </p>
+            </div>
+          </div>
+          <Link :href="`/working-reports/${props.order.working_report.id}/detail`"
+                class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-semibold">
+            Lihat WR
+          </Link>
+        </div>
+
         <div class="flex justify-between items-center mb-4">
           <h3 class="font-bold text-lg">
             <span v-if="completedSteps.includes(1)" class="text-green-600">✓</span>

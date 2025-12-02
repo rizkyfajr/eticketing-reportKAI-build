@@ -170,6 +170,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::get('/users', fn() => App\Models\User::get())->name('users');
 
+    Route::get('maintenance-orders/create-from-wr/{workingReport}', [App\Http\Controllers\MaintenanceOrderController::class, 'createFromWorkingReport'])
+        ->name('maintenance-orders.createFromWR');
+
     Route::resource('maintenance-orders', App\Http\Controllers\MaintenanceOrderController::class);
     Route::post('maintenance-orders/paginate', [App\Http\Controllers\MaintenanceOrderController::class, 'paginate'])
     ->name('maintenance-orders.paginate');

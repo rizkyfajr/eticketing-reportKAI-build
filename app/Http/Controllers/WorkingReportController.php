@@ -53,7 +53,7 @@ class WorkingReportController extends Controller
     //   $hasCreatedToday = WorkingReport::whereDate('date', today())
     //       ->where('created_by_id', $user->id)
     //       ->exists();
-          
+
       return Inertia::render('WorkingReport/Index', [
           'report'      => $report,
           'checksheet'  => $report->checksheet,
@@ -71,8 +71,8 @@ class WorkingReportController extends Controller
   public function detail(DataTableRequest $request, WorkingReport $report, WorkResult $workresult)
   {
         $report->load(
-            'checksheetday.dayresults', 
-            'checksheetday.checksheetworkresult', 
+            'checksheetday.dayresults',
+            'checksheetday.checksheetworkresult',
             'machine',
             'mglurusanawal.attachments',
             'mglengkunganawal.attachments',
@@ -84,6 +84,7 @@ class WorkingReportController extends Controller
             'mglengkunganakhir.attachments',
             'mgweselakhir.attachments',
             'perekamanakhir.attachments',
+            'maintenanceOrders.machine', // Load maintenance orders terkait
         );
 
         $machineType = $report->machine?->name;
@@ -105,7 +106,7 @@ class WorkingReportController extends Controller
         //     $query->where('jenis_mesin', $machineType);
         // })
         ->orderByRaw("
-            CASE 
+            CASE
                 WHEN LOWER(group_name) LIKE 'engine%' THEN 1
                 WHEN LOWER(group_name) LIKE 'mekanik%' THEN 2
                 WHEN LOWER(group_name) LIKE 'pneumatic%' THEN 3
@@ -140,9 +141,9 @@ class WorkingReportController extends Controller
         ];
       });
       $checksheetworkresult = $report->checksheetday?->checksheetworkresult()->first();
-      
+
       $user = auth()->user();
-      
+
       // Menampilkan data user yang login sesuai daop division
       $userQuery = User::select('id', 'name', 'username', 'division_id');
       if ($user->division_id) {
@@ -160,7 +161,7 @@ class WorkingReportController extends Controller
           'warmingup'   => $report->warmingup ?? null,
           'warmingup_user'  => $report->warmingup_user ?? null,
           'workresult'  => $report->workresult ?? null,
-          'workresult_user'  => $report->workresult_user ?? null,    
+          'workresult_user'  => $report->workresult_user ?? null,
           'machines'    => MasterMachine::with('region')->select('id', 'name', 'type', 'nomor', 'no_sarana', 'region_id')->get(),
           'regions'     => MasterRegion::select('id', 'name')->get(),
           'users' => $userQuery->get(),
@@ -186,7 +187,7 @@ class WorkingReportController extends Controller
           'perekamanakhir_attachments' => $report->perekamanakhir?->attachments ?? collect(),
       ]);
   }
-  
+
   /**
   * Show the form for creating a new resource.
   *
@@ -221,7 +222,7 @@ class WorkingReportController extends Controller
           $userQuery->where('division_id', $user->division_id);
       }
       // Menampilkan data user yang login sesuai daop division
-      
+
       return Inertia::render('WorkingReport/Create', [
           'report' => $report,
         //   'report' => $report->load('mglurusanawal'),
@@ -255,7 +256,7 @@ class WorkingReportController extends Controller
         //   'perekamanawal' => $report->perekamanawal,
       ]);
   }
-  
+
   /**
   * Store a newly created resource in storage.
   *
@@ -311,7 +312,7 @@ class WorkingReportController extends Controller
         return redirect()
             ->route('working-reports.detail', $report->id)
             ->with('success', 'Working report (Warming Up) berhasil disimpan.');
-            
+
     } else {
         // Jika mode adalah WORKING atau tidak diisi/lainnya,
         // buat semua record opname awal (MG1-MG6) dan lanjutkan ke langkah pengisian form.
@@ -321,7 +322,7 @@ class WorkingReportController extends Controller
         PemeriksaanSilangKpjr::create(['working_report_id' => $report->id]);
         PemeriksaanSilangLahan::create(['working_report_id' => $report->id]);
         PerekamanAwal::create(['working_report_id' => $report->id]);
-        
+
         // Redirect ke halaman pengisian form (create.withid)
         return redirect()
             ->route('working-reports.create.withid', $report->id)
@@ -351,7 +352,7 @@ class WorkingReportController extends Controller
         // PerekamanAwal::create([
         //     'working_report_id' => $report->id,
         // ]);
-    
+
         // return redirect()
         // ->route('working-reports.create.withid', $report->id)
         // ->with('success', 'Working report berhasil disimpan.');
@@ -498,7 +499,7 @@ class WorkingReportController extends Controller
   {
     //
   }
-  
+
   /**
   * Show the form for editing the specified resource.
   *
@@ -516,7 +517,7 @@ class WorkingReportController extends Controller
           'users' => User::select('id', 'name', 'username')->get(),
       ]);
   }
-  
+
   /**
   * Update the specified resource in storage.
   *
@@ -568,7 +569,7 @@ class WorkingReportController extends Controller
 
       return redirect()->route('working-reports.index')->with('success', 'Working Order berhasil diubah.');
   }
-  
+
   /**
   * Remove the specified resource from storage.
   *
@@ -602,7 +603,7 @@ class WorkingReportController extends Controller
         foreach ($model->getFillable() as $column) {
             $query->orWhere($column, 'like', $search);
         }
-        
+
         $query->orWhereRelation('workresult', 'working_report_id', 'like', $search);
         $query->orWhereRelation('warmingup', 'working_report_id', 'like', $search);
         $query->orWhereRelation('checksheet', 'working_report_id', 'like', $search);
@@ -635,7 +636,7 @@ class WorkingReportController extends Controller
     })
     // jika role kupt jakarta
     ->when(
-        $user->hasRole('Kepala UPT Mekanik') 
+        $user->hasRole('Kepala UPT Mekanik')
         && $user->position_id == 1
         && in_array($user->division_id, [1, 3]),
         function (Builder $query) {
@@ -645,7 +646,7 @@ class WorkingReportController extends Controller
 
     // jika role kupt bandung
     ->when(
-        $user->hasRole('Kepala UPT Mekanik') 
+        $user->hasRole('Kepala UPT Mekanik')
         && $user->position_id == 1
         && in_array($user->division_id, [4]),
         function (Builder $query) {
@@ -792,9 +793,9 @@ class WorkingReportController extends Controller
 
             $getAttachmentUrl = function ($attachment) {
                 $fullPath = $attachment->path . $attachment->filename;
-                return storage_path('app/public/' . $fullPath); 
+                return storage_path('app/public/' . $fullPath);
             };
-            
+
             $pdf = PDF::loadView('working_report_1',  compact('report', 'getAttachmentUrl'))->setPaper('A4', 'portrait');
 
             return $pdf->download('working-report-'.$report->id.'.pdf');

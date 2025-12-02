@@ -58,6 +58,41 @@ class MaintenanceOrderController extends Controller
         ]);
     }
 
+    /**
+     * Create Maintenance Order dari Working Report
+     */
+    public function createFromWorkingReport(WorkingReport $workingReport)
+    {
+        // Load relasi yang diperlukan
+        $workingReport->load(['machine.region', 'warmingup', 'workresult']);
+
+        $machines = MasterMachine::with('region:id,name')->select('id','name','type','nomor','hierarchy_code','no_sarana','region_id')->get();
+        $reports = WorkingReport::select('id')->get();
+        $pedoman = MasterPedoman::select('id', 'kode_pedoman')->orderBy('kode_pedoman')->get();
+        $users = User::select('id', 'name', 'username')->orderBy('name')->get()->map(function($user) {
+            $user->formatted_name = '[' . $user->username . '] ' . strtoupper($user->name);
+            return $user;
+        });
+
+        // Prepare data pre-fill dari working report
+        $prefillData = [
+            'working_report_id' => $workingReport->id,
+            'master_machine_id' => $workingReport->machine_id,
+            'category' => 'unplanned', // Dari WR biasanya unplanned
+            'trouble_at' => $workingReport->date,
+            'location' => $workingReport->region->name ?? '',
+        ];
+
+        return Inertia::render('MaintenanceOrders/Form', [
+            'machines' => $machines,
+            'reports' => $reports,
+            'pedoman' => $pedoman,
+            'users' => $users,
+            'workingReport' => $workingReport,
+            'prefillData' => $prefillData,
+        ]);
+    }
+
     public function edit(MaintenanceOrder $maintenanceOrder)
     {
         $maintenanceOrder->load(['machine:id,name,type,nomor,no_sarana','workingReport:id']);
