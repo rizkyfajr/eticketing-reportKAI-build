@@ -12,6 +12,7 @@ use App\Models\ReadinessAssessmentMaster;
 use App\Models\ReadinessAssessment;
 use App\Models\ReportUser;
 use App\Models\MaintenanceOrder;
+use App\Models\MasterMachine;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
@@ -60,187 +61,210 @@ class DashboardController extends Controller
     }
     // Cek apakah user sudah mengisi assessment hari ini (Raidnes Assessments)
 
-    // Dashboard Working Order
     $reports = WorkingReport::with([
         'machine:id,name,nomor,type',
         'warmingup',
         'workresult',
     ])->get();
 
-    $totalPerMesin = [];
-    $totalJamGenerator = [];
-    $totalCounterTamping = [];
-    $totalOdometer = [];
-    $totalHSD = [];
+    $statusCounts = $reports->countBy('status');
 
-    foreach ($reports as $wr) {
+    $dashboardStats = [
+        'draft' => $statusCounts['draft'] ?? 0,
+        'checksheet_done' => $statusCounts['checksheet_done'] ?? 0,
+        'warming_up_done' => $statusCounts['warming_up_done'] ?? 0,
+        'work_done' => $statusCounts['work_done'] ?? 0,
+        'finished' => $statusCounts['finished'] ?? 0,
+    ];
 
-        $machine = $wr->machine;
+    $allMachines = MasterMachine::select('id', 'name', 'nomor', 'type')->get();
 
-        if ($machine) {
+    $machineNames = $allMachines->map(function ($machine) {
+        return ' [' . $machine->nomor .'] ' . $machine->name . ' - ' . $machine->type . '';
+    })->unique()->toArray();
+
+    $totalPerMesin = array_fill_keys($machineNames, 0);
+    $totalJamGenerator = array_fill_keys($machineNames, 0);
+    $totalCounterTamping = array_fill_keys($machineNames, 0);
+    $totalOdometer = array_fill_keys($machineNames, 0);
+    $totalHSD = array_fill_keys($machineNames, 0);
+        
+        foreach ($reports as $wr) {
+
+            $machine = $wr->machine;
+
+            if (!$machine) {
+                continue; 
+            }
             $machineName = ' [' . $machine->nomor .'] ' . $machine->name . ' - ' . $machine->type . '';
-        } else {
-            $machineName = 'UNKNOWN';
-        }
 
-        $start = $wr->waktu_start_engine;
-        $stopWarm = $wr->warmingup?->waktu_stop_engine;
-        $stopWork = $wr->workresult?->waktu_stop_engine;
+            if (!isset($totalPerMesin[$machineName])) {
+                $totalPerMesin[$machineName] = 0;
+                $totalJamGenerator[$machineName] = 0;
+                $totalCounterTamping[$machineName] = 0;
+                $totalOdometer[$machineName] = 0;
+                $totalHSD[$machineName] = 0;
+                $machineNames[] = $machineName; 
+            }
 
-        $stop = null;
-        if ($stopWarm && $stopWork) {
-            $stop = max($stopWarm, $stopWork);
-        } elseif ($stopWarm) {
-            $stop = $stopWarm;
-        } elseif ($stopWork) {
-            $stop = $stopWork;
-        }
+            $start = $wr->waktu_start_engine;
+            $stopWarm = $wr->warmingup?->waktu_stop_engine;
+            $stopWork = $wr->workresult?->waktu_stop_engine;
 
-       if ($start && $stop) {
-            try {
-                $startTime = Carbon::createFromTimeString($start);
-                $stopTime  = Carbon::createFromTimeString($stop);
+            $stop = null;
+            if ($stopWarm && $stopWork) {
+                $stop = max($stopWarm, $stopWork);
+            } elseif ($stopWarm) {
+                $stop = $stopWarm;
+            } elseif ($stopWork) {
+                $stop = $stopWork;
+            }
 
-                if ($stopTime->lessThan($startTime)) {
-                    $stopTime->addDay();
+            if ($start && $stop) {
+                try {
+                    $startTime = Carbon::createFromTimeString($start);
+                    $stopTime  = Carbon::createFromTimeString($stop);
+
+                    if ($stopTime->lessThan($startTime)) {
+                        $stopTime->addDay();
+                    }
+
+                    $diffMinutes = $stopTime->diffInMinutes($startTime);
+                    $totalPerMesin[$machineName] += $diffMinutes;
+
+                } catch (\Exception $e) {
+
                 }
+            }
 
-                $diffMinutes = $stopTime->diffInMinutes($startTime);
+            $genStart = $wr->jam_generator_awal;
+            $genStopWarm = $wr->warmingup?->jam_generator_akhir;
+            $genStopWork = $wr->workresult?->jam_generator_akhir;
 
-                if (!isset($totalPerMesin[$machineName])) {
-                    $totalPerMesin[$machineName] = 0;
-                }
-                $totalPerMesin[$machineName] += $diffMinutes;
+            $genStop = null;
+            if ($genStopWarm !== null && $genStopWork !== null) {
+                $genStop = max($genStopWarm, $genStopWork);
+            } elseif ($genStopWarm !== null) {
+                $genStop = $genStopWarm;
+            } elseif ($genStopWork !== null) {
+                $genStop = $genStopWork;
+            }
 
-            } catch (\Exception $e) {
+            if ($genStart !== null && is_numeric($genStart)) {
+                $totalJamGenerator[$machineName] += $genStart;
+            }
+
+            if ($genStop !== null && is_numeric($genStop)) {
+                $totalJamGenerator[$machineName] += $genStop;
+            }
+
+            $tampStart = $wr->counter_tamping_awal;
+            $tampStopWarm = $wr->warmingup?->counter_tamping_akhir;
+            $tampStopWork = $wr->workresult?->counter_tamping_akhir;
+
+            $tampStop = null;
+            if ($tampStopWarm !== null && $tampStopWork !== null) {
+                $tampStop = max($tampStopWarm, $tampStopWork);
+            } elseif ($tampStopWarm !== null) {
+                $tampStop = $tampStopWarm;
+            } elseif ($tampStopWork !== null) {
+                $tampStop = $tampStopWork;
+            }
+
+            if ($tampStart !== null && is_numeric($tampStart)) {
+                $totalCounterTamping[$machineName] += $tampStart;
+            }
+
+            if ($tampStop !== null && is_numeric($tampStop)) {
+                $totalCounterTamping[$machineName] += $tampStop;
+            }
+
+            $odoStart = $wr->oddometer_awal;
+            $odoStopWarm = $wr->warmingup?->oddometer_akhir;
+            $odoStopWork = $wr->workresult?->oddometer_akhir;
+
+            $odoStop = null;
+            if ($odoStopWarm !== null && $odoStopWork !== null) {
+                $odoStop = max($odoStopWarm, $odoStopWork);
+            } elseif ($odoStopWarm !== null) {
+                $odoStop = $odoStopWarm;
+            } elseif ($odoStopWork !== null) {
+                $odoStop = $odoStopWork;
+            }
+
+            if ($odoStart !== null && is_numeric($odoStart)) {
+                $totalOdometer[$machineName] += $odoStart;
+            }
+
+            if ($odoStop !== null && is_numeric($odoStop)) {
+                $totalOdometer[$machineName] += $odoStop;
+            }
+
+            $hsdStart = $wr->hsd_awal_kerja;
+            $hsdStopWarm = $wr->warmingup?->hsd_akhir_kerja;
+            $hsdStopWork = $wr->workresult?->hsd_akhir_kerja;
+
+            $hsdStop = null;
+            if ($hsdStopWarm !== null && $hsdStopWork !== null) {
+                $hsdStop = max($hsdStopWarm, $hsdStopWork);
+            } elseif ($hsdStopWarm !== null) {
+                $hsdStop = $hsdStopWarm;
+            } elseif ($hsdStopWork !== null) {
+                $hsdStop = $hsdStopWork;
+            }
+
+            if ($hsdStart !== null && is_numeric($hsdStart)) {
+                $totalHSD[$machineName] += $hsdStart;
+            }
+
+            if ($hsdStop !== null && is_numeric($hsdStop)) {
+                $totalHSD[$machineName] += $hsdStop;
             }
         }
+        
+        $formatted = [];
+        $formattedGenerator = [];
+        $formattedTamping = [];
+        $formattedOdometer = [];
+        $formattedHSD = [];
 
-        $genStart = $wr->jam_generator_awal;
-        $genStopWarm = $wr->warmingup?->jam_generator_akhir;
-        $genStopWork = $wr->workresult?->jam_generator_akhir;
+        foreach ($machineNames as $mesin) {
+            
+            $menit = $totalPerMesin[$mesin] ?? 0;
+            if ($menit > 0) {
+                $formatted[$mesin] = floor($menit / 60) . " Jam " . ($menit % 60) . " Menit";
+            } else {
+                $formatted[$mesin] = null; 
+            }
 
-        $genStop = null;
-        if ($genStopWarm !== null && $genStopWork !== null) {
-            $genStop = max($genStopWarm, $genStopWork);
-        } elseif ($genStopWarm !== null) {
-            $genStop = $genStopWarm;
-        } elseif ($genStopWork !== null) {
-            $genStop = $genStopWork;
+            $jamGen = $totalJamGenerator[$mesin] ?? 0;
+            if ($jamGen > 0) {
+                $formattedGenerator[$mesin] = $jamGen . " Jam";
+            } else {
+                $formattedGenerator[$mesin] = null;
+            }
+
+            $counter = $totalCounterTamping[$mesin] ?? 0;
+            if ($counter > 0) {
+                $formattedTamping[$mesin] = number_format($counter, 0, ',', '.') . " Counter ";
+            } else {
+                $formattedTamping[$mesin] = null;
+            }
+
+            $odo = $totalOdometer[$mesin] ?? 0;
+            if ($odo > 0) {
+                $formattedOdometer[$mesin] = number_format($odo, 0, ',', '.') . " Km ";
+            } else {
+                $formattedOdometer[$mesin] = null;
+            }
+
+            $hsd = $totalHSD[$mesin] ?? 0;
+            if ($hsd > 0) {
+                $formattedHSD[$mesin] = number_format($hsd, 2, ',', '.') . " % ";
+            } else {
+                $formattedHSD[$mesin] = null;
+            }
         }
-
-        if (!isset($totalJamGenerator[$machineName])) {
-            $totalJamGenerator[$machineName] = 0;
-        }
-
-        if ($genStart !== null && is_numeric($genStart)) {
-            $totalJamGenerator[$machineName] += $genStart;
-        }
-
-        if ($genStop !== null && is_numeric($genStop)) {
-            $totalJamGenerator[$machineName] += $genStop;
-        }
-
-        $tampStart = $wr->counter_tamping_awal;
-        $tampStopWarm = $wr->warmingup?->counter_tamping_akhir;
-        $tampStopWork = $wr->workresult?->counter_tamping_akhir;
-
-        $tampStop = null;
-        if ($tampStopWarm !== null && $tampStopWork !== null) {
-            $tampStop = max($tampStopWarm, $tampStopWork);
-        } elseif ($tampStopWarm !== null) {
-            $tampStop = $tampStopWarm;
-        } elseif ($tampStopWork !== null) {
-            $tampStop = $tampStopWork;
-        }
-
-        if (!isset($totalCounterTamping[$machineName])) {
-            $totalCounterTamping[$machineName] = 0;
-        }
-
-        if ($tampStart !== null && is_numeric($tampStart)) {
-            $totalCounterTamping[$machineName] += $tampStart;
-        }
-
-        if ($tampStop !== null && is_numeric($tampStop)) {
-            $totalCounterTamping[$machineName] += $tampStop;
-        }
-
-        $odoStart = $wr->oddometer_awal;
-        $odoStopWarm = $wr->warmingup?->oddometer_akhir;
-        $odoStopWork = $wr->workresult?->oddometer_akhir;
-
-        $odoStop = null;
-        if ($odoStopWarm !== null && $odoStopWork !== null) {
-            $odoStop = max($odoStopWarm, $odoStopWork);
-        } elseif ($odoStopWarm !== null) {
-            $odoStop = $odoStopWarm;
-        } elseif ($odoStopWork !== null) {
-            $odoStop = $odoStopWork;
-        }
-
-        if (!isset($totalOdometer[$machineName])) {
-            $totalOdometer[$machineName] = 0;
-        }
-
-        if ($odoStart !== null && is_numeric($odoStart)) {
-            $totalOdometer[$machineName] += $odoStart;
-        }
-
-        if ($odoStop !== null && is_numeric($odoStop)) {
-            $totalOdometer[$machineName] += $odoStop;
-        }
-
-        $hsdStart = $wr->hsd_awal_kerja;
-        $hsdStopWarm = $wr->warmingup?->hsd_akhir_kerja;
-        $hsdStopWork = $wr->workresult?->hsd_akhir_kerja;
-
-        $hsdStop = null;
-        if ($hsdStopWarm !== null && $hsdStopWork !== null) {
-            $hsdStop = max($hsdStopWarm, $hsdStopWork);
-        } elseif ($hsdStopWarm !== null) {
-            $hsdStop = $hsdStopWarm;
-        } elseif ($hsdStopWork !== null) {
-            $hsdStop = $hsdStopWork;
-        }
-
-        if (!isset($totalHSD[$machineName])) {
-            $totalHSD[$machineName] = 0;
-        }
-
-        if ($hsdStart !== null && is_numeric($hsdStart)) {
-            $totalHSD[$machineName] += $hsdStart;
-        }
-
-        if ($hsdStop !== null && is_numeric($hsdStop)) {
-            $totalHSD[$machineName] += $hsdStop;
-        }
-    }
-
-    $formatted = [];
-    foreach ($totalPerMesin as $mesin => $menit) {
-        $formatted[$mesin] = floor($menit / 60) . " Jam " . ($menit % 60) . " Menit";
-    }
-
-    $formattedGenerator = [];
-    foreach ($totalJamGenerator as $mesin => $jam) {
-        $formattedGenerator[$mesin] = $jam . " Jam";
-    }
-
-    $formattedTamping = [];
-    foreach ($totalCounterTamping as $mesin => $counter) {
-        $formattedTamping[$mesin] = number_format($counter, 0, ',', '.') . " Counter ";
-    }
-
-    $formattedOdometer = [];
-    foreach ($totalOdometer as $mesin => $odo) {
-        $formattedOdometer[$mesin] = number_format($odo, 0, ',', '.') . " Km ";
-    }
-
-    $formattedHSD = [];
-    foreach ($totalHSD as $mesin => $hsd) {
-        $formattedHSD[$mesin] = number_format($hsd, 2, ',', '.') . " % ";
-    }
 
     // dd($formatted, $formattedGenerator, $formattedTamping, $formattedOdometer, $formattedHSD);
 
@@ -330,6 +354,7 @@ class DashboardController extends Controller
         });
 
     return Inertia::render('Dashboard', [
+      'report' => $dashboardStats,
       'formatted_mesin_total' => $formatted,
       'formatted_generator_total' => $formattedGenerator,
       'formatted_counter_total' => $formattedTamping,
