@@ -14,7 +14,7 @@ import axios from 'axios'
 
 const { user } = usePage().props.value
 
-const { users, hasCompletedAssessment, assessmentData, data_laporin_full, mesin_totals, formatted_mesin_total, formatted_generator_total, formatted_counter_total, formatted_oddometer_total, formatted_hsd_total, maintenanceStats, recentMaintenanceOrders, isAdminOrSupervisor } = defineProps({
+const { users, hasCompletedAssessment, assessmentData, data_laporin_full, mesin_totals, formatted_mesin_total, formatted_generator_total, formatted_counter_total, formatted_oddometer_total, formatted_hsd_total, maintenanceStats, recentMaintenanceOrders, isAdminOrSupervisor, report } = defineProps({
   users: Array,
   hasCompletedAssessment: Boolean,
   assessmentData: Object,
@@ -30,6 +30,7 @@ const { users, hasCompletedAssessment, assessmentData, data_laporin_full, mesin_
   recentMaintenanceOrders: Array,
   count : Number,
   isAdminOrSupervisor: Boolean, // Flag dari controller
+  report: Array,
 })
 
 const showAssessmentModal = ref(false);
@@ -136,6 +137,12 @@ onMounted(async () => {
 
 const showModal = ref(false);
 const selectedReport = ref(null);
+
+const openMachines = ref({});
+
+const toggleMachine = (machineName) => {
+    openMachines.value[machineName] = !openMachines.value[machineName];
+};
 
 const pbrFormattedTotals = computed(() => {
     if (!formatted_mesin_total) return {};
@@ -292,6 +299,151 @@ const mttFormattedHsdTotals = computed(() => {
     return filtered;
 });
 
+const mlimFormattedTotals = computed(() => {
+    if (!formatted_mesin_total) return {};
+    const filtered = {};
+    for (const machineName in formatted_mesin_total) {
+        if (formatted_mesin_total.hasOwnProperty(machineName)) {
+            if (machineName.includes('Material Logistic And Inspection Machine')) {
+                filtered[machineName] = formatted_mesin_total[machineName];
+            }
+        }
+    }
+    return filtered;
+});
+
+const mlimFormattedGeneratorTotals = computed(() => {
+    if (!formatted_generator_total) return {};
+    const filtered = {};
+    for (const machineName in formatted_generator_total) {
+        if (formatted_generator_total.hasOwnProperty(machineName)) {
+            if (machineName.includes('Material Logistic And Inspection Machine')) {
+                filtered[machineName] = formatted_generator_total[machineName];
+            }
+        }
+    }
+    return filtered;
+});
+
+const mlimFormattedCounterTotals = computed(() => {
+    if (!formatted_counter_total) return {};
+    const filtered = {};
+    for (const machineName in formatted_counter_total) {
+        if (formatted_counter_total.hasOwnProperty(machineName)) {
+            if (machineName.includes('Material Logistic And Inspection Machine')) {
+                filtered[machineName] = formatted_counter_total[machineName];
+            }
+        }
+    }
+    return filtered;
+});
+
+const mlimFormattedOddometerTotals = computed(() => {
+    if (!formatted_oddometer_total) return {};
+    const filtered = {};
+    for (const machineName in formatted_oddometer_total) {
+        if (formatted_oddometer_total.hasOwnProperty(machineName)) {
+            if (machineName.includes('Material Logistic And Inspection Machine')) {
+                filtered[machineName] = formatted_oddometer_total[machineName];
+            }
+        }
+    }
+    return filtered;
+});
+
+const mlimFormattedHsdTotals = computed(() => {
+    if (!formatted_hsd_total) return {};
+    const filtered = {};
+    for (const machineName in formatted_hsd_total) {
+        if (formatted_hsd_total.hasOwnProperty(machineName)) {
+            if (machineName.includes('Material Logistic And Inspection Machine')) {
+                filtered[machineName] = formatted_hsd_total[machineName];
+            }
+        }
+    }
+    return filtered;
+});
+
+const rmeFormattedTotals = computed(() => {
+    if (!formatted_mesin_total) return {};
+    const filtered = {};
+    for (const machineName in formatted_mesin_total) {
+        if (formatted_mesin_total.hasOwnProperty(machineName)) {
+            if (machineName.includes('Railway Maintenance Excavator')) {
+                filtered[machineName] = formatted_mesin_total[machineName];
+            }
+        }
+    }
+    return filtered;
+});
+
+const rmeFormattedGeneratorTotals = computed(() => {
+    if (!formatted_generator_total) return {};
+    const filtered = {};
+    for (const machineName in formatted_generator_total) {
+        if (formatted_generator_total.hasOwnProperty(machineName)) {
+            if (machineName.includes('Railway Maintenance Excavator')) {
+                filtered[machineName] = formatted_generator_total[machineName];
+            }
+        }
+    }
+    return filtered;
+});
+
+const rmeFormattedCounterTotals = computed(() => {
+    if (!formatted_counter_total) return {};
+    const filtered = {};
+    for (const machineName in formatted_counter_total) {
+        if (formatted_counter_total.hasOwnProperty(machineName)) {
+            if (machineName.includes('Railway Maintenance Excavator')) {
+                filtered[machineName] = formatted_counter_total[machineName];
+            }
+        }
+    }
+    return filtered;
+});
+
+const rmeFormattedOddometerTotals = computed(() => {
+    if (!formatted_oddometer_total) return {};
+    const filtered = {};
+    for (const machineName in formatted_oddometer_total) {
+        if (formatted_oddometer_total.hasOwnProperty(machineName)) {
+            if (machineName.includes('Railway Maintenance Excavator')) {
+                filtered[machineName] = formatted_oddometer_total[machineName];
+            }
+        }
+    }
+    return filtered;
+});
+
+const rmeFormattedHsdTotals = computed(() => {
+    if (!formatted_hsd_total) return {};
+    const filtered = {};
+    for (const machineName in formatted_hsd_total) {
+        if (formatted_hsd_total.hasOwnProperty(machineName)) {
+            if (machineName.includes('Railway Maintenance Excavator')) {
+                filtered[machineName] = formatted_hsd_total[machineName];
+            }
+        }
+    }
+    return filtered;
+});
+
+const hasValidData = (machineName, type) => {
+    let totals;
+    if (type === 'PBR') {
+        totals = pbrFormattedTotals.value;
+    } else if (type === 'MTT') {
+        totals = mttFormattedTotals.value;
+    } else if (type === 'MTT') {
+        totals = mlimFormattedTotals.value;
+    } else {
+        return false;
+    }
+    
+    return totals[machineName] !== null && totals[machineName] !== undefined;
+};
+
 const hasRole = (roles) => {
     if (!user.roles) return false;
     return user.roles.some(role => roles.includes(role.name));
@@ -313,339 +465,437 @@ const hasRole = (roles) => {
         <div class="min-h-screen bg-gray-50/50">
         <div class="p-1 ">
             <div class="">
-            <!-- Card Components -->
-            <div class="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
+            <div class="grid gap-6 md:grid-cols-5 lg:grid-cols-5 mb-6">
+                <div class="bg-gradient-to-br bg-gray-500 rounded-xl shadow-lg p-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-blue-100 text-sm">Process WorkingOrder</p>
+                            <p class="text-3xl font-bold mt-2">{{ report.draft || 0}}</p>
+                        </div>
+                        <div class="bg-blue-400/30 rounded-full p-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
 
+                <div class="bg-gradient-to-br bg-yellow-400 rounded-xl shadow-lg p-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-yellow-100 text-sm">Process Checksheet</p>
+                            <p class="text-3xl font-bold mt-2">{{ report.checksheet_done || 0 }}</p>
+                        </div>
+                        <div class="bg-yellow-400/30 rounded-full p-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-br bg-blue-500 rounded-xl shadow-lg p-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-orange-100 text-sm">Process Working</p>
+                            <p class="text-3xl font-bold mt-2">{{ report.work_done || 0 }}</p>
+                        </div>
+                        <div class="bg-orange-400/30 rounded-full p-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-br bg-orange-600 rounded-xl shadow-lg p-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-orange-100 text-sm">Process Warming Up</p>
+                            <p class="text-3xl font-bold mt-2">{{ report.warming_up_done || 0 }}</p>
+                        </div>
+                        <div class="bg-orange-400/30 rounded-full p-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 0118 10a8 8 0 10-15.657 8.657M18 12h2a2 2 0 012 2v2a2 2 0 01-2 2h-2m-4-2h-4m0 0v-4m0 4h-4m-4-2H2a2 2 0 01-2-2v-2a2 2 0 012-2h2" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-br bg-green-500 rounded-xl shadow-lg p-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-green-100 text-sm">Approve KUPT</p>
+                            <p class="text-3xl font-bold mt-2">{{ report.finished || 0 }}</p>
+                        </div>
+                        <div class="bg-green-400/30 rounded-full p-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card Components -->
+            <!-- <div class="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-3"> -->
+                <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3 xl:grid-cols-3">
+                    
                 <div class="relative flex flex-col bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100 transition-shadow duration-300 hover:shadow-3xl">
 
-                    <div class="p-4 flex justify-between items-center bg-blue-500">
-                        <div class="flex items-center space-x-3">
-                            <div class="bg-red-500 rounded-lg p-3 text-white shadow-md shadow-red-500/50">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <!-- <div class="p-2 flex justify-between items-center bg-blue-500">
+                        <div class="flex items-center space-x-2"> 
+                            <div class="bg-red-500 rounded-lg p-1 text-white shadow-md shadow-red-500/50">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.526.323 1.028.53 1.572.684.51-.157 1.012-.364 1.538-.684z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
                             </div>
                         </div>
-                        <h3 class="text-xl font-extrabold text-white text-center flex-grow">
+                        <h3 class="text-lg font-extrabold text-white text-center flex-grow">
                             Tamping Machine
                         </h3>
                         <button class="text-sm font-semibold text-blue-600 hover:text-blue-800 transition duration-150">
-                            <img src="../../../public/assets/receive-message.png" class="w-6" alt="Laporan">
+                            <img src="../../../public/assets/receive-message.png" class="w-5" alt="Laporan">
                         </button>
-                    </div>
+                    </div> -->
 
-                    <div class="p-4 divide-y divide-gray-200">
+                    <div class="p-2 flex justify-between items-center bg-blue-500">
+                        <h3 class="text-lg font-semibold text-white text-center flex-grow">
+                            Tamping Machine
+                        </h3>
+                    </div>                    
+
+                    <div class="p-2 divide-y divide-gray-200">
 
                         <div
                             v-for="(duration, machineName) in mttFormattedTotals"
                             :key="machineName"
                         >
-                            <div class="w-full border-b-2 border-gray-700 ">
-                                <span class="text-base font-bold text-black text-xs">
+                            <div 
+                                @click="toggleMachine(machineName)" 
+                                class="w-full py-2 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition duration-150"
+                            >
+                                <span class="font-semibold text-black text-sm">
                                     {{ machineName }}
                                 </span>
-                            </div>
-                            <div class="flex justify-between items-center py-2">
-                                <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-                                    <span class="text-blue-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                    </span>
-                                    <span>Engine Hours</span>
-                                </span>
-                                <span class="font-extrabold text-base text-blue-800">{{ duration }}</span>
-                            </div>
-
-                            <div
-                                v-if="mttFormattedGeneratorTotals[machineName]"
-                                class="flex justify-between items-center py-2"
-                            >
-                                <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-                                    <span class="text-green-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                                    </span>
-                                    <span>Generator Hours (Meter)</span>
-                                </span>
-                                <span class="font-bold text-base text-green-700">
-                                    {{ mttFormattedGeneratorTotals[machineName] }}
+                                
+                                <span :class="{'text-green-600': hasValidData(machineName, 'MTT'), 'text-red-600': !hasValidData(machineName, 'MTT')}">
+                                    <svg :class="{'rotate-180': openMachines[machineName]}" class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </span>
                             </div>
 
-                            <div
-                                v-if="mttFormattedCounterTotals[machineName]"
-                                class="flex justify-between items-center py-2"
-                            >
-                                <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-                                    <span class="text-red-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
-                                    </span>
-                                    <span>Tamping Counter</span>
-                                </span>
-                                <span class="font-bold text-base text-red-700">
-                                    {{ mttFormattedCounterTotals[machineName] }}
-                                </span>
+                            <div v-show="openMachines[machineName]" class="mt-2 pl-4 pr-2 pb-2 border-l-2 border-gray-300">
+                                
+                                <div v-if="hasValidData(machineName, 'MTT')">
+                                    
+                                    <div class="flex justify-between items-center py-2">
+                                        <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                                            <span class="text-blue-500">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                            </span>
+                                            <span>Engine Hours</span>
+                                        </span>
+                                        <span class="font-extrabold text-sm text-blue-800">{{ duration }}</span>
+                                    </div>
+
+                                    <div v-if="mttFormattedGeneratorTotals[machineName] !== null" class="flex justify-between items-center py-2">
+                                        <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                                            <span class="text-green-500">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                            </span>
+                                            <span>Generator Hours (Meter)</span>
+                                        </span>
+                                        <span class="font-bold text-sm text-green-700">
+                                            {{ mttFormattedGeneratorTotals[machineName] }}
+                                        </span>
+                                    </div>
+
+                                    <div v-if="pbrFormattedCounterTotals[machineName] !== null" class="flex justify-between items-center py-2">
+                                        <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                                            <span class="text-red-500">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                                            </span>
+                                            <span>Tamping Counter</span>
+                                        </span>
+                                        <span class="font-bold text-sm text-red-700">
+                                            {{ mttFormattedCounterTotals[machineName] }}
+                                        </span>
+                                    </div>
+
+                                    <div v-if="mttFormattedOddometerTotals[machineName] !== null" class="flex justify-between items-center py-2">
+                                        <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                                            <span class="text-indigo-500">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                            </span>
+                                            <span>Odometer</span>
+                                        </span>
+                                        <span class="font-bold text-sm text-indigo-700">
+                                            {{ mttFormattedOddometerTotals[machineName] }}
+                                        </span>
+                                    </div>
+
+                                    <div v-if="pbrFormattedHsdTotals[machineName] !== null" class="flex justify-between items-center py-2">
+                                        <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                                            <span class="text-orange-500">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                            </span>
+                                            <span>HSD (Liter)</span>
+                                        </span>
+                                        <span class="font-bold text-sm text-orange-700">
+                                            {{ mttFormattedHsdTotals[machineName] }}
+                                        </span>
+                                    </div>
+
+                                </div>
+
+                                <div v-else class="text-center text-sm text-red-600 font-semibold p-2 bg-red-50 rounded-lg">
+                                    ⚠️ Mesin ini belum memiliki data perhitungan .
+                                </div>
                             </div>
-
-                            <div
-                                v-if="mttFormattedOddometerTotals[machineName]"
-                                class="flex justify-between items-center py-2"
-                            >
-                                <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-                                    <span class="text-indigo-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                    </span>
-                                    <span>Odometer</span>
-                                </span>
-                                <span class="font-bold text-base text-indigo-700">
-                                    {{ mttFormattedOddometerTotals[machineName] }}
-                                </span>
-                            </div>
-
-                            <div
-                                v-if="mttFormattedHsdTotals[machineName]"
-                                class="flex justify-between items-center py-2"
-                            >
-                                <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-                                    <span class="text-orange-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                    </span>
-                                    <span>HSD (Liter)</span>
-                                </span>
-                                <span class="font-bold text-base text-orange-700">
-                                    {{ mttFormattedHsdTotals[machineName] }}
-                                </span>
-                            </div>
-
-                            <hr v-if="Object.keys(mttFormattedTotals).length > 1 && machineName !== Object.keys(mttFormattedTotals)[Object.keys(mttFormattedTotals).length - 1]" class="my-3 border-dashed border-gray-300" />
-
+                            <!-- <hr v-if="machineName !== Object.keys(pbrFormattedTotals)[Object.keys(pbrFormattedTotals).length - 1]" class="my-3 border-dashed border-gray-300" /> -->
                         </div>
 
-                        <div v-if="Object.keys(mttFormattedTotals).length === 0" class="col-span-3 text-center text-sm text-gray-500 p-4">
-                            Tidak ada data untuk Tamping Machine.
+                        <div v-if="Object.keys(pbrFormattedTotals).length === 0" class="col-span-3 text-center text-sm text-gray-500 p-4">
+                            Tidak ada Ballast Regulator Machine yang terdaftar.
                         </div>
                     </div>
                 </div>
 
                 <div class="relative flex flex-col bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100 transition-shadow duration-300 hover:shadow-3xl">
 
-                    <div class="p-4 flex justify-between items-center bg-blue-500">
-                        <div class="flex items-center space-x-3">
-                            <div class="bg-red-500 rounded-lg p-3 text-white shadow-md shadow-red-500/50">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9h2M5 12h2M12 5v2M12 17v2M17 12h2M5 12h2" />
-                                </svg>
-                            </div>
+                        <div class="p-2 flex justify-between items-center bg-blue-500">
+                            <h3 class="text-lg font-semibold text-white text-center flex-grow">
+                                Ballast Regulator Machine
+                            </h3>
                         </div>
 
-                        <h3 class="text-xl font-extrabold text-white text-center flex-grow">
-                            Ballast Regulator Machine
-                        </h3>
-
-                        <button class="text-sm font-semibold text-blue-600 hover:text-blue-800 transition duration-150">
-                            <img src="../../../public/assets/receive-message.png" class="w-6" alt="Laporan">
-                        </button>
-                    </div>
-
-                    <div class="p-4 divide-y divide-gray-200">
-
+                        <div class="p-2 divide-y divide-gray-200">
+                        
                         <div
                             v-for="(duration, machineName) in pbrFormattedTotals"
                             :key="machineName"
                         >
-                            <div class="w-full border-b-2 border-gray-700 ">
-                                <span class="text-base font-bold text-black text-xs">
+                            <div 
+                                @click="toggleMachine(machineName)" 
+                                class="w-full py-2 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition duration-150"
+                            >
+                                <span class="font-semibold text-black text-sm">
                                     {{ machineName }}
                                 </span>
-                            </div>
-                            <div class="flex justify-between items-center py-2">
-                                <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-                                    <span class="text-blue-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                    </span>
-                                    <span>Engine Hours</span>
-                                </span>
-                                <span class="font-extrabold text-base text-blue-800">{{ duration }}</span>
-                            </div>
-
-                            <div
-                                v-if="pbrFormattedGeneratorTotals[machineName]"
-                                class="flex justify-between items-center py-2"
-                            >
-                                <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-                                    <span class="text-green-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                                    </span>
-                                    <span>Generator Hours (Meter)</span>
-                                </span>
-                                <span class="font-bold text-base text-green-700">
-                                    {{ pbrFormattedGeneratorTotals[machineName] }}
+                                
+                                <span :class="{'text-green-600': hasValidData(machineName, 'PBR'), 'text-red-600': !hasValidData(machineName, 'PBR')}">
+                                    <svg :class="{'rotate-180': openMachines[machineName]}" class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </span>
                             </div>
 
-                            <div
-                                v-if="pbrFormattedCounterTotals[machineName]"
-                                class="flex justify-between items-center py-2"
-                            >
-                                <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-                                    <span class="text-red-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
-                                    </span>
-                                    <span>Tamping Counter</span>
-                                </span>
-                                <span class="font-bold text-base text-red-700">
-                                    {{ pbrFormattedCounterTotals[machineName] }}
-                                </span>
+                            <div v-show="openMachines[machineName]" class="mt-2 pl-4 pr-2 pb-2 border-l-2 border-gray-300">
+                                
+                                <div v-if="hasValidData(machineName, 'PBR')">
+                                    
+                                    <div class="flex justify-between items-center py-2">
+                                        <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                                            <span class="text-blue-500">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                            </span>
+                                            <span>Engine Hours</span>
+                                        </span>
+                                        <span class="font-extrabold text-sm text-blue-800">{{ duration }}</span>
+                                    </div>
+
+                                    <div v-if="pbrFormattedGeneratorTotals[machineName] !== null" class="flex justify-between items-center py-2">
+                                        <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                                            <span class="text-green-500">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                            </span>
+                                            <span>Generator Hours (Meter)</span>
+                                        </span>
+                                        <span class="font-bold text-sm text-green-700">
+                                            {{ pbrFormattedGeneratorTotals[machineName] }}
+                                        </span>
+                                    </div>
+
+                                    <div v-if="pbrFormattedCounterTotals[machineName] !== null" class="flex justify-between items-center py-2">
+                                        <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                                            <span class="text-red-500">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                                            </span>
+                                            <span>Tamping Counter</span>
+                                        </span>
+                                        <span class="font-bold text-sm text-red-700">
+                                            {{ pbrFormattedCounterTotals[machineName] }}
+                                        </span>
+                                    </div>
+
+                                    <div v-if="pbrFormattedOddometerTotals[machineName] !== null" class="flex justify-between items-center py-2">
+                                        <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                                            <span class="text-indigo-500">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                            </span>
+                                            <span>Odometer</span>
+                                        </span>
+                                        <span class="font-bold text-sm text-indigo-700">
+                                            {{ pbrFormattedOddometerTotals[machineName] }}
+                                        </span>
+                                    </div>
+
+                                    <div v-if="pbrFormattedHsdTotals[machineName] !== null" class="flex justify-between items-center py-2">
+                                        <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                                            <span class="text-orange-500">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                            </span>
+                                            <span>HSD (Liter)</span>
+                                        </span>
+                                        <span class="font-bold text-sm text-orange-700">
+                                            {{ pbrFormattedHsdTotals[machineName] }}
+                                        </span>
+                                    </div>
+
+                                </div>
+
+                                <div v-else class="text-center text-sm text-red-600 font-semibold p-2 bg-red-50 rounded-lg">
+                                    ⚠️ Mesin ini belum memiliki data perhitungan.
+                                </div>
                             </div>
-
-                            <div
-                                v-if="pbrFormattedOddometerTotals[machineName]"
-                                class="flex justify-between items-center py-2"
-                            >
-                                <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-                                    <span class="text-indigo-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                    </span>
-                                    <span>Odometer</span>
-                                </span>
-                                <span class="font-bold text-base text-indigo-700">
-                                    {{ pbrFormattedOddometerTotals[machineName] }}
-                                </span>
-                            </div>
-
-                            <div
-                                v-if="pbrFormattedHsdTotals[machineName]"
-                                class="flex justify-between items-center py-2"
-                            >
-                                <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-                                    <span class="text-orange-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                    </span>
-                                    <span>HSD (Liter)</span>
-                                </span>
-                                <span class="font-bold text-base text-orange-700">
-                                    {{ pbrFormattedHsdTotals[machineName] }}
-                                </span>
-                            </div>
-
-                            <hr v-if="Object.keys(pbrFormattedTotals).length > 1 && machineName !== Object.keys(pbrFormattedTotals)[Object.keys(pbrFormattedTotals).length - 1]" class="my-3 border-dashed border-gray-300" />
-
+                            <!-- <hr v-if="machineName !== Object.keys(pbrFormattedTotals)[Object.keys(pbrFormattedTotals).length - 1]" class="my-3 border-dashed border-gray-300" /> -->
                         </div>
 
                         <div v-if="Object.keys(pbrFormattedTotals).length === 0" class="col-span-3 text-center text-sm text-gray-500 p-4">
-                            Tidak ada data untuk Ballast Regulator Machine.
+                            Tidak ada Ballast Regulator Machine yang terdaftar.
                         </div>
                     </div>
                 </div>
 
                 <div class="relative flex flex-col bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100 transition-shadow duration-300 hover:shadow-3xl">
-
-                    <div class="p-4 flex justify-between items-center bg-blue-500">
-                        <div class="flex items-center space-x-3">
-                            <div class="bg-red-500 rounded-lg p-3 text-white shadow-md shadow-red-500/50">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9h2M5 12h2M12 5v2M12 17v2M17 12h2M5 12h2" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <h3 class="text-xl font-extrabold text-white text-center flex-grow">
-                            Material Logistic And Inspection Machine
+                    <div class="p-2 flex justify-between items-center bg-blue-500">
+                        <h3 class="text-lg font-semibold text-white text-center flex-grow">
+                            Railway Maintenance Excavator
                         </h3>
-
-                        <button class="text-sm font-semibold text-blue-600 hover:text-blue-800 transition duration-150">
-                            <img src="../../../public/assets/receive-message.png" class="w-6" alt="Laporan">
-                        </button>
                     </div>
 
-                    <div class="p-4 divide-y divide-gray-200">
-
-                        <!-- <div
-                            v-for="(duration, machineName) in pbrFormattedTotals"
-                            :key="machineName"
+                    <div class="p-2 divide-y divide-gray-200">
+                    
+                        <div
+                            v-for="(duration, machineName) in rmeFormattedTotals"  :key="machineName"
                         >
-                            <div class="w-full border-b-2 border-gray-700 ">
-                                <span class="text-base font-bold text-black text-xs">
+                            <div 
+                                @click="toggleMachine(machineName)" 
+                                class="w-full py-2 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition duration-150"
+                            >
+                                <span class="font-semibold text-black text-sm">
                                     {{ machineName }}
                                 </span>
-                            </div>
-                            <div class="flex justify-between items-center py-2">
-                                <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-                                    <span class="text-blue-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                    </span>
-                                    <span>Engine Hours</span>
-                                </span>
-                                <span class="font-extrabold text-base text-blue-800">{{ duration }}</span>
-                            </div>
-
-                            <div
-                                v-if="pbrFormattedGeneratorTotals[machineName]"
-                                class="flex justify-between items-center py-2"
-                            >
-                                <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-                                    <span class="text-green-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                                    </span>
-                                    <span>Generator Hours (Meter)</span>
-                                </span>
-                                <span class="font-bold text-base text-green-700">
-                                    {{ pbrFormattedGeneratorTotals[machineName] }}
+                                
+                                <span :class="{'text-green-600': hasValidData(machineName, 'RME'), 'text-red-600': !hasValidData(machineName, 'RME')}"> 
+                                    <svg :class="{'rotate-180': openMachines[machineName]}" class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </span>
                             </div>
 
-                            <div
-                                v-if="pbrFormattedCounterTotals[machineName]"
-                                class="flex justify-between items-center py-2"
-                            >
-                                <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-                                    <span class="text-red-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
-                                    </span>
-                                    <span>Tamping Counter</span>
-                                </span>
-                                <span class="font-bold text-base text-red-700">
-                                    {{ pbrFormattedCounterTotals[machineName] }}
-                                </span>
+                            <div v-show="openMachines[machineName]" class="mt-2 pl-4 pr-2 pb-2 border-l-2 border-gray-300">
+                                
+                                <div v-if="hasValidData(machineName, 'RME')"> <div class="flex justify-between items-center py-2">
+                                        <span>Engine Hours</span>
+                                        <span class="font-extrabold text-sm text-blue-800">{{ duration }}</span>
+                                    </div>
+
+                                    <div v-if="rmeFormattedGeneratorTotals[machineName] !== null" class="flex justify-between items-center py-2"> <span>Generator Hours</span>
+                                        <span class="font-bold text-sm text-green-700">
+                                            {{ rmeFormattedGeneratorTotals[machineName] }} 
+                                        </span>
+                                    </div>
+
+                                    <div v-if="rmeFormattedCounterTotals[machineName] !== null" class="flex justify-between items-center py-2"> <span>Counter / Tamping Count</span>
+                                        <span class="font-bold text-sm text-red-700">
+                                            {{ rmeFormattedCounterTotals[machineName] }} 
+                                        </span>
+                                    </div>
+
+                                    <div v-if="rmeFormattedOddometerTotals[machineName] !== null" class="flex justify-between items-center py-2"> <span>Oddometer / Jarak Tempuh</span>
+                                        <span class="font-bold text-sm text-indigo-700">
+                                            {{ rmeFormattedOddometerTotals[machineName] }} 
+                                        </span>
+                                    </div>
+
+                                    <div v-if="rmeFormattedHsdTotals[machineName] !== null" class="flex justify-between items-center py-2"> <span>HSD (Fuel)</span>
+                                        <span class="font-bold text-sm text-orange-700">
+                                            {{ rmeFormattedHsdTotals[machineName] }} 
+                                        </span>
+                                    </div>
+
+                                </div>
+
+                                <div v-else class="text-center text-sm text-red-600 font-semibold p-2 bg-red-50 rounded-lg">
+                                    ⚠️ Mesin ini belum memiliki data perhitungan.
+                                </div>
                             </div>
-
-                            <div
-                                v-if="pbrFormattedOddometerTotals[machineName]"
-                                class="flex justify-between items-center py-2"
-                            >
-                                <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-                                    <span class="text-indigo-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                    </span>
-                                    <span>Odometer</span>
-                                </span>
-                                <span class="font-bold text-base text-indigo-700">
-                                    {{ pbrFormattedOddometerTotals[machineName] }}
-                                </span>
-                            </div>
-
-                            <div
-                                v-if="pbrFormattedHsdTotals[machineName]"
-                                class="flex justify-between items-center py-2"
-                            >
-                                <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-                                    <span class="text-orange-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                    </span>
-                                    <span>HSD (Liter)</span>
-                                </span>
-                                <span class="font-bold text-base text-orange-700">
-                                    {{ pbrFormattedHsdTotals[machineName] }}
-                                </span>
-                            </div>
-
-                            <hr v-if="Object.keys(pbrFormattedTotals).length > 1 && machineName !== Object.keys(pbrFormattedTotals)[Object.keys(pbrFormattedTotals).length - 1]" class="my-3 border-dashed border-gray-300" />
-
                         </div>
 
-                        <div v-if="Object.keys(pbrFormattedTotals).length === 0" class="col-span-3 text-center text-sm text-gray-500 p-4">
-                            Tidak ada data untuk Ballast Regulator Machine.
-                        </div> -->
-                        <p class="text-center">Belum ada</p>
+                        <div v-if="Object.keys(rmeFormattedTotals).length === 0" class="col-span-3 text-center text-sm text-gray-500 p-4"> 
+                            Tidak ada Railway Maintenance Excavator (RME) yang terdaftar.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative flex flex-col bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100 transition-shadow duration-300 hover:shadow-3xl">
+    
+                    <div class="p-2 flex justify-between items-center bg-blue-500">
+                        <h3 class="text-lg font-semibold text-white text-center flex-grow">
+                            Material Logistic & Inspection Machine
+                        </h3>
+                    </div>
+
+                    <div class="p-2 divide-y divide-gray-200">
+                    
+                        <div
+                            v-for="(duration, machineName) in mlimFormattedTotals" :key="machineName"
+                        >
+                            <div 
+                                @click="toggleMachine(machineName)" 
+                                class="w-full py-2 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition duration-150"
+                            >
+                                <span class="font-semibold text-black text-sm">
+                                    {{ machineName }}
+                                </span>
+                                
+                                <span :class="{'text-green-600': hasValidData(machineName, 'MLIM'), 'text-red-600': !hasValidData(machineName, 'MLIM')}"> <svg :class="{'rotate-180': openMachines[machineName]}" class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </span>
+                            </div>
+
+                            <div v-show="openMachines[machineName]" class="mt-2 pl-4 pr-2 pb-2 border-l-2 border-gray-300">
+                                
+                                <div v-if="hasValidData(machineName, 'MLIM')"> <div class="flex justify-between items-center py-2">
+                                        <span class="font-extrabold text-sm text-blue-800">{{ duration }}</span>
+                                    </div>
+
+                                    <div v-if="mlimFormattedGeneratorTotals[machineName] !== null" class="flex justify-between items-center py-2"> <span class="font-bold text-sm text-green-700">
+                                            {{ mlimFormattedGeneratorTotals[machineName] }} 
+                                        </span>
+                                    </div>
+
+                                    <div v-if="mlimFormattedCounterTotals[machineName] !== null" class="flex justify-between items-center py-2"> <span class="font-bold text-sm text-red-700">
+                                            {{ mlimFormattedCounterTotals[machineName] }} 
+                                        </span>
+                                    </div>
+
+                                    <div v-if="mlimFormattedOddometerTotals[machineName] !== null" class="flex justify-between items-center py-2"> <span class="font-bold text-sm text-indigo-700">
+                                            {{ mlimFormattedOddometerTotals[machineName] }} 
+                                        </span>
+                                    </div>
+
+                                    <div v-if="mlimFormattedHsdTotals[machineName] !== null" class="flex justify-between items-center py-2"> <span class="font-bold text-sm text-orange-700">
+                                            {{ mlimFormattedHsdTotals[machineName] }} 
+                                        </span>
+                                    </div>
+
+                                </div>
+
+                                <div v-else class="text-center text-sm text-red-600 font-semibold p-2 bg-red-50 rounded-lg">
+                                    ⚠️ Mesin ini belum memiliki data perhitungan.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-if="Object.keys(mlimFormattedTotals).length === 0" class="col-span-3 text-center text-sm text-gray-500 p-4"> Tidak ada Material Logistic & Inspection Machine yang terdaftar.
+                        </div>
                     </div>
                 </div>
 
