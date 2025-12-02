@@ -840,7 +840,7 @@ const hasRole = (roles) => {
         </div>
     </DashboardLayout>
 
-    <Modal v-if="!hasRole(['admin', 'superuser', 'Kepala UPT Mekanik'])" :show="showAssessmentModal" max-width="full" closeable>
+    <Modal v-if="!hasRole(['admin', 'superuser', 'Kepala UPT Mekanik', 'Kepala Operator KPJR','user'])" :show="showAssessmentModal" max-width="full" closeable>
         <div class="p-6 bg-white rounded-lg">
 
             <div class="flex justify-between items-center border-b pb-3 mb-4">
@@ -937,7 +937,7 @@ const hasRole = (roles) => {
     </Modal>
 
     <!-- MODAL UPLOAD SURAT KETERANGAN SEHAT -->
-    <Modal v-if="!hasRole(['admin', 'superuser', 'Kepala UPT Mekanik'])" :show="showHealthCertModal" max-width="2xl" :closeable="false">
+    <Modal v-if="!hasRole(['admin', 'superuser', 'Kepala UPT Mekanik', 'Kepala Operator KPJR', 'user'])" :show="showHealthCertModal" max-width="2xl" :closeable="false">
         <div class="p-6 bg-white rounded-lg max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-3 mb-4">
                 <h2 class="text-xl font-bold text-blue-700">
