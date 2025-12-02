@@ -4,20 +4,40 @@
     <meta charset="utf-8">
     <title>Working Report - {{ $report->id }}</title>
 </head>
-<body style="font-family: Arial, sans-serif; font-size: 8pt; margin: 8mm;">
+<body style="font-family: Arial, sans-serif; font-size: 8pt; margin: 5mm; padding: 0;">
+<!-- <div style="border: 1px solid black; padding: 5mm; width: auto; box-sizing: border-box;"> -->
+    <div style="width: 100%; font-family: Arial, sans-serif; font-size: 10pt;">
+    
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="
+                    width: 75%; 
+                    text-align: center; 
+                    vertical-align: middle;
+                    border: 1px solid black; 
+                    padding: 5px 0;
+                ">
+                    <p style="margin: 0; font-size: 11pt; font-weight: bold;">LAPORAN PEMERIKSAAN HARIAN KPJR</p>
+                    <p style="margin: 2px 0; font-size: 11pt; font-weight: bold;">{{ strtoupper(optional($report->region)->name ?? '-') }}</p>
+                </td>
 
-    <img style="position: relative; top: -9px; float: left;" src="{{ public_path('assets/img/logo-kai-baru.png') }}" align="right" height="50" width="100">
-    <div style="text-align: center; margin-bottom: 5px;">
-        <h2 style="margin: 0; font-size: 12pt;">FORM LAPORAN HARIAN KPJR</h2>
+                <td style="
+                    width: 25%; 
+                    text-align: center; 
+                    vertical-align: middle;
+                    border: 1px solid black;
+                ">
+                    <img 
+                        src="{{ public_path('assets/img/logo-kai-baru.png') }}" 
+                        alt="Logo KAI"
+                        style="height: 50px; width: 100px; padding: 0;"
+                    >
+                </td>
+            </tr>
+        </table>
     </div>
-    <div style="
-        clear: both; /* Penting untuk menghentikan float */
-        border-bottom: 3px solid black; /* Garis tebal 3px, warna hitam */
-        margin-top: 5px; /* Jarak antara judul dan garis */
-        margin-bottom: 10px; /* Jarak antara garis dan konten berikutnya */
-    "></div>
 
-    <table style="width: 100%; border-collapse: collapse; margin-bottom: 5px;">
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 5px; margin-top: 5px;">
         <tr>
             <td style="width: 20%; font-weight: bold; padding: 1px 3px 1px 0;">Hari / Tanggal</td>
             <td style="width: 1%; text-align: center; font-weight: bold;">:</td>
@@ -140,7 +160,7 @@
               <td style="width: 20%; font-weight: bold;">No. Wesel</td>
               <td style="width: 1%;">:</td>
               <td style="width: 20%; border-bottom: 1px solid black; text-align: center;">{{ optional($report->workresult)->no_wesel1 ?? '-' }}</td>
-              <td style="width: 2%; text-align: center;">s/d</td>
+              <td style="width: 2%; text-align: center;">Km/Hm</td>
               <td style="width: 20%; border-bottom: 1px solid black; text-align: center;">{{ optional($report->workresult)->km_hm1 ?? '-' }}</td>
               <td style="width: 5%;">{{ optional($report->workresult)->hu_hi4 ?? '-' }}</td>
               
@@ -153,7 +173,7 @@
               <td style="width: 15%;"></td>
               <td style="width: 1%;">:</td>
               <td style="width: 20%; border-bottom: 1px solid black; text-align: center;">{{ optional($report->workresult)->no_wesel2 ?? '-' }}</td>
-              <td style="width: 2%; text-align: center;">s/d</td>
+              <td style="width: 2%; text-align: center;">Km/Hm</td>
               <td style="width: 20%; border-bottom: 1px solid black; text-align: center;">{{ optional($report->workresult)->km_hm2 ?? '-' }}</td>
               <td style="width: 5%;">{{ optional($report->workresult)->hu_hi5 ?? '-' }}</td>
               
@@ -166,7 +186,7 @@
               <td style="width: 15%;"></td>
               <td style="width: 1%;">:</td>
               <td style="width: 20%; border-bottom: 1px solid black; text-align: center;">{{ optional($report->workresult)->no_wesel3 ?? '-' }}</td>
-              <td style="width: 2%; text-align: center;">s/d</td>
+              <td style="width: 2%; text-align: center;">Km/Hm</td>
               <td style="width: 20%; border-bottom: 1px solid black; text-align: center;">{{ optional($report->workresult)->km_hm3 ?? '-' }}</td>
               <td style="width: 5%;">{{ optional($report->workresult)->hu_hi6 ?? '-' }}</td>
               
@@ -550,7 +570,7 @@
                   <td style="height: 10px; border: 1px solid black;">{{ $report->operator_at1 ? \Carbon\Carbon::parse($report->operator_at3)->translatedFormat('d F Y') : '-' }}</td>
               </tr>
           </tbody>
-      </table><br>
+      </table><br><br>
       
       @php
           $checkpointRelations = [
