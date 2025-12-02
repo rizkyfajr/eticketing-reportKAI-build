@@ -9,8 +9,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Inertia\Inertia;
 use App\Models\ReadinessAssessmentMaster;
 use App\Models\ReadinessAssessment;
+use App\Models\HealthCertificate;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class MasterReadinessAssessment extends Controller
 {
@@ -21,12 +23,16 @@ class MasterReadinessAssessment extends Controller
   */
   public function index(ReadinessAssessmentMaster $readines)
   {
+    $user = Auth::user();
+
+    // Cek apakah user punya role admin, superuser, atau Kepala UPT Mekanik
+    $isAdminOrSupervisor = $user->hasAnyRole(['admin', 'superuser', 'Kepala UPT Mekanik']);
+
     return Inertia::render('ReadinessAssessment/Index', [
-      'readines'      => $readines,
+      'readines' => $readines,
+      'isAdminOrSupervisor' => $isAdminOrSupervisor, // Flag untuk Vue
     ]);
-  }
-  
-  /**
+  }  /**
   * Show the form for creating a new resource.
   *
   * @return \Illuminate\Http\Response
@@ -35,7 +41,7 @@ class MasterReadinessAssessment extends Controller
   {
     //
   }
-  
+
   /**
   * Store a newly created resource in storage.
   *
@@ -68,8 +74,8 @@ class MasterReadinessAssessment extends Controller
     }
 
     return redirect()->back()->with('error', __('Gagal menambahkan data.'));
-  } 
-  
+  }
+
   /**
   * Display the specified resource.
   *
@@ -80,7 +86,7 @@ class MasterReadinessAssessment extends Controller
   {
     //
   }
-  
+
   /**
   * Show the form for editing the specified resource.
   *
@@ -91,7 +97,7 @@ class MasterReadinessAssessment extends Controller
   {
     //
   }
-  
+
   /**
   * Update the specified resource in storage.
   *
@@ -128,7 +134,7 @@ class MasterReadinessAssessment extends Controller
 
     return redirect()->back()->with('error', __('Gagal memperbarui data.'));
   }
-  
+
   /**
   * Remove the specified resource from storage.
   *
@@ -172,7 +178,7 @@ class MasterReadinessAssessment extends Controller
         }
     })
     ->orderBy($request->input('order.key') ?: 'created_at', $request->input('order.by') ?: 'desc')
-    ->when(!$user->hasRole(['superuser', 'it', 'admin']), fn (Builder $query) => 
+    ->when(!$user->hasRole(['superuser', 'it', 'admin']), fn (Builder $query) =>
         $query->where('created_by_id', $user->id)
     )
     ->select(['id', 'group_name', 'komponen', 'urutan', 'nomor', 'pertanyaan'])
@@ -180,17 +186,32 @@ class MasterReadinessAssessment extends Controller
 
     return response()->json($readines);
   }
-  
+
   public function storeassessment(Request $request)
   {
+    $user = Auth::user();
+    $userId = Auth::id();
+    $today = Carbon::today();
+
+    // ===== VALIDASI SURAT KETERANGAN SEHAT =====
+    // Cek apakah user punya sertifikat kesehatan yang masih valid
+    $validCertificate = HealthCertificate::where('user_id', $userId)
+      ->valid()
+      ->first();
+
+    if (!$validCertificate) {
+      return redirect()->back()
+        ->withErrors(['health_certificate' => 'Anda harus mengupload Surat Keterangan Sehat yang masih berlaku sebelum mengisi Daily Readiness Assessment.'])
+        ->with('show_upload_modal', true);
+    }
+
+    // Validasi jawaban assessment
     $validated = $request->validate([
         'answers' => ['required', 'array'],
-        'answers.*' => ['nullable', 'in:ya,tidak'], 
+        'answers.*' => ['nullable', 'in:ya,tidak'],
     ]);
 
     $answers = $validated['answers'];
-    $userId = Auth::id();
-    $today = now()->format('Y-m-d');
 
     DB::beginTransaction();
 
@@ -229,6 +250,82 @@ class MasterReadinessAssessment extends Controller
             ->withErrors(['submission' => 'Gagal menyimpan assessment. Error: ' . $e->getMessage()])
             ->withInput();
     }
+  }
+
+  /**
+   * Upload Surat Keterangan Sehat
+   */
+  public function uploadHealthCertificate(Request $request)
+  {
+    $request->validate([
+      'health_certificate' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'], // Max 5MB
+      'valid_from' => ['required', 'date', 'after_or_equal:today'],
+    ]);
+
+    $userId = Auth::id();
+    $validFrom = Carbon::parse($request->valid_from);
+    $validUntil = $validFrom->copy()->addDays(3); // Berlaku 4 hari (hari ini + 3 hari)
+    $uploadDate = Carbon::today();
+
+    DB::beginTransaction();
+
+    try {
+      // Expire sertifikat lama yang masih active
+      HealthCertificate::where('user_id', $userId)
+        ->where('status', 'active')
+        ->update(['status' => 'expired']);
+
+      // Upload file
+      $file = $request->file('health_certificate');
+      $fileName = 'health_cert_' . $userId . '_' . time() . '.' . $file->getClientOriginalExtension();
+      $filePath = $file->storeAs('health_certificates', $fileName, 'public');
+
+      // Simpan data sertifikat baru
+      $certificate = HealthCertificate::create([
+        'user_id' => $userId,
+        'upload_date' => $uploadDate,
+        'valid_from' => $validFrom,
+        'valid_until' => $validUntil,
+        'file_path' => $filePath,
+        'status' => 'active',
+        'notes' => $request->notes,
+      ]);
+
+      DB::commit();
+
+      return redirect()->back()->with('success',
+        'Surat Keterangan Sehat berhasil diupload! Berlaku dari ' .
+        $validFrom->format('d/m/Y') . ' sampai ' . $validUntil->format('d/m/Y') . ' (4 hari).'
+      );
+
+    } catch (\Exception $e) {
+      DB::rollback();
+
+      return redirect()->back()
+        ->withErrors(['upload' => 'Gagal mengupload sertifikat. Error: ' . $e->getMessage()]);
+    }
+  }
+
+  /**
+   * Get status sertifikat kesehatan user yang sedang login
+   */
+  public function getHealthCertificateStatus()
+  {
+    $userId = Auth::id();
+
+    $certificate = HealthCertificate::where('user_id', $userId)
+      ->valid()
+      ->first();
+
+    return response()->json([
+      'has_valid_certificate' => $certificate !== null,
+      'certificate' => $certificate ? [
+        'valid_from' => $certificate->valid_from->format('Y-m-d'),
+        'valid_until' => $certificate->valid_until->format('Y-m-d'),
+        'days_remaining' => Carbon::today()->diffInDays($certificate->valid_until, false) + 1,
+        'file_url' => asset('storage/' . $certificate->file_path),
+      ] : null,
+    ]);
   }
 
 }

@@ -56,6 +56,7 @@ const form = useForm({
   trouble_at: props.order?.trouble_at ?? '',
   location: props.order?.location ?? '',
   problem_note: props.order?.problem_note ?? '',
+  severity: props.order?.severity ?? 'medium',
   // planned
   plan_start_at: props.order?.plan_start_at ?? '',
   action_plan: props.order?.action_plan ?? '',
@@ -92,6 +93,38 @@ const machineKey = computed(() => {
   return selectedMachine.value?.hierarchy_code || selectedMachine.value?.type || null
 })
 
+// === Filter Pedoman berdasarkan jenis mesin ===
+const filteredPedoman = computed(() => {
+  if (!selectedMachine.value || !selectedMachine.value.type) {
+    return props.pedoman || []
+  }
+
+  const machineType = selectedMachine.value.type.toUpperCase()
+
+  // Extract keywords dari machine type
+  // Contoh: "PBR 400 U-RS" -> ["PBR", "400", "U-RS"]
+  // "MTT 09-32 CSM" -> ["MTT", "09-32", "CSM"]
+  const machineKeywords = machineType.split(/[\s-]+/).filter(k => k.length > 0)
+
+  const filtered = props.pedoman.filter(p => {
+    const pedomanCode = p.kode_pedoman.toUpperCase()
+
+    // Cek apakah ada keyword dari machine type yang cocok dengan kode pedoman
+    return machineKeywords.some(keyword => {
+      // Untuk keyword singkat (1-2 karakter), harus exact match sebagai kata terpisah
+      if (keyword.length <= 2) {
+        const regex = new RegExp(`\\b${keyword}\\b`)
+        return regex.test(pedomanCode)
+      }
+      // Untuk keyword panjang, cukup contains
+      return pedomanCode.includes(keyword)
+    })
+  })
+
+  // Jika tidak ada yang cocok, tampilkan semua pedoman
+  return filtered.length > 0 ? filtered : props.pedoman
+})
+
 // === Watcher Hierarki (sudah benar) ===
 watch(selectedMachineId, async (val) => {
   form.master_machine_id = val
@@ -100,6 +133,16 @@ watch(selectedMachineId, async (val) => {
   selectedLv3.value = null; componentsLv3.value = []
   selectedLv4.value = null; componentsLv4.value = []
   form.component_lv5_id = null; componentsLv5.value = []
+
+  // Reset pedoman selection ketika mesin berubah
+  // Cek apakah pedoman yang dipilih masih valid untuk mesin baru
+  if (form.master_pedoman_id && filteredPedoman.value.length > 0) {
+    const isPedomanStillValid = filteredPedoman.value.some(p => p.id === form.master_pedoman_id)
+    if (!isPedomanStillValid) {
+      form.master_pedoman_id = null
+    }
+  }
+
   if (!val || !machineKey.value) return
   const { data } = await axios.get('/api/machine-components', { params: { machine_type: machineKey.value } })
   componentsLv1.value = data
@@ -672,6 +715,16 @@ function finishLater() {
                   placeholder="Gejala, indikator, kondisi awal, dsb."></textarea>
                 <InputError :message="form.errors.problem_note" class="mt-1" />
               </div>
+              <div>
+                <label class="block text-sm font-semibold mb-1">Tingkat Keparahan (Severity)</label>
+                <select v-model="form.severity" class="w-full border rounded p-2">
+                  <option value="low">Low (Rendah)</option>
+                  <option value="medium">Medium (Sedang)</option>
+                  <option value="high">High (Tinggi)</option>
+                  <option value="critical">Critical (Kritis)</option>
+                </select>
+                <InputError :message="form.errors.severity" class="mt-1" />
+              </div>
             </div>
           </div>
 
@@ -682,11 +735,17 @@ function finishLater() {
                 <label class="block text-sm font-semibold mb-1">Pedoman Perawatan (Checklist)</label>
                 <select v-model="form.master_pedoman_id" class="w-full border rounded p-2">
                     <option :value="null" disabled>Pilih Pedoman Checklist</option>
-                    <option v-for="p in props.pedoman" :key="p.id" :value="p.id">
+                    <option v-for="p in filteredPedoman" :key="p.id" :value="p.id">
                       {{ p.kode_pedoman }}
                     </option>
                 </select>
                 <InputError :message="form.errors.master_pedoman_id" class="mt-1" />
+                <p v-if="selectedMachine && filteredPedoman.length === props.pedoman.length && props.pedoman.length > 0" class="text-sm text-yellow-600 mt-1">
+                  ℹ️ Tidak ada pedoman spesifik untuk {{ selectedMachine.type }}, menampilkan semua pedoman
+                </p>
+                <p v-else-if="selectedMachine && filteredPedoman.length < props.pedoman.length" class="text-sm text-green-600 mt-1">
+                  ✓ Menampilkan {{ filteredPedoman.length }} pedoman yang sesuai dengan {{ selectedMachine.type }}
+                </p>
               </div>
 
               <div>
@@ -778,8 +837,8 @@ function finishLater() {
             <ButtonBlue :disabled="formFollowUp.processing">
               {{ formFollowUp.processing ? 'Menyimpan…' : 'Simpan & Lanjutkan' }}
             </ButtonBlue>
-            <Button class="border" @click.prevent="skipFollowUp">Lewati Step Ini</Button>
-            <Button class="border" @click.prevent="finishLater">Selesaikan Nanti</Button>
+            <Button class="border border-slate-300 bg-white text-slate-700 hover:bg-slate-50" @click.prevent="skipFollowUp">Lewati Step Ini</Button>
+            <Button class="border border-slate-300 bg-white text-slate-700 hover:bg-slate-50" @click.prevent="finishLater">Selesaikan Nanti</Button>
           </div>
         </form>
       </template>
@@ -931,7 +990,7 @@ function finishLater() {
             <label class="block text-sm font-semibold mb-1">Nama Teknisi</label>
             <select v-model="formStartRepair.start_repair_by_id" class="w-full border rounded p-2">
               <option :value="null">Pilih Teknisi</option>
-              <option v-for="u in props.users" :key="u.id" :value="u.id">{{ u.name }}</option>
+              <option v-for="u in props.users" :key="u.id" :value="u.id">{{ u.formatted_name }}</option>
             </select>
             <InputError :message="formStartRepair.errors.start_repair_by_id" class="mt-1" />
           </div>
@@ -948,8 +1007,8 @@ function finishLater() {
             <ButtonBlue :disabled="formStartRepair.processing">
               {{ formStartRepair.processing ? 'Menyimpan…' : 'Simpan & Lanjutkan' }}
             </ButtonBlue>
-            <Button class="border" @click.prevent="skipStartRepair">Lewati Step Ini</Button>
-            <Button class="border" @click.prevent="finishLater">Selesaikan Nanti</Button>
+            <Button class="border border-slate-300 bg-white text-slate-700 hover:bg-slate-50" @click.prevent="skipStartRepair">Lewati Step Ini</Button>
+            <Button class="border border-slate-300 bg-white text-slate-700 hover:bg-slate-50" @click.prevent="finishLater">Selesaikan Nanti</Button>
           </div>
         </form>
       </template>
@@ -977,7 +1036,7 @@ function finishLater() {
             <label class="block text-sm font-semibold mb-1">Nama Teknisi</label>
             <select v-model="formComplete.complete_repair_by_id" class="w-full border rounded p-2">
               <option :value="null">Pilih Teknisi</option>
-              <option v-for="u in props.users" :key="u.id" :value="u.id">{{ u.name }}</option>
+              <option v-for="u in props.users" :key="u.id" :value="u.id">{{ u.formatted_name }}</option>
             </select>
             <InputError :message="formComplete.errors.complete_repair_by_id" class="mt-1" />
           </div>

@@ -104,9 +104,18 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         ->name('master-checksheet-day.paginate');
 
     Route::post('/readiness-store', [App\Http\Controllers\MasterReadinessAssessment::class, 'storeassessment'])->name('readiness.store');
+    Route::post('/health-certificate/upload', [App\Http\Controllers\MasterReadinessAssessment::class, 'uploadHealthCertificate'])->name('health-certificate.upload');
+    Route::get('/health-certificate/status', [App\Http\Controllers\MasterReadinessAssessment::class, 'getHealthCertificateStatus'])->name('health-certificate.status');
     Route::resource('master-readiness-assessment', App\Http\Controllers\MasterReadinessAssessment::class);
     Route::post('/master-readiness-assessment/paginate', [App\Http\Controllers\MasterReadinessAssessment::class, 'paginate'])
         ->name('master-readiness-assessment.paginate');
+
+    // Readiness Assessment History
+    Route::get('/readiness-assessment/my-history', [App\Http\Controllers\ReadinessAssessmentViewController::class, 'myHistory'])->name('readiness.myhistory');
+    Route::get('/readiness-assessment/admin-monitoring', [App\Http\Controllers\ReadinessAssessmentViewController::class, 'adminMonitoring'])
+        ->name('readiness.admin.monitoring');
+    Route::get('/readiness-assessment/user/{userId}', [App\Http\Controllers\ReadinessAssessmentViewController::class, 'userDetail'])
+        ->name('readiness.admin.userdetail');
 
     // Route::get('/working-reports/{report}/create', [App\Http\Controllers\WorkingReportController::class, 'create'])->name('working-reports.create.withid');
     Route::get('working-reports/{report}/download', [App\Http\Controllers\WorkingReportController::class, 'downloadReport'])->name('working-reports.download');
@@ -186,6 +195,18 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::get('/maintenance-orders/{maintenanceOrder}/print-pdf', [App\Http\Controllers\MaintenanceOrderController::class, 'printPDF'])
         ->name('maintenance-orders.printPDF');
+
+    // === NOTIFIKASI MAINTENANCE ORDER ===
+    Route::get('/notifications', [App\Http\Controllers\MaintenanceOrderNotificationController::class, 'index'])
+        ->name('notifications.index');
+    Route::get('/notifications/recent', [App\Http\Controllers\MaintenanceOrderNotificationController::class, 'recent'])
+        ->name('notifications.recent');
+    Route::post('/notifications/{notification}/read', [App\Http\Controllers\MaintenanceOrderNotificationController::class, 'markAsRead'])
+        ->name('notifications.markAsRead');
+    Route::post('/notifications/read-all', [App\Http\Controllers\MaintenanceOrderNotificationController::class, 'markAllAsRead'])
+        ->name('notifications.markAllAsRead');
+    Route::delete('/notifications/{notification}', [App\Http\Controllers\MaintenanceOrderNotificationController::class, 'destroy'])
+        ->name('notifications.destroy');
 
     Route::get('machine-components', [App\Http\Controllers\MachineComponentController::class, 'index'])->name('machine-components.index');
     Route::post('machine-components', [App\Http\Controllers\MachineComponentController::class, 'store'])->name('machine-components.store');

@@ -15,9 +15,17 @@ use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Inertia\Inertia;
+use App\Services\MaintenanceOrderNotificationService;
 
 class MaintenanceOrderController extends Controller
 {
+    protected $notificationService;
+
+    public function __construct(MaintenanceOrderNotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
     /**
      * Halaman Index (Daftar Order)
      */
@@ -37,7 +45,10 @@ class MaintenanceOrderController extends Controller
         $machines = MasterMachine::with('region:id,name')->select('id','name','type','nomor','hierarchy_code','no_sarana','region_id')->get();
         $reports = WorkingReport::select('id')->get();
         $pedoman = MasterPedoman::select('id', 'kode_pedoman')->orderBy('kode_pedoman')->get();
-        $users = User::select('id', 'name')->orderBy('name')->get();
+        $users = User::select('id', 'name', 'username')->orderBy('name')->get()->map(function($user) {
+            $user->formatted_name = '[' . $user->username . '] ' . strtoupper($user->name);
+            return $user;
+        });
 
         return Inertia::render('MaintenanceOrders/Form', [
             'machines' => $machines,
@@ -56,7 +67,10 @@ class MaintenanceOrderController extends Controller
             'machines' => MasterMachine::with('region:id,name')->select('id','name','type','nomor','hierarchy_code','no_sarana','region_id')->get(),
             'reports'  => WorkingReport::select('id')->latest()->take(100)->get(),
             'pedoman' => MasterPedoman::select('id', 'kode_pedoman')->orderBy('kode_pedoman')->get(),
-            'users' => User::select('id', 'name')->orderBy('name')->get(),
+            'users' => User::select('id', 'name', 'username')->orderBy('name')->get()->map(function($user) {
+                $user->formatted_name = '[' . $user->username . '] ' . strtoupper($user->name);
+                return $user;
+            }),
         ]);
     }
 
@@ -73,12 +87,18 @@ class MaintenanceOrderController extends Controller
             'trouble_at'   => ['nullable', 'required_if:category,unplanned', 'date'],
             'location'     => ['nullable', 'required_if:category,unplanned', 'string', 'max:255'],
             'problem_note' => ['nullable', 'required_if:category,unplanned', 'string'],
+            'severity'     => ['nullable', 'in:low,medium,high,critical'],
             'plan_start_at' => ['nullable', 'required_if:category,planned', 'date'],
             'action_plan'   => ['nullable', 'string'],
             'lampiran'          => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'], // Max 5MB
             'master_pedoman_id' => ['nullable', 'required_if:category,planned', 'exists:master_pedoman,id'],
             'machine_hours' => ['nullable', 'numeric', 'min:0'],
         ]);
+
+        // Set default severity jika tidak diisi
+        if (!isset($data['severity'])) {
+            $data['severity'] = 'medium';
+        }
 
         if ($request->hasFile('lampiran')) {
             // Simpan file di 'storage/app/public/lampiran_orders'
@@ -91,15 +111,22 @@ class MaintenanceOrderController extends Controller
         $newOrder->load([
             'masterPedoman.categories.items' => function ($query) {
                 $query->orderBy('nomor_poin');
-            }
+            },
+            'machine'
         ]);
+
+        // 🔔 NOTIFIKASI: Input Failure - Kirim ke KAOP/Teknisi BY
+        $this->notificationService->notifyInputFailure($newOrder);
 
         // Return dengan render ulang form dengan order yang baru dibuat (untuk wizard flow)
         return Inertia::render('MaintenanceOrders/Form', [
             'machines' => MasterMachine::with('region:id,name')->select('id','name','type','nomor','hierarchy_code','no_sarana','region_id')->get(),
             'reports' => WorkingReport::select('id')->get(),
             'pedoman' => MasterPedoman::select('id', 'kode_pedoman')->orderBy('kode_pedoman')->get(),
-            'users' => User::select('id', 'name')->orderBy('name')->get(),
+            'users' => User::select('id', 'name', 'username')->orderBy('name')->get()->map(function($user) {
+                $user->formatted_name = '[' . $user->username . '] ' . strtoupper($user->name);
+                return $user;
+            }),
             'newOrder' => $newOrder, // Kirim order yang baru dibuat
         ])->with('success', 'Maintenance Order berhasil disimpan.');
     }
@@ -187,8 +214,19 @@ class MaintenanceOrderController extends Controller
 
     public function show(MaintenanceOrder $maintenanceOrder)
     {
-        $maintenanceOrder->load(['machine:id,name,type,nomor,no_sarana','workingReport:id', 'masterPedoman.categories.items', 'results']);
-        $users = User::select('id', 'name')->orderBy('name')->get();
+        $maintenanceOrder->load([
+            'machine:id,name,type,nomor,no_sarana',
+            'workingReport:id',
+            'masterPedoman.categories.items',
+            'results',
+            'followUpBy:id,name,username',
+            'startRepairBy:id,name,username',
+            'completeRepairBy:id,name,username'
+        ]);
+        $users = User::select('id', 'name', 'username')->orderBy('name')->get()->map(function($user) {
+            $user->formatted_name = '[' . $user->username . '] ' . strtoupper($user->name);
+            return $user;
+        });
 
         return Inertia::render('MaintenanceOrders/Show', [
             'order' => $maintenanceOrder,
@@ -199,12 +237,6 @@ class MaintenanceOrderController extends Controller
 
     public function storeResults(Request $request, MaintenanceOrder $maintenanceOrder)
     {
-
-        if ($maintenanceOrder->status !== 'DIKERJAKAN') {
-            return redirect()->back()->with('error', 'Hanya bisa menyimpan checklist jika status pekerjaan "DIKERJAKAN".');
-        }
-
-
         $request->validate([
             'results' => ['required', 'array'],
             'results.*.realisasi' => ['nullable', 'string', 'max:255'],
@@ -259,6 +291,12 @@ class MaintenanceOrderController extends Controller
 
         $maintenanceOrder->update($data);
 
+        // Load relasi untuk notifikasi
+        $maintenanceOrder->load(['followUpBy', 'machine']);
+
+        // 🔔 NOTIFIKASI: Follow Up Plan - Kirim ke teknisi yang ditugaskan dan KAOP/Teknisi BY
+        $this->notificationService->notifyFollowUpPlan($maintenanceOrder);
+
         return redirect()->back()->with('success', 'Follow Up Plan berhasil disimpan.');
     }
 
@@ -279,6 +317,12 @@ class MaintenanceOrderController extends Controller
         $data['start_repair_at'] = (new \DateTime())->format('Y-m-d H:i:s');
 
         $maintenanceOrder->update($data);
+
+        // Load relasi untuk notifikasi
+        $maintenanceOrder->load(['startRepairBy', 'machine']);
+
+        // 🔔 NOTIFIKASI: Start Repair - Kirim ke KAOP/Teknisi BY
+        $this->notificationService->notifyStartRepair($maintenanceOrder);
 
         return redirect()->back()->with('success', 'Pekerjaan telah dimulai.');
     }
@@ -304,6 +348,12 @@ class MaintenanceOrderController extends Controller
         $data['complete_repair_at'] = (new \DateTime())->format('Y-m-d H:i:s');
 
         $maintenanceOrder->update($data);
+
+        // Load relasi untuk notifikasi
+        $maintenanceOrder->load(['completeRepairBy', 'machine']);
+
+        // 🔔 NOTIFIKASI: Repair Complete - Kirim ke KAOP/Teknisi BY
+        $this->notificationService->notifyRepairComplete($maintenanceOrder);
 
         return redirect()->route('maintenance-orders.index')
             ->with('success', 'Pekerjaan Order #'.$maintenanceOrder->id.' telah Selesai.');

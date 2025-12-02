@@ -127,7 +127,6 @@ const kodeOptions = [
   'P6 CSM WITH GEN',
   'P6 PBR U-RS',
   'P6 UNIMAT',
-  // Tambahan P12, P24, P48 di sini
   'P12 CSM', 'P12 PBR U-RS', 'P12 UNIMAT',
   'P24 CSM', 'P24 PBR U-RS', 'P24 UNIMAT',
   'P48 CSM', 'P48 PBR U-RS', 'P48 UNIMAT',

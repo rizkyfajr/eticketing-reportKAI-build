@@ -137,7 +137,7 @@ const formatDate = (dateString) => {
 <template>
   <DashboardLayout title="Detail Maintenance Order">
     <main class="p-0 py-0 mb-[1.25rem] ml-[1.25rem] mt-[1.25rem]">
-      <h2 class="font-bold text-2xl">Detail Maintenance Order #{{ order.id }}</h2>
+      <h2 class="font-bold text-2xl">Detail Maintenance Order - {{ order.title }}</h2>
       <a :href="route('maintenance-orders.index')" class="text-sm text-gray-500 font-semibold hover:text-sky-600">Maintenance Order</a>
       <span class="font-semibold text-sm px-2">-</span>
       <span class="text-sm text-gray-500 font-semibold">Detail</span>
@@ -179,19 +179,23 @@ const formatDate = (dateString) => {
           </template>
           <template v-if="!isBaru">
             <hr class="md:col-span-2 my-2 border-slate-200">
+            <div><label class="block text-sm font-semibold">Teknisi Follow Up:</label><p class="font-semibold text-blue-600">{{ order.follow_up_by ? '[' + order.follow_up_by.username + '] ' + order.follow_up_by.name.toUpperCase() : '-' }}</p></div>
+            <div><label class="block text-sm font-semibold">Tanggal Follow Up:</label><p>{{ formatDate(order.follow_up_at) }}</p></div>
             <div><label class="block text-sm font-semibold">Follow Up Plan:</label><p>{{ order.follow_up_plan || '-' }}</p></div>
             <div><label class="block text-sm font-semibold">Estimasi Selesai:</label><p>{{ formatDate(order.follow_up_estimate_at) }}</p></div>
           </template>
           <template v-if="isDikerjakan || isSelesai">
             <hr class="md:col-span-2 my-2 border-slate-200">
-            <div><label class="block text-sm font-semibold">Catatan Mulai Kerja:</label><p>{{ order.start_repair_notes || '-' }}</p></div>
+            <div><label class="block text-sm font-semibold">Teknisi Perbaikan:</label><p class="font-semibold text-orange-600">{{ order.start_repair_by ? '[' + order.start_repair_by.username + '] ' + order.start_repair_by.name.toUpperCase() : '-' }}</p></div>
             <div><label class="block text-sm font-semibold">Mulai Dikerjakan:</label><p>{{ formatDate(order.start_repair_at) }}</p></div>
+            <div class="md:col-span-2"><label class="block text-sm font-semibold">Catatan Mulai Kerja:</label><p>{{ order.start_repair_notes || '-' }}</p></div>
             <div v-if="order.start_repair_photo"><label class="block text-sm font-semibold">Foto Mulai:</label><a :href="`/storage/${order.start_repair_photo}`" target="_blank" class="text-blue-600 hover:underline">📷 Lihat Foto</a></div>
           </template>
           <template v-if="isSelesai">
             <hr class="md:col-span-2 my-2 border-slate-200">
-            <div><label class="block text-sm font-semibold">Hasil Tindak Lanjut:</label><p>{{ order.complete_repair_notes || '-' }}</p></div>
+            <div><label class="block text-sm font-semibold">Diselesaikan oleh:</label><p class="font-semibold text-green-600">{{ order.complete_repair_by ? '[' + order.complete_repair_by.username + '] ' + order.complete_repair_by.name.toUpperCase() : '-' }}</p></div>
             <div><label class="block text-sm font-semibold">Selesai Dikerjakan:</label><p>{{ formatDate(order.complete_repair_at) }}</p></div>
+            <div class="md:col-span-2"><label class="block text-sm font-semibold">Hasil Tindak Lanjut:</label><p>{{ order.complete_repair_notes || '-' }}</p></div>
             <div v-if="order.complete_repair_photo"><label class="block text-sm font-semibold">Foto Selesai:</label><a :href="`/storage/${order.complete_repair_photo}`" target="_blank" class="text-blue-600 hover:underline">📷 Lihat Foto</a></div>
           </template>
         </div>
@@ -203,7 +207,7 @@ const formatDate = (dateString) => {
         <h3 class="font-bold text-lg mb-4 text-blue-700">Formulir Follow Up Plan</h3>
         <form @submit.prevent="submitFollowUp" class="space-y-4">
           <div><label class="block text-sm font-semibold mb-1">Nama Teknisi / KAOP</label>
-            <select v-model="formFollowUp.follow_up_by_id" class="w-full border rounded p-2"><option :value="null">Pilih User</option><option v-for="u in props.users" :key="u.id" :value="u.id">{{ u.name }}</option></select>
+            <select v-model="formFollowUp.follow_up_by_id" class="w-full border rounded p-2"><option :value="null">Pilih User</option><option v-for="u in props.users" :key="u.id" :value="u.id">{{ u.formatted_name }}</option></select>
             <InputError :message="formFollowUp.errors.follow_up_by_id" class="mt-1" /></div>
           <div><label class="block text-sm font-semibold mb-1">Rencana Tindak Lanjut</label><textarea v-model="formFollowUp.follow_up_plan" rows="3" class="w-full border rounded p-2"></textarea><InputError :message="formFollowUp.errors.follow_up_plan" class="mt-1" /></div>
           <div><label class="block text-sm font-semibold mb-1">Estimasi Waktu</label><input type="datetime-local" v-model="formFollowUp.follow_up_estimate_at" class="w-full border rounded p-2" /><InputError :message="formFollowUp.errors.follow_up_estimate_at" class="mt-1" /></div>
@@ -216,7 +220,7 @@ const formatDate = (dateString) => {
       <template #body>
         <h3 class="font-bold text-lg mb-4 text-cyan-700">Formulir Mulai Perbaikan</h3>
         <form @submit.prevent="submitStartRepair" class="space-y-4">
-          <div><label class="block text-sm font-semibold mb-1">Nama Teknisi</label><select v-model="formStartRepair.start_repair_by_id" class="w-full border rounded p-2"><option :value="null">Pilih Teknisi</option><option v-for="u in props.users" :key="u.id" :value="u.id">{{ u.name }}</option></select><InputError :message="formStartRepair.errors.start_repair_by_id" class="mt-1" /></div>
+          <div><label class="block text-sm font-semibold mb-1">Nama Teknisi</label><select v-model="formStartRepair.start_repair_by_id" class="w-full border rounded p-2"><option :value="null">Pilih Teknisi</option><option v-for="u in props.users" :key="u.id" :value="u.id">{{ u.formatted_name }}</option></select><InputError :message="formStartRepair.errors.start_repair_by_id" class="mt-1" /></div>
           <div><label class="block text-sm font-semibold mb-1">Tindak Lanjut / Keterangan</label><textarea v-model="formStartRepair.start_repair_notes" rows="3" class="w-full border rounded p-2"></textarea><InputError :message="formStartRepair.errors.start_repair_notes" class="mt-1" /></div>
           <div><label class="block text-sm font-semibold mb-1">Upload Foto</label><input type="file" @input="formStartRepair.start_repair_photo = $event.target.files[0]" class="w-full" /></div>
           <div class="flex justify-end"><ButtonBlue :disabled="formStartRepair.processing">Mulai Pekerjaan</ButtonBlue></div>
@@ -328,7 +332,7 @@ const formatDate = (dateString) => {
         <template #body>
           <h3 class="font-bold text-lg mb-4 text-red-700">Formulir Selesaikan Perbaikan</h3>
           <form @submit.prevent="submitComplete" class="space-y-4">
-            <div><label class="block text-sm font-semibold mb-1">Nama Teknisi</label><select v-model="formComplete.complete_repair_by_id" class="w-full border rounded p-2"><option :value="null">Pilih Teknisi</option><option v-for="u in props.users" :key="u.id" :value="u.id">{{ u.name }}</option></select><InputError :message="formComplete.errors.complete_repair_by_id" class="mt-1" /></div>
+            <div><label class="block text-sm font-semibold mb-1">Nama Teknisi</label><select v-model="formComplete.complete_repair_by_id" class="w-full border rounded p-2"><option :value="null">Pilih Teknisi</option><option v-for="u in props.users" :key="u.id" :value="u.id">{{ u.formatted_name }}</option></select><InputError :message="formComplete.errors.complete_repair_by_id" class="mt-1" /></div>
             <div><label class="block text-sm font-semibold mb-1">Hasil Tindak Lanjut</label><textarea v-model="formComplete.complete_repair_notes" rows="3" class="w-full border rounded p-2"></textarea><InputError :message="formComplete.errors.complete_repair_notes" class="mt-1" /></div>
             <div><label class="block text-sm font-semibold mb-1">Upload Foto Selesai</label><input type="file" @input="formComplete.complete_repair_photo = $event.target.files[0]" class="w-full" /></div>
             <div class="flex justify-end"><ButtonRed :disabled="formComplete.processing">Selesaikan Pekerjaan</ButtonRed></div>

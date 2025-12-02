@@ -11,6 +11,7 @@ use Inertia\Inertia;
 use App\Models\ReadinessAssessmentMaster;
 use App\Models\ReadinessAssessment;
 use App\Models\ReportUser;
+use App\Models\MaintenanceOrder;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
@@ -35,7 +36,7 @@ class DashboardController extends Controller
 
     if (!$hasCompletedAssessment) {
         $masterQuestions = ReadinessAssessmentMaster::orderBy('urutan')
-            ->orderBy('group_name') 
+            ->orderBy('group_name')
             ->get();
 
         $existingAssessments = ReadinessAssessment::where('user_id', $user->id)
@@ -215,7 +216,7 @@ class DashboardController extends Controller
             $totalHSD[$machineName] += $hsdStop;
         }
     }
-    
+
     $formatted = [];
     foreach ($totalPerMesin as $mesin => $menit) {
         $formatted[$mesin] = floor($menit / 60) . " Jam " . ($menit % 60) . " Menit";
@@ -228,20 +229,105 @@ class DashboardController extends Controller
 
     $formattedTamping = [];
     foreach ($totalCounterTamping as $mesin => $counter) {
-        $formattedTamping[$mesin] = number_format($counter, 0, ',', '.') . " Counter "; 
+        $formattedTamping[$mesin] = number_format($counter, 0, ',', '.') . " Counter ";
     }
 
     $formattedOdometer = [];
     foreach ($totalOdometer as $mesin => $odo) {
-        $formattedOdometer[$mesin] = number_format($odo, 0, ',', '.') . " Km "; 
+        $formattedOdometer[$mesin] = number_format($odo, 0, ',', '.') . " Km ";
     }
 
     $formattedHSD = [];
     foreach ($totalHSD as $mesin => $hsd) {
-        $formattedHSD[$mesin] = number_format($hsd, 2, ',', '.') . " % "; 
+        $formattedHSD[$mesin] = number_format($hsd, 2, ',', '.') . " % ";
     }
 
     // dd($formatted, $formattedGenerator, $formattedTamping, $formattedOdometer, $formattedHSD);
+
+    // Dashboard Maintenance Order
+    $maintenanceStats = [
+        'total_failures' => MaintenanceOrder::count(),
+        'pending_followup' => MaintenanceOrder::where(function($q) {
+            $q->whereIn('status', ['OPEN', 'DIPROSES'])
+              ->orWhereNull('status');
+        })->count(),
+        'in_progress' => MaintenanceOrder::where('status', 'DIKERJAKAN')->count(),
+        'completed' => MaintenanceOrder::where('status', 'SELESAI')->count(),
+        'critical_failures' => MaintenanceOrder::where('severity', 'critical')->count(),
+    ];
+
+    // Hitung rata-rata waktu perbaikan (MTTR - Mean Time To Repair)
+    // MTTR = Waktu dari mulai repair sampai selesai repair (bukan dari trouble_at)
+    $completedOrders = MaintenanceOrder::where('status', 'SELESAI')
+        ->whereNotNull('start_repair_at')
+        ->whereNotNull('complete_repair_at')
+        ->get();
+
+    $totalRepairMinutes = 0;
+    $repairCount = 0;
+
+    foreach ($completedOrders as $order) {
+        try {
+            $startDate = Carbon::parse($order->start_repair_at);
+            $completeDate = Carbon::parse($order->complete_repair_at);
+
+            // Pastikan complete_repair_at lebih besar dari start_repair_at
+            if ($completeDate->greaterThan($startDate)) {
+                $totalRepairMinutes += $startDate->diffInMinutes($completeDate);
+                $repairCount++;
+            }
+        } catch (\Exception $e) {
+            // Skip jika parsing gagal
+        }
+    }
+
+    $avgRepairTime = $repairCount > 0 ? floor($totalRepairMinutes / $repairCount) : 0;
+    $maintenanceStats['avg_repair_hours'] = floor($avgRepairTime / 60);
+    $maintenanceStats['avg_repair_minutes'] = $avgRepairTime % 60;
+
+    // Hitung rata-rata Response Time (dari kerusakan sampai mulai perbaikan)
+    $respondedOrders = MaintenanceOrder::where('status', 'SELESAI')
+        ->whereNotNull('trouble_at')
+        ->whereNotNull('start_repair_at')
+        ->get();
+
+    $totalResponseMinutes = 0;
+    $responseCount = 0;
+
+    foreach ($respondedOrders as $order) {
+        try {
+            $troubleDate = Carbon::parse($order->trouble_at);
+            $startDate = Carbon::parse($order->start_repair_at);
+
+            if ($startDate->greaterThan($troubleDate)) {
+                $totalResponseMinutes += $troubleDate->diffInMinutes($startDate);
+                $responseCount++;
+            }
+        } catch (\Exception $e) {
+            // Skip
+        }
+    }
+
+    $avgResponseTime = $responseCount > 0 ? floor($totalResponseMinutes / $responseCount) : 0;
+    $maintenanceStats['avg_response_hours'] = floor($avgResponseTime / 60);
+    $maintenanceStats['avg_response_minutes'] = $avgResponseTime % 60;
+
+    // Recent Maintenance Orders (5 terbaru)
+    $recentMaintenanceOrders = MaintenanceOrder::with(['machine:id,name,nomor', 'user:id,name'])
+        ->latest()
+        ->take(5)
+        ->get()
+        ->map(function ($order) {
+            return [
+                'id' => $order->id,
+                'machine_name' => $order->machine ? '[' . $order->machine->nomor . '] ' . $order->machine->name : 'N/A',
+                'failure_description' => \Str::limit($order->problem_note ?? $order->title ?? '-', 50),
+                'status' => $order->status,
+                'severity' => $order->severity,
+                'created_by' => $order->user->name ?? 'Unknown',
+                'created_at' => $order->created_at->format('d M Y H:i'),
+            ];
+        });
 
     return Inertia::render('Dashboard', [
       'formatted_mesin_total' => $formatted,
@@ -255,6 +341,9 @@ class DashboardController extends Controller
           'divisions:id,division_name',
           'positions:id,position',
       ]),
+      'maintenanceStats' => $maintenanceStats,
+      'recentMaintenanceOrders' => $recentMaintenanceOrders,
+      'isAdminOrSupervisor' => $user->hasAnyRole(['admin', 'superuser', 'Kepala UPT Mekanik']),
     ]);
   }
 

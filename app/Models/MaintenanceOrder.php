@@ -32,6 +32,7 @@ class MaintenanceOrder extends Model
         'master_pedoman_id',
         'machine_hours',
         'status',
+        'severity',          // low | medium | high | critical
 
         // Kolom Follow Up Plan
         'follow_up_by_id',
@@ -72,6 +73,11 @@ class MaintenanceOrder extends Model
     public function machine()
     {
         return $this->belongsTo(MasterMachine::class, 'master_machine_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'assigned_to');
     }
 
     public function scopeByReport($q, $reportId)

@@ -3,7 +3,8 @@ import { onMounted, onUnmounted, ref, watch, computed } from 'vue'
 import { Head, usePage } from '@inertiajs/inertia-vue3'
 import Toggler from '@/Components/DashboardLayout/SidebarToggler.vue'
 import TopbarDropdown from '@/Components/DashboardLayout/TopbarDropdown.vue'
-import Sidebar from '@/Components/DashboardLayout/Sidebar.vue';
+import Sidebar from '@/Components/DashboardLayout/Sidebar.vue'
+import NotificationBell from '@/Components/NotificationBell.vue';
 
 defineProps({
   title: String,
@@ -66,7 +67,11 @@ onUnmounted(() => document.removeEventListener('keyup', q))
       <div class="flex-1 text-center md:text-left text-lg font-semibold">
         </div>
 
-      <div>
+      <div class="flex items-center gap-3">
+        <!-- Notification Bell -->
+        <NotificationBell />
+
+        <!-- User Dropdown -->
         <TopbarDropdown />
       </div>
     </div>
