@@ -2249,7 +2249,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                 <div class="text-sm font-extrabold  border-gray-200 py-1 pl-0">C. DATA PERSONEL</div>
                 <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">
                   <div class="flex flex-col items-start space-y-1">
-                    <label for="operator_by1" class="block text-xs font-semibold">
+                    <label for="operator_by1" class="block text-xs font-bold">
                       {{ __('Operator 1') }}
                     </label>
 
@@ -2274,7 +2274,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   </div>
 
                   <div class="flex flex-col items-start space-y-1">
-                    <label for="operator_by2" class="block text-xs font-semibold">
+                    <label for="operator_by2" class="block text-xs font-bold">
                       {{ __('Operator 2') }}
                     </label>
 
@@ -2299,7 +2299,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   </div>
 
                   <div class="flex flex-col items-start space-y-1">
-                    <label for="operator_by3" class="block text-xs font-semibold">
+                    <label for="operator_by3" class="block text-xs font-bold">
                       {{ __('Operator 3') }}
                     </label>
 
@@ -2324,7 +2324,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   </div>
 
                   <div class="flex flex-col items-start space-y-1">
-                    <label for="hsd_awal_kerja" class="font-semibold text-xs">
+                    <label for="hsd_awal_kerja" class="font-bold text-xs">
                       {{ __('NIPP Pengawal 1') }}
                     </label>
 
@@ -2340,7 +2340,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   </div>
 
                   <div class="flex flex-col items-start space-y-1">
-                    <label for="hsd_awal_kerja" class="font-semibold text-xs">
+                    <label for="hsd_awal_kerja" class="font-bold text-xs">
                       {{ __('Nama Pengawal 1') }}
                     </label>
 
@@ -2356,7 +2356,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   </div>
 
                   <div class="flex flex-col items-start space-y-1">
-                    <label for="hsd_awal_kerja" class="font-semibold text-xs">
+                    <label for="hsd_awal_kerja" class="font-bold text-xs">
                       {{ __('NIPP Pengawal 2') }}
                     </label>
 
@@ -2372,7 +2372,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   </div>
 
                   <div class="flex flex-col items-start space-y-1">
-                    <label for="hsd_awal_kerja" class="font-semibold text-xs">
+                    <label for="hsd_awal_kerja" class="font-bold text-xs">
                       {{ __('Nama Pengawal 2') }}
                     </label>
 
