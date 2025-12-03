@@ -197,23 +197,30 @@ onMounted(() => {
 });
 
 const validateForms = () => {
-    const failedForms = [];
-    const validationMap = [
-        { form: form1, name: 'MG 1 (Lurusan)' },
-        { form: form2, name: 'MG 2 (Lengkungan)' },
-        { form: form3, name: 'MG 3 (Wesel)' },
-        { form: form4, name: 'Pemeriksaan Silang KPJR' },
-        { form: form5, name: 'Pemeriksaan Silang Lahan' },
-        { form: form6, name: 'Perekaman Awal' },
-    ];
+    const failedValidations = [];
+    
+    const isOneOfMgUploaded = 
+        (props.mglurusanawal_attachments?.length > 0) || 
+        (props.mglengkunganawal_attachments?.length > 0) || 
+        (props.mgweselawal_attachments?.length > 0);
 
-    validationMap.forEach(item => {
-        if (item.form.ada === '0' && item.form.tidak === '0') {
-            failedForms.push(item.name);
-        }
-    });
+    if (!isOneOfMgUploaded) {
+        failedValidations.push("Data Opname Rel Jalan Awal (MG 1, MG 2, atau MG 3) (Wajib pilih salah satu)");
+    }
+    
+    if (!(props.pemeriksaansilangkpjr_attachments?.length > 0)) {
+        failedValidations.push("Data Pemeriksaan Silang KPJR");
+    }
 
-    return failedForms;
+    if (!(props.pemeriksaansilanglahan_attachments?.length > 0)) {
+        failedValidations.push("Data Pemeriksaan Silang Lahan");
+    }
+
+    if (!(props.perekamanawal_attachments?.length > 0)) {
+        failedValidations.push("Data Perekaman (Awal)");
+    }
+
+    return failedValidations;
 };
 
 const submit = () => {
@@ -314,7 +321,17 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
             <form @submit.prevent="submit" class="gap-6 p-4">
               <div v-if="!showForm1" class="space-y-4">
                 
-                <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">                  
+                <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">     
+
+                  <div class="flex flex-col">
+                    <label class="block text-xs font-semibold">Tanggal</label>
+                    <Input
+                      v-model="form.date"
+                      type="datetime-local"
+                      class="w-full border rounded-md px-2 py-2 text-xs"
+                      placeholder="Isi tanggal"
+                    />
+                  </div>             
 
                   <div class="flex flex-col">
                     <label for="approved_by1" class="block text-xs font-semibold">
@@ -334,15 +351,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
 
                   <div class="flex flex-col">
                     <label class="block text-xs font-semibold">Nama Mesin</label>
-                    <!-- <select
-                      v-model="form.machine_id"
-                      class="w-full border rounded-md px-2 py-2 bg-white text-xs"
-                    >
-                      <option disabled value="">-- Pilih Mesin --</option>
-                      <option v-for="machine in machines" :key="machine.id" :value="machine.id">
-                          {{ `${machine.name} - ${machine.type} (${machine.region.name})` }}
-                      </option>
-                    </select> -->
                     <Select
                       v-model="form.machine_id"
                       class="w-full border rounded-md px-2 py-2 bg-white text-xs"
@@ -384,16 +392,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       </template>
                     </Select>
                     <InputError :error="form.errors.region_id" />
-                  </div>
-
-                  <div class="flex flex-col">
-                    <label class="block text-xs font-semibold">Tanggal</label>
-                    <Input
-                      v-model="form.date"
-                      type="datetime-local"
-                      class="w-full border rounded-md px-2 py-2 text-xs"
-                      placeholder="Isi tanggal"
-                    />
                   </div>
 
                   <div class="flex flex-col">
@@ -586,55 +584,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       </template>
                     </Select>
                     <InputError :error="form.errors.operator_by3" />
-                  </div>
-
-                  <!-- <div class="flex flex-col">
-                    <label for="approved_by" class="block text-xs font-semibold">
-                      {{ __('Pengawal 1') }}
-                    </label>
-                    
-                    <Select
-                      v-model="form.approved_by"
-                      :options="users.filter(user => user.id !== 1 && user.id !== 3).map(user => ({
-                        label: `[${user.username}] ${user.name.toUpperCase()}`,
-                        value: user.id,
-                      }))"
-                      :searchable="true"
-                      placeholder="Pilih Pengawal 1"
-                      style="font-size: 0.7rem;"
-                    >
-                      <template #option="{ option }">
-                        <span class="text-xs antialiased">
-                            {{ option.label }}
-                        </span>
-                      </template>
-                    </Select>
-                    <InputError :error="form.errors.approved_by" />
-                  </div>
-
-                  <div class="flex flex-col">
-                    <label for="approved_by1" class="block text-xs font-semibold">
-                      {{ __('Pengawal 2') }}
-                    </label>
-                    
-                    <Select
-                      v-model="form.approved_by1"
-                      :options="users.filter(user => user.id !== 1 && user.id !== 3).map(user => ({
-                        label: `[${user.username}] ${user.name.toUpperCase()}`,
-                        value: user.id,
-                      }))"
-                      :searchable="true"
-                      placeholder="Pilih Pengawal 2"
-                      style="font-size: 0.7rem;"
-                    >
-                      <template #option="{ option }">
-                        <span class="text-xs antialiased">
-                            {{ option.label }}
-                        </span>
-                      </template>
-                    </Select>
-                    <InputError :error="form.errors.approved_by1" />
-                  </div>                  -->                  
+                  </div>    
 
                   <div class="flex flex-col">
                     <label class="block text-xs font-semibold">NIPP Pengawal 1</label>
