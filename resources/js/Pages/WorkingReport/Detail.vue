@@ -1535,7 +1535,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
         <div class="step-circle"
             :class="{
               'bg-blue-700 text-white': currentSection === 'report',
-              'bg-blue-500 text-white': currentSection !== 'report' && report.id,
+              'bg-green-500 text-white': currentSection !== 'report' && report.id,
               'bg-red-300 text-white': !report.id
             }">
           1
@@ -1553,7 +1553,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
         <div class="step-circle"
             :class="{
               'bg-blue-700 text-white font-bold': currentSection === 'checksheetday' && hasWorkingOrder,
-              'bg-blue-500 text-white font-bold': currentSection !== 'checksheetday' && report.checksheetday?.checksheetworkresult?.id && hasWorkingOrder,
+              'bg-green-500 text-white font-bold': currentSection !== 'checksheetday' && report.checksheetday?.checksheetworkresult?.id && hasWorkingOrder,
               'bg-gray-500 text-white cursor-not-allowed': !hasWorkingOrder,
               'bg-gray-500 text-white': currentSection !== 'checksheetday' && !report.checksheetday?.checksheetworkresult?.id && hasWorkingOrder
             }">
@@ -1572,7 +1572,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
         <div class="step-circle"
             :class="{
               'bg-blue-700 text-white font-bold': currentSection === 'warmingup' && isWarmingUpMode,
-              'bg-blue-500 text-white font-bold': currentSection !== 'warmingup' && report.warmingup?.id && isWarmingUpMode,
+              'bg-green-500 text-white font-bold': currentSection !== 'warmingup' && report.warmingup?.id && isWarmingUpMode,
               'bg-red-500 text-white cursor-not-allowed': !isWarmingUpMode,
               'bg-gray-500 text-white': currentSection !== 'warmingup' && !report.warmingup?.id && isWarmingUpMode
             }">
@@ -1591,7 +1591,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
         <div class="step-circle"
             :class="{
               'bg-blue-700 text-white font-bold': currentSection === 'workresult',
-              'bg-blue-500 text-white font-bold': currentSection !== 'workresult' && report.workresult?.id && isWorkingOrderMode,
+              'bg-green-500 text-white font-bold': currentSection !== 'workresult' && report.workresult?.id && isWorkingOrderMode,
               'bg-red-500 text-white cursor-not-allowed': !isWorkingOrderMode,
               'bg-gray-500 text-white': currentSection !== 'workresult' && !report.workresult?.id && isWorkingOrderMode
             }">
@@ -1611,7 +1611,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
         <div class="step-circle"
             :class="{
               'bg-blue-700 text-white': currentSection === 'workresultok',
-              'bg-blue-500 text-white': currentSection !== 'workresultok' && (report.workresult?.id || warmingup?.id),
+              'bg-green-500 text-white': currentSection !== 'workresultok' && (report.workresult?.id || warmingup?.id),
               'bg-red-500 text-white': !report.workresult?.id && !warmingup?.id
             }">
           5
@@ -1621,7 +1621,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
 
     </div>
 
-    <Card class="border bg-white dark:bg-white dark:text-black">
+    <Card class="bg-white shadow-lg border border-solid" style="border-radius:.625rem; margin-bottom: 1rem;">
       <template #body>
       <div class="flex flex-col space-y-2 p-1">
         <div class="flex flex-col md:flex-row mt-2 md:space-y-0 md:space-x-0">
