@@ -1634,7 +1634,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
 
                 <!-- Header dengan button Create Maintenance Order -->
                 <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-200">
-                  <h3 class="text-lg font-bold text-gray-800">Working Report Detail</h3>
+                  <h3 class="text-lg font-bold text-gray-800">Working Order Detail</h3>
                   <div class="flex items-center space-x-2">
                     <!-- Badge jumlah MO -->
                     <span v-if="report.maintenance_orders && report.maintenance_orders.length > 0"
@@ -1644,19 +1644,17 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
 
                     <!-- Button Create MO -->
                     <Link :href="`/maintenance-orders/create-from-wr/${report.id}`"
-                          class="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-semibold transition flex items-center space-x-2">
+                          class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-semibold transition flex items-center space-x-2">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.308 17c-.77 1.333.192 3 1.732 3z"/>
                       </svg>
-                      <span>Create Maintenance Order</span>
+                      <span>Report Maintenance Order</span>
                     </Link>
                   </div>
                 </div>
 
-                <!-- <div class="grid grid-cols-1 gap-2 mb-4 md:grid-cols-2"> -->
-                <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">
+                <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2 pb-3 border-b border-gray-200">
 
-                  <!-- <div class="flex items-center text-xs border-b border-gray-200 py-1"> -->
                   <div class="flex flex-col items-start space-y-1">
                     <label for="machine_id" class="font-bold text-xs">
                       {{ __('Nama Mesin') }}
@@ -1683,37 +1681,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       </Select>
                       <InputError :error="form.errors.machine_id" />
                     </div>
-                    <!-- <div class="w-32 font-bold text-xs">Nama Mesin</div>
-                    <div class="pr-2 text-xs">:</div>
-                    <div> {{ report?.machine.name }} - {{ report?.machine.type }}- {{ report?.machine.nomor }} - {{ report?.machine.no_sarana }} ({{ report?.machine?.region.name }})</div> -->
                   </div>
-
-                  <!-- <div class="flex flex-col items-start space-y-1">
-                    <label for="region_id" class="font-bold text-xs">
-                      {{ __('Nama Wilayah') }}
-                    </label>
-
-                    <div class="w-full">
-                      <Select
-                        v-model="form.region_id"
-                        :options="regions.map(region => ({
-                          label: region.name,
-                          value: region.id,
-                        }))"
-                        :searchable="true"
-                        placeholder="Pilih Wilayah"
-                        class="w-full border-none text-center text-xs"
-                        style="font-size: 0.7rem;"
-                      >
-                        <template #option="{ option }">
-                          <span class="text-xs antialiased">
-                              {{ option.label }}
-                          </span>
-                        </template>
-                      </Select>
-                      <InputError :error="form.errors.region_id"/>
-                    </div>
-                  </div> -->
 
                   <div class="flex flex-col items-start space-y-1">
                     <label for="date" class="font-bold text-xs">
@@ -1729,9 +1697,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       />
                       <InputError :error="form.errors.date"/>
                     </div>
-                    <!-- <div class="w-32 font-bold text-xs">Tanggal</div>
-                    <div class="pr-2 text-xs">:</div>
-                    <div>{{ formatDate(report?.date || '-' ) }}</div> -->
                   </div>
 
                   <div class="flex flex-col items-start space-y-1">
@@ -1748,9 +1713,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       />
                       <InputError :error="form.errors.cuaca"/>
                     </div>
-                    <!-- <div class="w-32 font-bold text-xs">Cuaca</div>
-                    <div class="pr-2 text-xs">:</div>
-                    <div> {{ report?.cuaca || '-' }}</div> -->
                   </div>
 
                   <div class="flex flex-col items-start space-y-1">
@@ -1767,9 +1729,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       />
                       <InputError :error="form.errors.jenis_kpjr"/>
                     </div>
-                    <!-- <div class="w-32 font-bold text-xs">Jenis KPJR</div>
-                    <div class="pr-2 text-xs">:</div>
-                    <div> {{ report?.jenis_kpjr || '-' }}</div> -->
                   </div>
 
                   <div class="flex flex-col items-start space-y-1">
@@ -1786,9 +1745,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       />
                       <InputError :error="form.errors.nomor_mesin"/>
                     </div>
-                      <!-- <div class="w-32 font-bold text-xs">Nomor Mesin</div>
-                      <div class="pr-2 text-xs">:</div>
-                      <div> {{ report?.nomor_mesin || '-' }}</div> -->
                   </div>
 
                   <div class="flex flex-col items-start space-y-1">
@@ -1805,9 +1761,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       />
                       <InputError :error="form.errors.nomor_sarana"/>
                     </div>
-                    <!-- <div class="w-32 font-bold text-xs">Nomor Sarana</div>
-                    <div class="pr-2 text-xs">:</div>
-                    <div> {{ report?.nomor_sarana || '-' }}</div> -->
                   </div>
 
                   <!-- <div class="flex flex-col items-start space-y-1">
@@ -1842,7 +1795,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   </div> -->
                 </div>
 
-                <div v-if="form.mode === 'working'" class="p-1">
+                <div v-if="form.mode === 'working'" class="p-1 pb-3 border-b border-gray-200">
                   <div class="text-sm font-extrabold border-gray-200 py-1 py-1">A. DATA UPLOAD</div>
                   <p class="text-sm font-semibold border-gray-200 py-1">
                       1. Data Opname Resor Jalan Rel (Awal)
@@ -2163,7 +2116,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                 </div><br>
 
                 <div class="text-sm font-extrabold border-gray-200 py-1 pl-0">B. DATA OPERASI MESIN</div>
-                <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">
+                <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2 pb-3 border-b border-gray-200">
                   <div class="flex flex-col items-start space-y-1">
                     <label for="waktu_start_engine" class="font-bold text-xs">
                       {{ __('Waktu Start Engine') }}
@@ -2178,9 +2131,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       />
                       <InputError :error="form.errors.waktu_start_engine"/>
                     </div>
-                    <!-- <div class="w-32 font-bold text-xs">Waktu Start Engine</div>
-                    <div class="pr-2 text-xs">:</div>
-                    <div> {{ report?.waktu_start_engine?.slice(0, 5)  || '-' }}</div> -->
                   </div>
 
                   <div class="flex flex-col items-start space-y-1">
@@ -2197,9 +2147,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       />
                       <InputError :error="form.errors.jam_traveling_awal"/>
                     </div>
-                    <!-- <div class="w-32 font-bold text-xs">Jam Traveling Awal</div>
-                    <div class="pr-2 text-xs">:</div>
-                    <div> {{ report?.jam_traveling_awal || '-' }}</div> -->
                   </div>
 
                   <div class="flex flex-col items-start space-y-1">
@@ -2216,9 +2163,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       />
                       <InputError :error="form.errors.jam_kerja_awal"/>
                     </div>
-                    <!-- <div class="w-32 font-bold text-xs">Jam Kerja Awal</div>
-                    <div class="pr-2 text-xs">:</div>
-                    <div> {{ report?.jam_kerja_awal?.slice(0, 5)  || '-' }}</div> -->
                   </div>
 
                   <div class="flex flex-col items-start space-y-1">
@@ -2235,9 +2179,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       />
                       <InputError :error="form.errors.jam_mesin_awal"/>
                     </div>
-                    <!-- <div class="w-32 font-bold text-xs">Jam Mesin Awal</div>
-                    <div class="pr-2 text-xs">:</div>
-                    <div> {{ report?.jam_mesin_awal || '-' }}</div> -->
                   </div>
 
                   <div class="flex flex-col items-start space-y-1">
@@ -2254,9 +2195,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       />
                       <InputError :error="form.errors.jam_generator_awal"/>
                     </div>
-                    <!-- <div class="w-32 font-bold text-xs">Jam Generator Awal</div>
-                    <div class="pr-2 text-xs">:</div>
-                    <div> {{ report?.jam_generator_awal || '-' }}</div> -->
                   </div>
 
                   <div class="flex flex-col items-start space-y-1">
@@ -2273,9 +2211,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       />
                       <InputError :error="form.errors.counter_tamping_awal"/>
                     </div>
-                    <!-- <div class="w-32 font-bold text-xs">Counter Tamping Awal</div>
-                    <div class="pr-2 text-xs">:</div>
-                    <div> {{ report?.counter_tamping_awal || '-' }}</div> -->
                   </div>
 
                   <div class="flex flex-col items-start space-y-1">
@@ -2292,9 +2227,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       />
                       <InputError :error="form.errors.oddometer_awal"/>
                     </div>
-                    <!-- <div class="w-32 font-bold text-xs">Oddometer Awal</div>
-                    <div class="pr-2 text-xs">:</div>
-                    <div> {{ report?.oddometer_awal || '-' }}</div> -->
                   </div>
 
                   <div class="flex flex-col items-start space-y-1">
@@ -2311,202 +2243,147 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       />
                       <InputError :error="form.errors.hsd_awal_kerja"/>
                     </div>
-                    <!-- <div class="w-32 font-bold text-xs">HSD Awal Kerja</div>
-                    <div class="pr-2 text-xs">:</div>
-                    <div> {{ report?.hsd_awal_kerja || '-' }}</div> -->
                   </div>
                 </div>
 
-                <div class="p-1">
-                  <div class="text-sm font-extrabold  border-gray-200 py-1 pl-0">C. DATA PERSONEL</div>
-                  <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">
-                    <div class="flex flex-col items-start space-y-1">
-                      <label for="operator_by1" class="block text-xs font-semibold">
-                        {{ __('Operator 1') }}
-                      </label>
+                <div class="text-sm font-extrabold  border-gray-200 py-1 pl-0">C. DATA PERSONEL</div>
+                <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">
+                  <div class="flex flex-col items-start space-y-1">
+                    <label for="operator_by1" class="block text-xs font-semibold">
+                      {{ __('Operator 1') }}
+                    </label>
 
-                      <Select
-                        v-model="form.operator_by1"
-                        :options="users.filter(user => user.id !== 1).map(user => ({
-                          label: `[${user.username}] ${user.name.toUpperCase()}`,
-                          value: user.id,
-                        }))"
-                        :searchable="true"
-                        placeholder="Pilih Operator 1"
-                        class="w-full border-none text-center text-xs"
-                        style="font-size: 0.7rem;"
-                      >
-                        <template #option="{ option }">
-                          <span class="text-xs antialiased">
-                              {{ option.label }}
-                          </span>
-                        </template>
-                      </Select>
-                      <InputError :error="form.errors.operator_by1" />
+                    <Select
+                      v-model="form.operator_by1"
+                      :options="users.filter(user => user.id !== 1).map(user => ({
+                        label: `[${user.username}] ${user.name.toUpperCase()}`,
+                        value: user.id,
+                      }))"
+                      :searchable="true"
+                      placeholder="Pilih Operator 1"
+                      class="w-full border-none text-center text-xs"
+                      style="font-size: 0.7rem;"
+                    >
+                      <template #option="{ option }">
+                        <span class="text-xs antialiased">
+                            {{ option.label }}
+                        </span>
+                      </template>
+                    </Select>
+                    <InputError :error="form.errors.operator_by1" />
+                  </div>
+
+                  <div class="flex flex-col items-start space-y-1">
+                    <label for="operator_by2" class="block text-xs font-semibold">
+                      {{ __('Operator 2') }}
+                    </label>
+
+                    <Select
+                      v-model="form.operator_by2"
+                      :options="users.filter(user => user.id !== 1).map(user => ({
+                        label: `[${user.username}] ${user.name.toUpperCase()}`,
+                        value: user.id,
+                      }))"
+                      :searchable="true"
+                      placeholder="Pilih Operator 2"
+                      class="w-full border-none text-center text-xs"
+                      style="font-size: 0.7rem;"
+                    >
+                      <template #option="{ option }">
+                        <span class="text-xs antialiased">
+                            {{ option.label }}
+                        </span>
+                      </template>
+                    </Select>
+                    <InputError :error="form.errors.operator_by2" />
+                  </div>
+
+                  <div class="flex flex-col items-start space-y-1">
+                    <label for="operator_by3" class="block text-xs font-semibold">
+                      {{ __('Operator 3') }}
+                    </label>
+
+                    <Select
+                      v-model="form.operator_by3"
+                      :options="users.filter(user => user.id !== 1).map(user => ({
+                        label: `[${user.username}] ${user.name.toUpperCase()}`,
+                        value: user.id,
+                      }))"
+                      :searchable="true"
+                      placeholder="Pilih Operator 3"
+                      class="w-full border-none text-center text-xs"
+                      style="font-size: 0.7rem;"
+                    >
+                      <template #option="{ option }">
+                        <span class="text-xs antialiased">
+                            {{ option.label }}
+                        </span>
+                      </template>
+                    </Select>
+                    <InputError :error="form.errors.operator_by3" />
+                  </div>
+
+                  <div class="flex flex-col items-start space-y-1">
+                    <label for="hsd_awal_kerja" class="font-semibold text-xs">
+                      {{ __('NIPP Pengawal 1') }}
+                    </label>
+
+                    <div class="w-full">
+                      <Input
+                        v-model="form.nipp"
+                        :placeholder="__('NIPP Pengawal 1')"
+                        type="number"
+                        class="text-xs"
+                      />
+                      <InputError :error="form.errors.hsd_awal_kerja"/>
                     </div>
+                  </div>
 
-                    <!-- <div class="flex flex-col items-start space-y-1">
-                      <label for="approved_by" class="block text-xs font-semibold">
-                        {{ __('Pengawal 1') }}
-                      </label>
+                  <div class="flex flex-col items-start space-y-1">
+                    <label for="hsd_awal_kerja" class="font-semibold text-xs">
+                      {{ __('Nama Pengawal 1') }}
+                    </label>
 
-                      <Select
-                        v-model="form.approved_by"
-                        :options="users.filter(user => user.id !== 1).map(user => ({
-                          label: `[${user.username}] ${user.name.toUpperCase()}`,
-                          value: user.id,
-                        }))"
-                        :searchable="true"
-                        placeholder="Pilih Pengawal 1"
-                        class="w-full border-none text-center text-xs"
-                        style="font-size: 0.7rem;"
-                      >
-                        <template #option="{ option }">
-                          <span class="text-xs antialiased">
-                              {{ option.label }}
-                          </span>
-                        </template>
-                      </Select>
-                      <InputError :error="form.errors.approved_by" />
-                    </div> -->
-
-                    <div class="flex flex-col items-start space-y-1">
-                      <label for="operator_by2" class="block text-xs font-semibold">
-                        {{ __('Operator 2') }}
-                      </label>
-
-                      <Select
-                        v-model="form.operator_by2"
-                        :options="users.filter(user => user.id !== 1).map(user => ({
-                          label: `[${user.username}] ${user.name.toUpperCase()}`,
-                          value: user.id,
-                        }))"
-                        :searchable="true"
-                        placeholder="Pilih Operator 2"
-                        class="w-full border-none text-center text-xs"
-                        style="font-size: 0.7rem;"
-                      >
-                        <template #option="{ option }">
-                          <span class="text-xs antialiased">
-                              {{ option.label }}
-                          </span>
-                        </template>
-                      </Select>
-                      <InputError :error="form.errors.operator_by2" />
+                    <div class="w-full">
+                      <Input
+                        v-model="form.nama_pengawal"
+                        :placeholder="__('Nama Pengawal 1')"
+                        type="text"
+                        class="text-xs"
+                      />
+                      <InputError :error="form.errors.hsd_awal_kerja"/>
                     </div>
+                  </div>
 
-                    <!-- <div class="flex flex-col items-start space-y-1">
-                      <label for="approved_by1" class="block text-xs font-semibold">
-                        {{ __('Pengawal 2') }}
-                      </label>
+                  <div class="flex flex-col items-start space-y-1">
+                    <label for="hsd_awal_kerja" class="font-semibold text-xs">
+                      {{ __('NIPP Pengawal 2') }}
+                    </label>
 
-                      <Select
-                        v-model="form.approved_by1"
-                        :options="users.filter(user => user.id !== 1).map(user => ({
-                          label: `[${user.username}] ${user.name.toUpperCase()}`,
-                          value: user.id,
-                        }))"
-                        :searchable="true"
-                        placeholder="Pilih Pengawal 2"
-                        class="w-full border-none text-center text-xs"
-                        style="font-size: 0.7rem;"
-                      >
-                        <template #option="{ option }">
-                          <span class="text-xs antialiased">
-                              {{ option.label }}
-                          </span>
-                        </template>
-                      </Select>
-                      <InputError :error="form.errors.approved_by1" />
-                    </div> -->
-
-                    <div class="flex flex-col items-start space-y-1">
-                      <label for="operator_by3" class="block text-xs font-semibold">
-                        {{ __('Operator 3') }}
-                      </label>
-
-                      <Select
-                        v-model="form.operator_by3"
-                        :options="users.filter(user => user.id !== 1).map(user => ({
-                          label: `[${user.username}] ${user.name.toUpperCase()}`,
-                          value: user.id,
-                        }))"
-                        :searchable="true"
-                        placeholder="Pilih Operator 3"
-                        class="w-full border-none text-center text-xs"
-                        style="font-size: 0.7rem;"
-                      >
-                        <template #option="{ option }">
-                          <span class="text-xs antialiased">
-                              {{ option.label }}
-                          </span>
-                        </template>
-                      </Select>
-                      <InputError :error="form.errors.operator_by3" />
+                    <div class="w-full">
+                      <Input
+                        v-model="form.nipp1"
+                        :placeholder="__('NIPP Pengawal 2')"
+                        type="number"
+                        class="text-xs"
+                      />
+                      <InputError :error="form.errors.hsd_awal_kerja"/>
                     </div>
+                  </div>
 
-                    <div class="flex flex-col items-start space-y-1">
-                      <label for="hsd_awal_kerja" class="font-semibold text-xs">
-                        {{ __('NIPP Pengawal 1') }}
-                      </label>
+                  <div class="flex flex-col items-start space-y-1">
+                    <label for="hsd_awal_kerja" class="font-semibold text-xs">
+                      {{ __('Nama Pengawal 2') }}
+                    </label>
 
-                      <div class="w-full">
-                        <Input
-                          v-model="form.nipp"
-                          :placeholder="__('NIPP Pengawal 1')"
-                          type="number"
-                          class="text-xs"
-                        />
-                        <InputError :error="form.errors.hsd_awal_kerja"/>
-                      </div>
-                    </div>
-
-                    <div class="flex flex-col items-start space-y-1">
-                      <label for="hsd_awal_kerja" class="font-semibold text-xs">
-                        {{ __('Nama Pengawal 1') }}
-                      </label>
-
-                      <div class="w-full">
-                        <Input
-                          v-model="form.nama_pengawal"
-                          :placeholder="__('Nama Pengawal 1')"
-                          type="text"
-                          class="text-xs"
-                        />
-                        <InputError :error="form.errors.hsd_awal_kerja"/>
-                      </div>
-                    </div>
-
-                    <div class="flex flex-col items-start space-y-1">
-                      <label for="hsd_awal_kerja" class="font-semibold text-xs">
-                        {{ __('NIPP Pengawal 2') }}
-                      </label>
-
-                      <div class="w-full">
-                        <Input
-                          v-model="form.nipp1"
-                          :placeholder="__('NIPP Pengawal 2')"
-                          type="number"
-                          class="text-xs"
-                        />
-                        <InputError :error="form.errors.hsd_awal_kerja"/>
-                      </div>
-                    </div>
-
-                    <div class="flex flex-col items-start space-y-1">
-                      <label for="hsd_awal_kerja" class="font-semibold text-xs">
-                        {{ __('Nama Pengawal 2') }}
-                      </label>
-
-                      <div class="w-full">
-                        <Input
-                          v-model="form.nama_pengawal1"
-                          :placeholder="__('Nama Pengawal 2')"
-                          type="text"
-                          class="text-xs"
-                        />
-                        <InputError :error="form.errors.hsd_awal_kerja"/>
-                      </div>
+                    <div class="w-full">
+                      <Input
+                        v-model="form.nama_pengawal1"
+                        :placeholder="__('Nama Pengawal 2')"
+                        type="text"
+                        class="text-xs"
+                      />
+                      <InputError :error="form.errors.hsd_awal_kerja"/>
                     </div>
                   </div>
                 </div>
