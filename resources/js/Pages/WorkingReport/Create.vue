@@ -395,13 +395,23 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   </div>
 
                   <div class="flex flex-col">
-                    <label class="block text-xs font-semibold">Cuaca</label>
-                    <Input
+                    <label for="cuaca" class="block text-xs font-semibold">
+                      {{ __('Cuaca') }}
+                    </label>
+                    
+                    <select 
                       v-model="form.cuaca"
-                      type="text"
-                      class="w-full border rounded-md px-2 py-2 text-xs"
-                      placeholder="Isi Cuaca"
-                    />
+                      class="border border-gray-300 rounded-md px-2 py-1 h-9 text-xs bg-white focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                    >
+                      <option value="" disabled>Pilih</option>
+                      <option value="Cerah">Cerah</option>
+                      <option value="Berawan">Berawan</option>
+                      <option value="Hujan">Hujan</option>
+                      <option value="Panas">Panas</option>
+                      <option value="Dingin">Dingin</option>
+                      <option value="Berangin">Berangin</option>
+                    </select>
+                    <InputError :error="form.errors.cuaca" />
                   </div>
 
                   <div class="flex flex-col">
