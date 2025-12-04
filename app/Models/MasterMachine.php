@@ -13,6 +13,7 @@ class MasterMachine extends Model
 
     protected $fillable = [
         'region_id',
+        'classification_id',
         'name',
         'type',
         'nomor',
@@ -21,15 +22,22 @@ class MasterMachine extends Model
         'umur',
         'no_sarana',
         'keterangan',
+        'qr_code',
     ];
 
     protected $with = [
         'region',
+        'classification',
     ];
 
 
     public function region()
     {
         return $this->belongsTo(MasterRegion::class);
+    }
+
+    public function classification()
+    {
+        return $this->belongsTo(MasterClassification::class);
     }
 }

@@ -20,11 +20,13 @@ import Select from '@vueform/multiselect'
 
 const { machine } = defineProps({
     machine: Array,
-    regions: Array
+    regions: Array,
+    classifications: Array,
 })
 
 const form = useForm({
   region_id: '',
+  classification_id: '',
   name: '',
   type: '',
 //   code: '',
@@ -70,6 +72,7 @@ const store = () => {
 const edit = (machine) => {
     form.id = machine.id
     form.region_id = machine.region_id
+    form.classification_id = machine.classification_id
     form.name = machine.name
     form.type = machine.type
     // form.code = machine.code
@@ -106,6 +109,10 @@ const destroy = async machien => {
 
 const submit = () => form.id ? update() : store()
 
+const viewQrCode = (machine) => {
+    Inertia.visit(route('master-machines.view-qr', machine.id))
+}
+
 const esc = e => e.key === 'Escape' && close()
 onMounted(() => window.addEventListener('keydown', esc))
 onUnmounted(() => window.removeEventListener('keydown', esc))
@@ -122,12 +129,12 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
         }">
         <main class="p-0 py-0 mb-[1.25rem] ml-[1.25rem] mt-[1.25rem]">
             <h2 class="font-bold text-2xl">Master Data Mesin</h2>
-           <a type="button" href="/" class="text-sm text-gray-500 font-semibold hover:text-sky-600 focus:text-sky-600">Home</a> 
+           <a type="button" href="/" class="text-sm text-gray-500 font-semibold hover:text-sky-600 focus:text-sky-600">Home</a>
            <span class="font-semibold text-sm pl-2 pr-2">-</span>
-           <span class="text-sm text-gray-500 font-semibold hover:text-sky-600 focus:text-sky-700">Master</span> 
+           <span class="text-sm text-gray-500 font-semibold hover:text-sky-600 focus:text-sky-700">Master</span>
             <slot />
         </main>
-        </div> -->     
+        </div> -->
         <Card class="bg-white pt-[1.100rem] pb-[2.5rem] shadow-lg border border-solid border-slate-200" style="border-radius: 0.625rem;">
             <template #header>
                 <!-- <h1 class="w-full flex justify-center items-center h-[80px] text-2xl font-bold">Data <span class="ml-2 mr-2"
@@ -157,42 +164,47 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                 <Th :table="table" :sort="false" name="region_id"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
                                     {{ __('Daop').toUpperCase() }}
-                                </Th>   
+                                </Th>
+
+                                <Th :table="table" :sort="false" name="klasifikasi"
+                                    class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
+                                    {{ __('Klasifikasi').toUpperCase() }}
+                                </Th>
 
                                 <Th :table="table" :sort="false" name="name"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
                                     {{ __('Jenis').toUpperCase() }}
-                                </Th>    
+                                </Th>
 
                                 <Th :table="table" :sort="false" name="type"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
                                     {{ __('type').toUpperCase() }}
-                                </Th>  
+                                </Th>
 
                                 <Th :table="table" :sort="false" name="nomor"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
                                     {{ __('nomor').toUpperCase() }}
-                                </Th>  
+                                </Th>
 
                                 <Th :table="table" :sort="false" name="tahun_md"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
                                     {{ __('tahun mulai dinas').toUpperCase() }}
-                                </Th>     
+                                </Th>
 
                                 <Th :table="table" :sort="false" name="umur"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
                                     {{ __('umur').toUpperCase() }}
-                                </Th>     
+                                </Th>
 
                                 <Th :table="table" :sort="false" name="nomor_sarana"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
                                     {{ __('nomor sarana').toUpperCase() }}
-                                </Th>      
+                                </Th>
 
                                 <Th :table="table" :sort="false" name="keterangan"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
                                     {{ __('keterangan').toUpperCase() }}
-                                </Th>                         
+                                </Th>
 
                                 <Th :table="table" :sort="false"
                                     class="border border-gray-300 px-3 py-1 text-center capitalize font-extrabold text-xs">
@@ -234,6 +246,10 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                 </td>
 
                                 <td class="border-b uppercase border-gray-300 px-4 py-1 text-center text-xs">
+                                  {{ machine.classification?.name || '-' }}
+                                </td>
+
+                                <td class="border-b uppercase border-gray-300 px-4 py-1 text-center text-xs">
                                   {{ machine.name }}
                                 </td>
 
@@ -263,6 +279,16 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
 
                                 <td class="ppx-2 py-1 border-b text-center">
                                   <div class="flex justify-center gap-2">
+                                    <Button
+                                      v-if="can('read machine')"
+                                      @click.prevent="viewQrCode(machine)"
+                                      class="bg-purple-600 hover:bg-purple-800"
+                                      title="Lihat QR Code"
+                                    >
+                                      <Icon name="qrcode" />
+                                      <p class="font-bold text-xs">QR</p>
+                                    </Button>
+
                                     <ButtonBlue
                                       v-if="can('update machine')"
                                       @click.prevent="edit(machine)"
@@ -327,14 +353,35 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
 
                                 <div class="flex flex-col space-y-2">
                                     <div class="flex items-center space-x-2">
+                                        <label for="classification_id" class="w-1/3 capitalize text-sm">
+                                            {{ __('Klasifikasi') }}
+                                        </label>
+
+                                        <Select
+                                            v-model="form.classification_id"
+                                            :options="classifications.map(classification => ({
+                                            label: classification.name,
+                                            value: classification.id,
+                                            }))"
+                                            :searchable="true"
+                                            placeholder="Pilih Klasifikasi"
+                                            style="font-size: 0.9rem;"
+                                        />
+                                    </div>
+
+                                    <InputError :error="form.errors.classification_id" />
+                                </div>
+
+                                <div class="flex flex-col space-y-2">
+                                    <div class="flex items-center space-x-2">
                                         <label for="name" class="w-1/3 capitalize text-sm">
                                             {{ __('Jenis') }}
                                         </label>
 
                                         <Input v-model="form.name"
-                                            :placeholder="__('Jenis')" 
+                                            :placeholder="__('Jenis')"
                                             type="text"
-                                            required 
+                                            required
                                             class="text-sm"
                                         />
                                     </div>
@@ -349,9 +396,9 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                         </label>
 
                                         <Input v-model="form.nomor"
-                                            :placeholder="__('nomor mesin')" 
+                                            :placeholder="__('nomor mesin')"
                                             type="text"
-                                            required 
+                                            required
                                             class="text-sm"
                                         />
                                     </div>
@@ -366,7 +413,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                         </label>
 
                                         <Input v-model="form.type"
-                                            :placeholder="__('type')" 
+                                            :placeholder="__('type')"
                                             type="text"
                                             required
                                             class="text-sm"
@@ -383,7 +430,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                         </label>
 
                                         <Input v-model="form.tahun_md"
-                                            :placeholder="__('tahun mulai dinas')" 
+                                            :placeholder="__('tahun mulai dinas')"
                                             type="number"
                                             class="text-sm"
                                         />
@@ -399,7 +446,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                         </label>
 
                                         <Input v-model="form.umur"
-                                            :placeholder="__('umur')" 
+                                            :placeholder="__('umur')"
                                             type="number"
                                             class="text-sm"
                                         />
@@ -415,7 +462,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                         </label>
 
                                         <Input v-model="form.no_sarana"
-                                            :placeholder="__('Nomor Sarana')" 
+                                            :placeholder="__('Nomor Sarana')"
                                             type="text"
                                             class="text-sm"
                                         />
@@ -431,7 +478,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                         </label>
 
                                         <Input v-model="form.keterangan"
-                                            :placeholder="__('keterangan')" 
+                                            :placeholder="__('keterangan')"
                                             type="text"
                                             class="text-sm"
                                         />
@@ -439,7 +486,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
 
                                     <InputError :error="form.errors.keterangan" />
                                 </div>
-                                
+
                             </template>
                         </div>
                     </template>

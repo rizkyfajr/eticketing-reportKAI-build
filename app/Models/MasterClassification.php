@@ -5,18 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class MasterRegion extends Model
+class MasterClassification extends Model
 {
   use HasFactory;
 
-  protected $table = 'master_regions';
+  protected $table = 'master_classifications';
 
   protected $fillable = [
       'name',
   ];
-
-  public function machines()
-  {
-      return $this->hasMany(MasterMachine::class, 'region_id');
-  }
 }
