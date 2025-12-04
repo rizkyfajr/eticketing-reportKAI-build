@@ -13,39 +13,81 @@ import InputError from '@/Components/InputError.vue'
 
 const props = defineProps({
   order: Object,
-  newOrder: Object, // Order yang baru dibuat untuk wizard flow
   machines: Array,
   reports: Array,
   pedoman: Array,
   users: Array, // tambahan untuk form follow up & repair
   workingReport: Object, // Working Report yang jadi sumber (jika create dari WR)
   prefillData: Object, // Data pre-fill dari WR
+  isWizardMode: Boolean, // Flag untuk wizard mode (true = lanjut step by step)
+  isFromWorkingReport: Boolean, // Flag jika dibuat dari WR (lock category & machine)
+  defaultCategory: String, // Default category (planned/unplanned)
 })
 
 // === STATE WIZARD ===
 const currentStep = ref(1) // Track step mana yang sudah selesai
 const completedSteps = ref([]) // Array step yang sudah completed
-const savedOrderId = ref(props.order?.id || props.newOrder?.id || null)
-const savedOrderData = ref(props.order || props.newOrder || null)
+const savedOrderId = ref(props.order?.id || null)
+const savedOrderData = ref(props.order || null)
 
 // Debug - hapus setelah selesai
 console.log('Props order:', props.order)
-console.log('Props newOrder:', props.newOrder)
 console.log('Props workingReport:', props.workingReport)
 console.log('Props prefillData:', props.prefillData)
+console.log('Props isWizardMode:', props.isWizardMode)
 console.log('Saved Order ID:', savedOrderId.value)
 
-// Jika ada newOrder dari response, mark step 1 as completed
-if (props.newOrder && !props.order) {
-  completedSteps.value = [1]
-  currentStep.value = 2
-  console.log('NewOrder detected, moving to step 2')
+// Deteksi wizard step HANYA jika isWizardMode = true
+// isWizardMode = true artinya: baru dibuat dan perlu lanjut wizard
+// isWizardMode = false/undefined artinya: mode edit biasa
+if (props.isWizardMode && props.order && props.order.id) {
+  savedOrderId.value = props.order.id
+  savedOrderData.value = props.order
+
+  if (!props.order.follow_up_plan) {
+    // Step 1 sudah selesai, belum isi follow up
+    completedSteps.value = [1]
+    currentStep.value = 2
+    console.log('Wizard mode: moving to step 2 (follow up)')
+  } else if (!props.order.started_at) {
+    // Follow up sudah, belum mulai perbaikan
+    completedSteps.value = [1, 2]
+    currentStep.value = 3
+    console.log('Wizard mode: moving to step 3 (start repair)')
+  } else if (!props.order.completed_at) {
+    // Sudah mulai, belum selesai
+    completedSteps.value = [1, 2, 3]
+    currentStep.value = 4
+    console.log('Wizard mode: moving to step 4 (complete)')
+  }
+} else if (props.order && props.order.id) {
+  // Mode edit biasa - tetap di step 1
+  savedOrderId.value = props.order.id
+  savedOrderData.value = props.order
+  currentStep.value = 1
+  console.log('Edit mode: staying at step 1')
 }
 
+// === Computed untuk Unlock Steps ===
+const isStep2Unlocked = computed(() => {
+  // Step 2 unlock jika: ada savedOrderId (Step 1 sudah tersimpan)
+  return !!savedOrderId.value
+})
+
+const isStep3Unlocked = computed(() => {
+  // Step 3 unlock jika: Step 2 completed ATAU sudah ada follow_up_plan
+  return completedSteps.value.includes(2) || !!(savedOrderData.value?.follow_up_plan)
+})
+
+const isStep4Unlocked = computed(() => {
+  // Step 4 unlock jika: Step 3 completed ATAU sudah started_at
+  return completedSteps.value.includes(3) || !!(savedOrderData.value?.started_at)
+})
+
 const form = useForm({
-  working_report_id: props.prefillData?.working_report_id ?? props.order?.working_report_id ?? (props.reports?.[0]?.id ?? null),
+  working_report_id: props.prefillData?.working_report_id ?? props.order?.working_report_id ?? null,
   master_machine_id: props.prefillData?.master_machine_id ?? props.order?.master_machine_id ?? null,
-  category: props.prefillData?.category ?? props.order?.category ?? 'unplanned',
+  category: props.prefillData?.category ?? props.order?.category ?? props.defaultCategory ?? 'unplanned',
   title: props.order?.title ?? '',
 
   lampiran: null, // <-- TAMBAHAN UNTUK FITUR LAMPIRAN
@@ -238,29 +280,8 @@ function submit() {
     // Mode EDIT: update langsung dan redirect ke index
     form.put(route('maintenance-orders.update', props.order.id))
   } else {
-    // Mode CREATE: simpan dulu, backend akan render ulang dengan newOrder
-    form.post(route('maintenance-orders.store'), {
-      preserveScroll: true,
-      onSuccess: (page) => {
-        console.log('Step 1 saved, page response:', page)
-
-        // Set savedOrderId dan savedOrderData dari response newOrder
-        if (page.props.newOrder && page.props.newOrder.id) {
-          savedOrderId.value = page.props.newOrder.id
-          savedOrderData.value = page.props.newOrder
-          console.log('savedOrderId set to:', savedOrderId.value)
-          console.log('savedOrderData:', savedOrderData.value)
-
-          // Re-initialize checklist results jika ada pedoman
-          if (savedOrderData.value.master_pedoman) {
-            formChecklist.results = initializeChecklistResults()
-          }
-        }
-
-        completedSteps.value.push(1)
-        currentStep.value = 2
-      }
-    })
+    // Mode CREATE: simpan dulu, backend akan redirect ke edit page untuk wizard
+    form.post(route('maintenance-orders.store'))
   }
 }
 
@@ -392,17 +413,10 @@ const formChecklist = useForm({
 // Auto-save state
 const checklistSaveStatus = ref('') // '', 'saving', 'saved'
 let checklistSaveTimeout = null
-let isNavigating = ref(false) // Flag untuk mencegah auto-save saat navigasi
 
 function submitChecklist() {
   if (!savedOrderId.value) {
     console.warn('Cannot save checklist: savedOrderId is null')
-    return
-  }
-
-  // Jangan save jika sedang navigating
-  if (isNavigating.value) {
-    console.warn('Navigation in progress, skipping auto-save')
     return
   }
 
@@ -456,42 +470,13 @@ function triggerAutoSave() {
   }, 1500) // Auto-save setelah 1.5 detik tidak ada perubahan
 }
 
-// Cleanup saat component unmount untuk menghindari memory leak dan blocking navigation
+// Cleanup saat component unmount untuk menghindari memory leak
 onUnmounted(() => {
   if (checklistSaveTimeout) {
     clearTimeout(checklistSaveTimeout)
     checklistSaveTimeout = null
   }
-  // Remove Inertia event listeners
-  Inertia.off('start', handleNavigationStart)
-  Inertia.off('finish', handleNavigationFinish)
 })
-
-// Handle Inertia navigation events
-const handleNavigationStart = () => {
-  isNavigating.value = true
-  // Clear any pending auto-save
-  if (checklistSaveTimeout) {
-    clearTimeout(checklistSaveTimeout)
-    checklistSaveTimeout = null
-  }
-  console.log('Navigation started, auto-save disabled')
-}
-
-const handleNavigationFinish = () => {
-  // Delay reset agar tidak langsung trigger auto-save
-  setTimeout(() => {
-    isNavigating.value = false
-    console.log('Navigation finished, auto-save enabled')
-  }, 500)
-}
-
-// Setup event listeners saat component mounted
-onMounted(() => {
-  Inertia.on('start', handleNavigationStart)
-  Inertia.on('finish', handleNavigationFinish)
-})
-
 
 function finishLater() {
   // Clear pending auto-save sebelum navigate
@@ -579,20 +564,22 @@ function finishLater() {
           </div>
         </div>
 
-        <!-- Badge jika MO terkait dengan Working Report (mode edit) -->
-        <div v-if="props.order && props.order.working_report" class="mb-4 p-3 bg-green-50 border-l-4 border-green-500 rounded flex items-center justify-between">
+        <!-- Badge jika MO DIBUAT DARI Working Report (hanya tampil jika ada workingReport prop atau order.working_report dan bukan wizard mode) -->
+        <div v-if="props.workingReport || (props.order && props.order.working_report && !props.isWizardMode)" class="mb-4 p-3 bg-green-50 border-l-4 border-green-500 rounded flex items-center justify-between">
           <div class="flex items-start">
             <svg class="w-5 h-5 text-green-600 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
             </svg>
             <div>
-              <h4 class="font-semibold text-green-800 text-sm">Terkait dengan Working Report #{{ props.order.working_report.id }}</h4>
+              <h4 class="font-semibold text-green-800 text-sm">
+                Terkait dengan Working Report #{{ props.workingReport?.id || props.order.working_report.id }}
+              </h4>
               <p class="text-green-700 text-xs mt-1">
-                Tanggal WR: <strong>{{ props.order.working_report.date }}</strong>
+                Tanggal WR: <strong>{{ props.workingReport?.date || props.order.working_report.date }}</strong>
               </p>
             </div>
           </div>
-          <Link :href="`/working-reports/${props.order.working_report.id}/detail`"
+          <Link :href="`/working-reports/${props.workingReport?.id || props.order.working_report.id}/detail`"
                 class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-semibold">
             Lihat WR
           </Link>
@@ -614,62 +601,70 @@ function finishLater() {
         <div :class="{'pointer-events-none opacity-40': !props.order && currentStep !== 1 && !completedSteps.includes(1)}">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-          <div>
-            <label class="block text-sm font-semibold mb-1">Kategori</label>
-            <select v-model="form.category" class="w-full border rounded p-2">
-              <option value="unplanned">Unplanned (Gangguan)</option>
-              <option value="planned">Planned (Perawatan)</option>
-            </select>
-            <InputError :message="form.errors.category" class="mt-1" />
-          </div>
-
-          <div>
-            <label class="block text-sm font-semibold mb-1">Judul</label>
+          <!-- 1. JUDUL (Paling Atas) -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold mb-1">Judul <span class="text-red-500">*</span></label>
             <Input v-model="form.title" placeholder="Contoh: Gangguan motor kanan / Perawatan berkala pompa" />
             <InputError :message="form.errors.title" class="mt-1" />
           </div>
 
+          <!-- 2. KATEGORI (Disabled jika dari WR) -->
           <div>
-            <label class="block text-sm font-semibold mb-1">Lampiran (Foto/PDF)</label>
-            <input
-              type="file"
-              @input="form.lampiran = $event.target.files[0]"
-              accept="image/jpeg,image/png,application/pdf"
-              capture="environment"
-              class="w-full border rounded p-2 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-            />
-            <progress v-if="form.progress" :value="form.progress.percentage" max="100">
-              {{ form.progress.percentage }}%
-            </progress>
-            <InputError :message="form.errors.lampiran" class="mt-1" />
+            <label class="block text-sm font-semibold mb-1">Kategori <span class="text-red-500">*</span></label>
+            <select v-model="form.category"
+                    class="w-full border rounded p-2"
+                    :disabled="props.isFromWorkingReport"
+                    :class="{'bg-gray-100 cursor-not-allowed': props.isFromWorkingReport}">
+              <option value="unplanned">Unplanned (Gangguan)</option>
+              <option value="planned">Planned (Perawatan)</option>
+            </select>
+            <small v-if="props.isFromWorkingReport" class="text-xs text-orange-600 mt-1 block">
+              🔒 Kategori otomatis "Unplanned" karena dari Working Report
+            </small>
+            <InputError :message="form.errors.category" class="mt-1" />
           </div>
 
+          <!-- 3. WORKING REPORT (Disabled jika dari WR) -->
           <div v-if="props.reports && props.reports.length > 0">
             <label class="block text-sm font-semibold mb-1">Working Report (Opsional)</label>
-            <select v-model="form.working_report_id" class="w-full border rounded p-2">
+            <select v-model="form.working_report_id"
+                    class="w-full border rounded p-2"
+                    :disabled="props.isFromWorkingReport"
+                    :class="{'bg-gray-100 cursor-not-allowed': props.isFromWorkingReport}">
               <option :value="null">-- Tidak Ada --</option>
               <option v-for="r in props.reports" :key="r.id" :value="r.id">WR #{{ r.id }}</option>
             </select>
+            <small v-if="props.isFromWorkingReport" class="text-xs text-orange-600 mt-1 block">
+              🔒 Working Report sudah terpilih otomatis
+            </small>
             <InputError :message="form.errors.working_report_id" class="mt-1" />
           </div>
-          <div v-else class="text-sm text-gray-500 italic bg-gray-50 p-3 rounded border border-dashed">
+          <div v-else-if="!props.isFromWorkingReport" class="text-sm text-gray-500 italic bg-gray-50 p-3 rounded border border-dashed">
             ℹ️ Working Report belum tersedia. Anda bisa langsung membuat Maintenance Order tanpa Working Report.
           </div>
 
-          <div>
-            <label class="block text-sm font-semibold mb-1">Mesin</label>
-            <select v-model="selectedMachineId" class="w-full border rounded p-2">
+          <!-- 4. MESIN (Disabled jika dari WR) -->
+          <div :class="props.isFromWorkingReport ? 'md:col-span-2' : ''">
+            <label class="block text-sm font-semibold mb-1">Mesin <span class="text-red-500">*</span></label>
+            <select v-model="selectedMachineId"
+                    class="w-full border rounded p-2"
+                    :disabled="props.isFromWorkingReport"
+                    :class="{'bg-gray-100 cursor-not-allowed': props.isFromWorkingReport}">
               <option :value="null" disabled>Pilih Mesin</option>
               <option v-for="m in props.machines" :key="m.id" :value="m.id">
                 [{{ m.nomor }}] {{ m.name }} - {{ m.type }} - SR {{ m.no_sarana }} ({{ m.region?.name || 'N/A' }})
               </option>
             </select>
+            <small v-if="props.isFromWorkingReport" class="text-xs text-orange-600 mt-1 block">
+              🔒 Mesin sudah terpilih otomatis dari Working Report
+            </small>
             <InputError :message="form.errors.master_machine_id" class="mt-1" />
             <small v-if="selectedMachine" class="block text-[11px] text-slate-500 mt-1">
               key API: {{ selectedMachine.hierarchy_code || selectedMachine.type }}
             </small>
           </div>
 
+          <!-- 5. KOMPONEN HIERARKI -->
           <div v-if="machineHasHierarchy">
             <label class="block text-sm font-semibold mb-1">Level 1 (System)</label>
             <select v-model="selectedLv1" class="w-full border rounded p-2">
@@ -802,6 +797,22 @@ function finishLater() {
               </div>
             </div>
           </div>
+
+          <!-- LAMPIRAN - Paling Bawah -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold mb-1">Lampiran (Foto/PDF)</label>
+            <input
+              type="file"
+              @input="form.lampiran = $event.target.files[0]"
+              accept="image/jpeg,image/png,application/pdf"
+              capture="environment"
+              class="w-full border rounded p-2 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+            />
+            <progress v-if="form.progress" :value="form.progress.percentage" max="100">
+              {{ form.progress.percentage }}%
+            </progress>
+            <InputError :message="form.errors.lampiran" class="mt-1" />
+          </div>
         </div>
 
         <div class="flex gap-2 mt-6" v-if="!completedSteps.includes(1)">
@@ -837,8 +848,8 @@ function finishLater() {
         </div>
 
         <!-- Alert Sukses -->
-        <div v-else-if="props.newOrder && !completedSteps.includes(2)" class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <p class="text-green-800 font-semibold">✓ Maintenance Order #{{ props.newOrder.id }} berhasil dibuat!</p>
+        <div v-else-if="savedOrderId && !completedSteps.includes(2)" class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+          <p class="text-green-800 font-semibold">✓ Maintenance Order #{{ savedOrderId }} berhasil dibuat!</p>
           <p class="text-sm text-green-700 mt-1">Silakan lanjutkan dengan Follow Up Plan atau lewati step ini.</p>
         </div>
 
