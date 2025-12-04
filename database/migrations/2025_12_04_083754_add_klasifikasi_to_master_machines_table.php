@@ -14,7 +14,10 @@ return new class extends Migration
   public function up()
   {
     Schema::table('master_machines', function (Blueprint $table) {
-      $table->foreignId('classification_id')->nullable()->after('region_id')->constrained('master_classifications')->nullOnDelete();
+      // Cek jika kolom belum ada
+      if (!Schema::hasColumn('master_machines', 'classification_id')) {
+        $table->foreignId('classification_id')->nullable()->after('region_id')->constrained('master_classifications')->nullOnDelete();
+      }
     });
   }
 
