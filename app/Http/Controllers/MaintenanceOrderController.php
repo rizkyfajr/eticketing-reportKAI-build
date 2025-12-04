@@ -38,7 +38,7 @@ class MaintenanceOrderController extends Controller
     }
 
     /**
-     * Halaman Form 'Create'
+     * Halaman Form 'Create' - Default untuk Planned Maintenance
      */
     public function create()
     {
@@ -46,7 +46,7 @@ class MaintenanceOrderController extends Controller
         $reports = WorkingReport::select('id')->get();
         $pedoman = MasterPedoman::select('id', 'kode_pedoman')->orderBy('kode_pedoman')->get();
         $users = User::select('id', 'name', 'username')->orderBy('name')->get()->map(function($user) {
-            $user->formatted_name = '[' . $user->username . '] ' . strtoupper($user->name);
+            $user->formatted_name = '[' . $user->username . '] - ' . strtoupper($user->name);
             return $user;
         });
 
@@ -55,11 +55,12 @@ class MaintenanceOrderController extends Controller
             'reports' => $reports,
             'pedoman' => $pedoman,
             'users' => $users,
+            'defaultCategory' => 'planned', // Default kategori untuk create biasa
         ]);
     }
 
     /**
-     * Create Maintenance Order dari Working Report
+     * Create Maintenance Order dari Working Report - Locked ke Unplanned
      */
     public function createFromWorkingReport(WorkingReport $workingReport)
     {
@@ -70,7 +71,7 @@ class MaintenanceOrderController extends Controller
         $reports = WorkingReport::select('id')->get();
         $pedoman = MasterPedoman::select('id', 'kode_pedoman')->orderBy('kode_pedoman')->get();
         $users = User::select('id', 'name', 'username')->orderBy('name')->get()->map(function($user) {
-            $user->formatted_name = '[' . $user->username . '] ' . strtoupper($user->name);
+            $user->formatted_name = '[' . $user->username . '] - ' . strtoupper($user->name);
             return $user;
         });
 
@@ -78,7 +79,7 @@ class MaintenanceOrderController extends Controller
         $prefillData = [
             'working_report_id' => $workingReport->id,
             'master_machine_id' => $workingReport->machine_id,
-            'category' => 'unplanned', // Dari WR biasanya unplanned
+            'category' => 'unplanned', // Dari WR selalu unplanned
             'trouble_at' => $workingReport->date,
             'location' => $workingReport->region->name ?? '',
         ];
@@ -90,6 +91,7 @@ class MaintenanceOrderController extends Controller
             'users' => $users,
             'workingReport' => $workingReport,
             'prefillData' => $prefillData,
+            'isFromWorkingReport' => true, // Flag untuk lock fields
         ]);
     }
 
@@ -103,9 +105,10 @@ class MaintenanceOrderController extends Controller
             'reports'  => WorkingReport::select('id')->latest()->take(100)->get(),
             'pedoman' => MasterPedoman::select('id', 'kode_pedoman')->orderBy('kode_pedoman')->get(),
             'users' => User::select('id', 'name', 'username')->orderBy('name')->get()->map(function($user) {
-                $user->formatted_name = '[' . $user->username . '] ' . strtoupper($user->name);
+                $user->formatted_name = '[' . $user->username . '] - ' . strtoupper($user->name);
                 return $user;
             }),
+            'isWizardMode' => true, // Flag untuk wizard flow
         ]);
     }
 
@@ -153,17 +156,9 @@ class MaintenanceOrderController extends Controller
         // 🔔 NOTIFIKASI: Input Failure - Kirim ke KAOP/Teknisi BY
         $this->notificationService->notifyInputFailure($newOrder);
 
-        // Return dengan render ulang form dengan order yang baru dibuat (untuk wizard flow)
-        return Inertia::render('MaintenanceOrders/Form', [
-            'machines' => MasterMachine::with('region:id,name')->select('id','name','type','nomor','hierarchy_code','no_sarana','region_id')->get(),
-            'reports' => WorkingReport::select('id')->get(),
-            'pedoman' => MasterPedoman::select('id', 'kode_pedoman')->orderBy('kode_pedoman')->get(),
-            'users' => User::select('id', 'name', 'username')->orderBy('name')->get()->map(function($user) {
-                $user->formatted_name = '[' . $user->username . '] ' . strtoupper($user->name);
-                return $user;
-            }),
-            'newOrder' => $newOrder, // Kirim order yang baru dibuat
-        ])->with('success', 'Maintenance Order berhasil disimpan.');
+        // Redirect ke edit page dengan newOrder untuk wizard flow
+        return redirect()->route('maintenance-orders.edit', $newOrder->id)
+            ->with('success', 'Maintenance Order berhasil disimpan. Lanjutkan ke Step 2.');
     }
 
     public function update(Request $request, MaintenanceOrder $maintenanceOrder)
@@ -259,7 +254,7 @@ class MaintenanceOrderController extends Controller
             'completeRepairBy:id,name,username'
         ]);
         $users = User::select('id', 'name', 'username')->orderBy('name')->get()->map(function($user) {
-            $user->formatted_name = '[' . $user->username . '] ' . strtoupper($user->name);
+            $user->formatted_name = '[' . $user->username . '] - ' . strtoupper($user->name);
             return $user;
         });
 
@@ -446,3 +441,4 @@ class MaintenanceOrderController extends Controller
         return $pdf->stream('Laporan-Maintenance-Order-'.$maintenanceOrder->id.'.pdf');
     }
 }
+

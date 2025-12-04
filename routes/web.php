@@ -90,6 +90,16 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::resource('master-machines', App\Http\Controllers\MasterMachineController::class);
     Route::post('/master-machines/paginate', [App\Http\Controllers\MasterMachineController::class, 'paginate'])
         ->name('master-machines.paginate');
+    Route::post('/master-machines/{id}/generate-qr', [App\Http\Controllers\MasterMachineController::class, 'generateQrCode'])
+        ->name('master-machines.generate-qr');
+    Route::get('/master-machines/{id}/download-qr', [App\Http\Controllers\MasterMachineController::class, 'downloadQrCode'])
+        ->name('master-machines.download-qr');
+    Route::get('/master-machines/{id}/view-qr', [App\Http\Controllers\MasterMachineController::class, 'viewQrCode'])
+        ->name('master-machines.view-qr');
+
+    Route::resource('master-classifications', App\Http\Controllers\MasterClassificationController::class);
+    Route::post('/master-classifications/paginate', [App\Http\Controllers\MasterClassificationController::class, 'paginate'])
+        ->name('master-classifications.paginate');
 
     Route::resource('master-regions', App\Http\Controllers\MasterRegionController::class);
     Route::post('/master-regions/paginate', [App\Http\Controllers\MasterRegionController::class, 'paginate'])

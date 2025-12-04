@@ -7,6 +7,7 @@ import Swal from 'sweetalert2'
 import Select from '@vueform/multiselect'
 import Input from '@/Components/Input.vue'
 import AttachmentInline from '@/Components/Button/AttachmentInline.vue'
+import QrScanner from '@/Components/QrScanner.vue'
 import axios from 'axios'
 
 const props = defineProps({
@@ -64,42 +65,42 @@ const form = useForm({
 const form1 = useForm({
   id: props.mglurusanawal?.id || null,
   working_report_id: props.report?.id || null,
-  ada: props.mglurusanawal?.ada || '0', 
+  ada: props.mglurusanawal?.ada || '0',
   tidak: props.mglurusanawal?.tidak || '0',
 })
 
 const form2 = useForm({
   id: props.mglengkunganawal?.id || null,
   working_report_id: props.report?.id || null,
-  ada: props.mglengkunganawal?.ada || '0', 
+  ada: props.mglengkunganawal?.ada || '0',
   tidak: props.mglengkunganawal?.tidak || '0',
 })
 
 const form3 = useForm({
   id: props.mgweselawal?.id || null,
   working_report_id: props.report?.id || null,
-  ada: props.mgweselawal?.ada || '0', 
+  ada: props.mgweselawal?.ada || '0',
   tidak: props.mgweselawal?.tidak || '0',
 })
 
 const form4 = useForm({
   id: props.pemeriksaansilangkpjr?.id || null,
   working_report_id: props.report?.id || null,
-  ada: props.pemeriksaansilangkpjr?.ada || '0', 
+  ada: props.pemeriksaansilangkpjr?.ada || '0',
   tidak: props.pemeriksaansilangkpjr?.tidak || '0',
 })
 
 const form5 = useForm({
   id: props.pemeriksaansilanglahan?.id || null,
   working_report_id: props.report?.id || null,
-  ada: props.pemeriksaansilanglahan?.ada || '0', 
+  ada: props.pemeriksaansilanglahan?.ada || '0',
   tidak: props.pemeriksaansilanglahan?.tidak || '0',
 })
 
 const form6 = useForm({
   id: props.perekamanawal?.id || null,
   working_report_id: props.report?.id || null,
-  ada: props.perekamanawal?.ada || '0', 
+  ada: props.perekamanawal?.ada || '0',
   tidak: props.perekamanawal?.tidak || '0',
 })
 
@@ -124,6 +125,38 @@ watch(
     }
   }
 )
+
+// Handler untuk QR Scanner
+const handleQrScanned = (data) => {
+  try {
+    // Set machine_id dari QR code
+    form.machine_id = data.machine_id
+
+    // Auto-fill field lainnya
+    form.jenis_kpjr = `${data.name} ${data.type}`
+    form.nomor_mesin = data.nomor || ''
+    form.nomor_sarana = data.no_sarana || ''
+    form.region_id = data.region_id || ''
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Berhasil!',
+      text: 'Data mesin berhasil di-scan dari QR Code',
+      timer: 1500,
+      showConfirmButton: false,
+    })
+  } catch (err) {
+    console.error('Error processing QR data:', err)
+  }
+}
+
+const handleQrError = (error) => {
+  Swal.fire({
+    icon: 'error',
+    title: 'Error!',
+    text: error,
+  })
+}
 
 watch(() => props.mglurusanawal_attachments, (val) => {
     if (val?.length > 0) {
@@ -238,7 +271,7 @@ const submit = () => {
         text: 'Working Report berhasil disimpan.',
         timer: 1200,
         showConfirmButton: false,
-      });      
+      });
       setTimeout(() => window.location.reload(), 1000);
     },
     onError: () => {
@@ -337,8 +370,8 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <label for="approved_by1" class="block text-xs font-semibold">
                       {{ __('Mode') }}
                     </label>
-                    
-                    <select 
+
+                    <select
                       v-model="form.mode"
                       class="border border-gray-300 rounded-md px-2 py-1 h-9 text-xs bg-white focus:ring-blue-500 focus:border-blue-500 shadow-sm"
                     >
@@ -371,8 +404,28 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <InputError :error="form.errors.machine_id" />
                   </div>
 
+                </div>
+
+                <!-- QR Code Scanner Section -->
+                <div class="mb-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                  <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-bold text-purple-800">
+                      Scan QR Code Mesin
+                    </h3>
+                    <p class="text-xs text-gray-600">
+                      Scan QR code untuk input otomatis data mesin
+                    </p>
+                  </div>
+                  <QrScanner
+                    @scanned="handleQrScanned"
+                    @error="handleQrError"
+                  />
+                </div>
+
+                <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">
+
                   <div class="flex flex-col">
-                    <label class="block text-xs font-semibold">Wilayah</label>      
+                    <label class="block text-xs font-semibold">Wilayah</label>
                     <Select
                       v-model="form.region_id"
                       class="w-full border rounded-md px-2 py-2 bg-white text-xs"
@@ -528,7 +581,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <label for="operator_by1" class="block text-xs font-semibold">
                       {{ __('Operator 1') }}
                     </label>
-                    
+
                     <Select
                       v-model="form.operator_by1"
                       :options="users.filter(user => user.id !== 1 && user.id !== 3).map(user => ({
@@ -552,7 +605,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <label for="operator_by2" class="block text-xs font-semibold">
                       {{ __('Operator 2') }}
                     </label>
-                    
+
                     <Select
                       v-model="form.operator_by2"
                       :options="users.filter(user => user.id !== 1 && user.id !== 3).map(user => ({
@@ -576,7 +629,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <label for="operator_by3" class="block text-xs font-semibold">
                       {{ __('Operator 3') }}
                     </label>
-                    
+
                     <Select
                       v-model="form.operator_by3"
                       :options="users.filter(user => user.id !== 1 && user.id !== 3).map(user => ({
@@ -605,7 +658,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       placeholder="Isi NIPP Pengawal 1"
                     />
                   </div>
-                  
+
                   <div class="flex flex-col">
                     <label class="block text-xs font-semibold">Nama Pengawal 1</label>
                     <Input
@@ -614,7 +667,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       class="w-full border rounded-md px-2 py-2 text-xs"
                       placeholder="Isi Nama Pengawal 1"
                     />
-                  </div>       
+                  </div>
 
                   <div class="flex flex-col">
                     <label class="block text-xs font-semibold">NIPP Pengawal 2</label>
@@ -625,7 +678,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       placeholder="Isi NIPP Pengawal 2"
                     />
                   </div>
-                  
+
                   <div class="flex flex-col">
                     <label class="block text-xs font-semibold">Nama Pengawal 2</label>
                     <Input
@@ -651,50 +704,50 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     type="submit"
                     class="bg-green-600 text-white text-xs px-3 py-1 rounded-md hover:bg-green-700 mt-10"
                   >
-                  <p class="font-bold text-xs">Simpan</p> 
+                  <p class="font-bold text-xs">Simpan</p>
                   </Button>
                 </div>
               </div>
 
               <div v-if="showForm1 && form.mode === 'working'" class="space-y-1 p-1 rounded-lg ">
-    
+
                   <p class="font-bold text-sm text-gray-800">
                       1. Data Opname Resor Jalan Rel (Awal)
                   </p>
 
                   <div class="space-y-1">
-                      
+
                       <div class="p-2 border border-gray-200 rounded-lg shadow-sm hover:border-sky-500 transition duration-150">
-                          <div class="flex flex-row items-start justify-between text-sm"> 
-                              
+                          <div class="flex flex-row items-start justify-between text-sm">
+
                               <label for="mg1_awal" class="flex-1 text-xs text-black font-semi-bold pr-2">
                                   a. MG 1 (Lurusan)
                               </label>
 
                               <div class="flex space-x-4 flex-shrink-0 text-xs">
-                                  
-                                  <label 
+
+                                  <label
                                       class="flex items-center space-x-1 cursor-pointer transition duration-100"
                                       :class="{'text-sky-600 font-semibold': form1.ada === '1', 'text-gray-500': form1.ada !== '1'}"
                                   >
-                                      <input 
-                                          type="checkbox" 
-                                          v-model="form1.ada" 
-                                          true-value="1" 
+                                      <input
+                                          type="checkbox"
+                                          v-model="form1.ada"
+                                          true-value="1"
                                           false-value="0"
                                           class="rounded text-sky-600 focus:ring-sky-500 w-3 h-3"
                                       >
                                       <span>Ada</span>
                                   </label>
-                                  
-                                  <label 
+
+                                  <label
                                       class="flex items-center space-x-1 cursor-pointer transition duration-100"
                                       :class="{'text-red-600 font-semibold': form1.tidak === '1', 'text-gray-500': form1.tidak !== '1'}"
                                   >
-                                      <input 
-                                          type="checkbox" 
-                                          v-model="form1.tidak" 
-                                          true-value="1" 
+                                      <input
+                                          type="checkbox"
+                                          v-model="form1.tidak"
+                                          true-value="1"
                                           false-value="0"
                                           class="rounded text-red-600 focus:ring-red-500 w-3 h-3"
                                       >
@@ -704,46 +757,46 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                           </div>
 
                           <div class="mt-2 px-3">
-                            <AttachmentInline 
-                              :model="mglurusanawal ?? {}" 
-                              type="MgLurusanAwal" 
+                            <AttachmentInline
+                              :model="mglurusanawal ?? {}"
+                              type="MgLurusanAwal"
                               :redaction="`Lampiran (MG 1 Lurusan)`"
-                              :attachments="mglurusanawal_attachments" 
+                              :attachments="mglurusanawal_attachments"
                             />
                           </div>
                       </div>
 
                       <div class="p-2 border border-gray-200 rounded-lg shadow-sm hover:border-sky-500 transition duration-150">
                           <div class="flex flex-row items-start justify-between text-sm">
-                              
+
                               <label for="mg2_awal" class="flex-1 text-xs text-black font-semi-bold pr-2">
                                   b. MG 2 (Lengkungan)
                               </label>
 
                               <div class="flex space-x-4 flex-shrink-0 text-xs">
-                                  
-                                  <label 
+
+                                  <label
                                       class="flex items-center space-x-1 cursor-pointer transition duration-100"
                                       :class="{'text-sky-600 font-semibold': form2.ada === '1', 'text-gray-500': form2.ada !== '1'}"
                                   >
-                                      <input 
-                                          type="checkbox" 
-                                          v-model="form2.ada" 
-                                          true-value="1" 
+                                      <input
+                                          type="checkbox"
+                                          v-model="form2.ada"
+                                          true-value="1"
                                           false-value="0"
                                           class="rounded text-sky-600 focus:ring-sky-500 w-3 h-3"
                                       >
                                       <span>Ada</span>
                                   </label>
-                                  
-                                  <label 
+
+                                  <label
                                       class="flex items-center space-x-1 cursor-pointer transition duration-100"
                                       :class="{'text-red-600 font-semibold': form2.tidak === '1', 'text-gray-500': form2.tidak !== '1'}"
                                   >
-                                      <input 
-                                          type="checkbox" 
-                                          v-model="form2.tidak" 
-                                          true-value="1" 
+                                      <input
+                                          type="checkbox"
+                                          v-model="form2.tidak"
+                                          true-value="1"
                                           false-value="0"
                                           class="rounded text-red-600 focus:ring-red-500 w-3 h-3"
                                       >
@@ -753,46 +806,46 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                           </div>
 
                           <div class="mt-2 px-3">
-                            <AttachmentInline 
-                              :model="mglengkunganawal ?? {}" 
-                              type="MgLengkunganAwal" 
+                            <AttachmentInline
+                              :model="mglengkunganawal ?? {}"
+                              type="MgLengkunganAwal"
                               :redaction="`Lampiran (MG 2 Lengkungan)`"
-                              :attachments="mglengkunganawal_attachments" 
+                              :attachments="mglengkunganawal_attachments"
                             />
                           </div>
                       </div>
 
                       <div class="p-2 border border-gray-200 rounded-lg shadow-sm hover:border-sky-500 transition duration-150">
                           <div class="flex flex-row items-start justify-between text-sm">
-                              
+
                               <label for="mg3_awal" class="flex-1 text-xs text-black font-semi-bold pr-2">
                                   c. MG 3 (Wesel)
                               </label>
 
                               <div class="flex space-x-4 flex-shrink-0 text-xs">
-                                  
-                                  <label 
+
+                                  <label
                                       class="flex items-center space-x-1 cursor-pointer transition duration-100"
                                       :class="{'text-sky-600 font-semibold': form3.ada === '1', 'text-gray-500': form3.ada !== '1'}"
                                   >
-                                      <input 
-                                          type="checkbox" 
-                                          v-model="form3.ada" 
-                                          true-value="1" 
+                                      <input
+                                          type="checkbox"
+                                          v-model="form3.ada"
+                                          true-value="1"
                                           false-value="0"
                                           class="rounded text-sky-600 focus:ring-sky-500 w-3 h-3"
                                       >
                                       <span>Ada</span>
                                   </label>
-                                  
-                                  <label 
+
+                                  <label
                                       class="flex items-center space-x-1 cursor-pointer transition duration-100"
                                       :class="{'text-red-600 font-semibold': form3.tidak === '1', 'text-gray-500': form3.tidak !== '1'}"
                                   >
-                                      <input 
-                                          type="checkbox" 
-                                          v-model="form3.tidak" 
-                                          true-value="1" 
+                                      <input
+                                          type="checkbox"
+                                          v-model="form3.tidak"
+                                          true-value="1"
                                           false-value="0"
                                           class="rounded text-red-600 focus:ring-red-500 w-3 h-3"
                                       >
@@ -802,11 +855,11 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                           </div>
 
                           <div class="mt-2 px-3">
-                            <AttachmentInline 
-                              :model="mgweselawal ?? {}" 
-                              type="MgWeselAwal" 
+                            <AttachmentInline
+                              :model="mgweselawal ?? {}"
+                              type="MgWeselAwal"
                               :redaction="`Lampiran (MG 3 Wesel)`"
-                              :attachments="mgweselawal_attachments" 
+                              :attachments="mgweselawal_attachments"
                             />
                           </div>
                       </div>
@@ -818,38 +871,38 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   </p>
 
                   <div class="space-y-1">
-                      
+
                       <div class="p-2 border border-gray-200 rounded-lg shadow-sm hover:border-sky-500 transition duration-150">
-                          <div class="flex flex-row items-start justify-between text-sm"> 
-                              
+                          <div class="flex flex-row items-start justify-between text-sm">
+
                               <label for="mg1_awal" class="flex-1 text-xs text-black font-semi-bold pr-2">
                                   a. KPJR
                               </label>
 
                               <div class="flex space-x-4 flex-shrink-0 text-xs">
-                                  
-                                  <label 
+
+                                  <label
                                       class="flex items-center space-x-1 cursor-pointer transition duration-100"
                                       :class="{'text-sky-600 font-semibold': form4.ada === '1', 'text-gray-500': form4.ada !== '1'}"
                                   >
-                                      <input 
-                                          type="checkbox" 
-                                          v-model="form4.ada" 
-                                          true-value="1" 
+                                      <input
+                                          type="checkbox"
+                                          v-model="form4.ada"
+                                          true-value="1"
                                           false-value="0"
                                           class="rounded text-sky-600 focus:ring-sky-500 w-3 h-3"
                                       >
                                       <span>Ada</span>
                                   </label>
-                                  
-                                  <label 
+
+                                  <label
                                       class="flex items-center space-x-1 cursor-pointer transition duration-100"
                                       :class="{'text-red-600 font-semibold': form4.tidak === '1', 'text-gray-500': form4.tidak !== '1'}"
                                   >
-                                      <input 
-                                          type="checkbox" 
-                                          v-model="form4.tidak" 
-                                          true-value="1" 
+                                      <input
+                                          type="checkbox"
+                                          v-model="form4.tidak"
+                                          true-value="1"
                                           false-value="0"
                                           class="rounded text-red-600 focus:ring-red-500 w-3 h-3"
                                       >
@@ -859,46 +912,46 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                           </div>
 
                           <div class="mt-2 px-3">
-                            <AttachmentInline 
-                              :model="pemeriksaansilangkpjr ?? {}" 
-                              type="PemeriksaanSilangKpjr" 
+                            <AttachmentInline
+                              :model="pemeriksaansilangkpjr ?? {}"
+                              type="PemeriksaanSilangKpjr"
                               :redaction="`Lampiran (Pemeriksaan Silang KPJR)`"
-                              :attachments="pemeriksaansilangkpjr_attachments" 
+                              :attachments="pemeriksaansilangkpjr_attachments"
                             />
                           </div>
                       </div>
 
                       <div class="p-2 border border-gray-200 rounded-lg shadow-sm hover:border-sky-500 transition duration-150">
                           <div class="flex flex-row items-start justify-between text-sm">
-                              
+
                               <label for="mg2_awal" class="flex-1 text-xs text-black font-semi-bold pr-2">
                                   b. Lahan
                               </label>
 
                               <div class="flex space-x-4 flex-shrink-0 text-xs">
-                                  
-                                  <label 
+
+                                  <label
                                       class="flex items-center space-x-1 cursor-pointer transition duration-100"
                                       :class="{'text-sky-600 font-semibold': form5.ada === '1', 'text-gray-500': form5.ada !== '1'}"
                                   >
-                                      <input 
-                                          type="checkbox" 
-                                          v-model="form5.ada" 
-                                          true-value="1" 
+                                      <input
+                                          type="checkbox"
+                                          v-model="form5.ada"
+                                          true-value="1"
                                           false-value="0"
                                           class="rounded text-sky-600 focus:ring-sky-500 w-3 h-3"
                                       >
                                       <span>Ada</span>
                                   </label>
-                                  
-                                  <label 
+
+                                  <label
                                       class="flex items-center space-x-1 cursor-pointer transition duration-100"
                                       :class="{'text-red-600 font-semibold': form5.tidak === '1', 'text-gray-500': form5.tidak !== '1'}"
                                   >
-                                      <input 
-                                          type="checkbox" 
-                                          v-model="form5.tidak" 
-                                          true-value="1" 
+                                      <input
+                                          type="checkbox"
+                                          v-model="form5.tidak"
+                                          true-value="1"
                                           false-value="0"
                                           class="rounded text-red-600 focus:ring-red-500 w-3 h-3"
                                       >
@@ -908,11 +961,11 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                           </div>
 
                           <div class="mt-2 px-3">
-                            <AttachmentInline 
-                              :model="pemeriksaansilanglahan ?? {}" 
-                              type="PemeriksaanSilangLahan" 
+                            <AttachmentInline
+                              :model="pemeriksaansilanglahan ?? {}"
+                              type="PemeriksaanSilangLahan"
                               :redaction="`Lampiran (Pemeriksaan Silang Lahan)`"
-                              :attachments="pemeriksaansilanglahan_attachments" 
+                              :attachments="pemeriksaansilanglahan_attachments"
                             />
                           </div>
                       </div>
@@ -924,38 +977,38 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   </p>
 
                   <div class="space-y-1">
-                      
+
                       <div class="p-2 border border-gray-200 rounded-lg shadow-sm hover:border-sky-500 transition duration-150">
-                          <div class="flex flex-row items-start justify-between text-sm"> 
-                              
+                          <div class="flex flex-row items-start justify-between text-sm">
+
                               <label for="mg1_awal" class="flex-1 text-xs text-black font-semi-bold pr-2">
                                   a. Data Perekaman Awal
                               </label>
 
                               <div class="flex space-x-4 flex-shrink-0 text-xs">
-                                  
-                                  <label 
+
+                                  <label
                                       class="flex items-center space-x-1 cursor-pointer transition duration-100"
                                       :class="{'text-sky-600 font-semibold': form6.ada === '1', 'text-gray-500': form6.ada !== '1'}"
                                   >
-                                      <input 
-                                          type="checkbox" 
-                                          v-model="form6.ada" 
-                                          true-value="1" 
+                                      <input
+                                          type="checkbox"
+                                          v-model="form6.ada"
+                                          true-value="1"
                                           false-value="0"
                                           class="rounded text-sky-600 focus:ring-sky-500 w-3 h-3"
                                       >
                                       <span>Ada</span>
                                   </label>
-                                  
-                                  <label 
+
+                                  <label
                                       class="flex items-center space-x-1 cursor-pointer transition duration-100"
                                       :class="{'text-red-600 font-semibold': form6.tidak === '1', 'text-gray-500': form6.tidak !== '1'}"
                                   >
-                                      <input 
-                                          type="checkbox" 
-                                          v-model="form6.tidak" 
-                                          true-value="1" 
+                                      <input
+                                          type="checkbox"
+                                          v-model="form6.tidak"
+                                          true-value="1"
                                           false-value="0"
                                           class="rounded text-red-600 focus:ring-red-500 w-3 h-3"
                                       >
@@ -965,27 +1018,27 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                           </div>
 
                           <div class="mt-2 px-3">
-                            <AttachmentInline 
-                              :model="perekamanawal ?? {}" 
-                              type="PerekamanAwal" 
+                            <AttachmentInline
+                              :model="perekamanawal ?? {}"
+                              type="PerekamanAwal"
                               :redaction="`Lampiran (Perekaman Awal)`"
-                              :attachments="perekamanawal_attachments" 
+                              :attachments="perekamanawal_attachments"
                             />
                           </div>
                       </div>
                   </div>
-                  
+
                   <div class="flex items-center justify-end px-4 py-1 rounded space-x-2 p-2 pr-[1.100rem]">
-                    <Button 
+                    <Button
                       type="button"
-                      @click="submitForms" 
+                      @click="submitForms"
                       class="bg-green-600 text-white text-xs px-3 py-1 rounded-md hover:bg-green-700 mt-10"
                     >
                         Simpan
                     </Button>
                   </div>
               </div>
-              
+
             </form>
           </template>
         </Card>
