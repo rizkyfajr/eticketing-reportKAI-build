@@ -128,7 +128,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         ->name('readiness.admin.userdetail');
 
     // Route::get('/working-reports/{report}/create', [App\Http\Controllers\WorkingReportController::class, 'create'])->name('working-reports.create.withid');
-    Route::get('working-reports/{report}/download', [App\Http\Controllers\WorkingReportController::class, 'downloadReport'])->name('working-reports.download');
+    Route::get('working-reports/{report}/download', [App\Http\Controllers\WorkingReportController::class, 'downloadReport'])->name('working-reports.download');    
+    Route::post('/working-reports/setmode', [App\Http\Controllers\WorkingReportController::class, 'setMode'])->name('working-reports.setMode');
     Route::post('/working-reports/approveKUPT', [App\Http\Controllers\WorkingReportController::class, 'approveKUPT'])->name('working-reports.approveKUPT');
     Route::post('/working-reports/{report}/approvePengawal/{level}', [App\Http\Controllers\WorkingReportController::class, 'approvePengawal'])->name('working-reports.approvePengawal');
     Route::post('/working-reports/{report}/approve/{level}', [App\Http\Controllers\WorkingReportController::class, 'approve'])->name('working-reports.approve');
