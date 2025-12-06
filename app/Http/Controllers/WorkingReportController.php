@@ -84,19 +84,19 @@ class WorkingReportController extends Controller
             'mglengkunganakhir.attachments',
             'mgweselakhir.attachments',
             'perekamanakhir.attachments',
-            'maintenanceOrders.machine', // Load maintenance orders terkait
+            'maintenanceOrders.machine', 
         );
 
         $machineType = $report->machine?->name;
 
-        // Ambil Nama Klasifikasi Master (misalnya: 'Tamping Machine', 'Ballast Regulator Machine')
+        // DAILY CHECK SHEET BERDASARKAN TIPE MESIN
         $machineClassification = $report->machine?->classification?->name; 
         $filterType = null;
 
         if ($machineClassification === 'Tamping Machine' || $machineClassification === 'Material and Logistic Machine' || $machineClassification === 'Stabilization and Consolidation Machine') {
-            $filterType = 'MTT'; // Asumsi: Tamping, Logistik, dan Stabilisasi menggunakan Checksheet MTT
+            $filterType = 'MTT'; 
         } elseif ($machineClassification === 'Ballast Regulator Machine' || $machineClassification === 'Distributing and Profiling') {
-            $filterType = 'PBR'; // Asumsi: Ballast Regulator menggunakan Checksheet PBR
+            $filterType = 'PBR'; 
         }
 
         $masters = CheckSheetMasterDay::when($filterType, function ($query, $filterType) {
@@ -802,7 +802,6 @@ class WorkingReportController extends Controller
 
             // return $pdf->download('working-report-'.$report->id.'.pdf');
 
-            // --- 2. Menentukan Filter Tipe Mesin (Sama seperti di detail()) ---
             $machineType = $report->machine?->name;
             $filterType = $machineType;
 
@@ -812,7 +811,6 @@ class WorkingReportController extends Controller
                 $filterType = 'PBR';
             }
 
-            // --- 3. Memuat CheckSheet Master (Diurutkan) ---
             $masters = CheckSheetMasterDay::when($filterType, function ($query, $filterType) {
                 $query->where('jenis_mesin', $filterType);
             })
@@ -828,7 +826,6 @@ class WorkingReportController extends Controller
                 END
             ")->get();
 
-            // --- 4. Menggabungkan Master dengan Hasil Pengisian ---
             $existingResults = $report->dayresults
                 ? $report->dayresults->keyBy('check_sheet_master_day_id')
                 : collect();
@@ -844,7 +841,6 @@ class WorkingReportController extends Controller
                     'nilai_rujukan' => $master->nilai_rujukan,
                     'satuan' => $master->satuan,
                     'urutan' => $master->urutan,
-                    // Mengambil nilai dari hasil jika ada, defaultnya 0 atau ''
                     'cek' => $result ? (int) $result->cek : 0,
                     'tambahan' => $result ? (int) $result->tambahan : 0,
                     'ganti' => $result ? (int) $result->ganti : 0,
@@ -854,15 +850,13 @@ class WorkingReportController extends Controller
                 ];
             });
             
-            // --- 5. Fungsi Get Attachment URL (Tidak diubah) ---
             $getAttachmentUrl = function ($attachment) {
                 $fullPath = $attachment->path . $attachment->filename;
                 return storage_path('app/public/' . $fullPath);
             };
 
-            // --- 6. Mengirim data ke View PDF ---
             $pdf = PDF::loadView('working_report_1', 
-                compact('report', 'getAttachmentUrl', 'mergedResults', 'masters') // TAMBAHKAN mergedResults dan masters
+                compact('report', 'getAttachmentUrl', 'mergedResults', 'masters') 
             )->setPaper('A4', 'portrait');
 
             return $pdf->download('working-report-'.$report->id.'.pdf');
