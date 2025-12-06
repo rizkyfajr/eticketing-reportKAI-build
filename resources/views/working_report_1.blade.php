@@ -3,6 +3,21 @@
 <head>
     <meta charset="utf-8">
     <title>Working Report - {{ $report->id }}</title>
+    <style>
+        .page-break {
+            page-break-before: always;
+        }
+        .table-bottom {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        }
+        .check {
+        font-family: DejaVu Sans, sans-serif;
+        font-size: 12px;
+        }
+    </style>
 </head>
 <body style="font-family: Arial, sans-serif; font-size: 8pt; margin: 5mm; padding: 0;">
 <!-- <div style="border: 1px solid black; padding: 5mm; width: auto; box-sizing: border-box;"> -->
@@ -66,7 +81,7 @@
     </table>
 
     @if ($report->mode === 'working')
-      <div style="font-weight: bold; padding: 3px 0; border-top: 1px solid black; border-bottom: 1px solid black; background-color: #f0f0f0; margin-top: 5px; margin-bottom: 5px;">A. DATA PEKERJAAN</div>
+      <div style="font-weight: bold; padding: 3px 0; border-top: 1px solid black; border-bottom: 1px solid black; background-color: #f0f0f0; margin-top: 5px; margin-bottom: 5px; background-color: #ccc;">A. DATA PEKERJAAN</div>
 
       <table style="width: 100%; border-collapse: collapse; margin-bottom: 3px;">
           <tr>
@@ -405,7 +420,7 @@
           </tr>
       </table>
     
-      <div style="font-weight: bold; padding: 3px 0; border-top: 1px solid black; border-bottom: 1px solid black; background-color: #f0f0f0; margin-top: 5px; margin-bottom: 5px;">B. DATA OPERASI MESIN</div>
+      <div style="font-weight: bold; padding: 3px 0; border-top: 1px solid black; border-bottom: 1px solid black; background-color: #f0f0f0; margin-top: 5px; margin-bottom: 5px; background-color: #ccc;">B. DATA OPERASI MESIN</div>
 
       <table style="width: 100%; border-collapse: collapse; margin-bottom: 5px;">
           <tr>
@@ -498,7 +513,7 @@
           </tr>
       </table>
 
-      <div style="font-weight: bold; padding: 3px 0; border-top: 1px solid black; border-bottom: 1px solid black; background-color: #f0f0f0; margin-top: 5px; margin-bottom: 5px;">C. DATA PERSONEL</div>
+      <div style="font-weight: bold; padding: 3px 0; border-top: 1px solid black; border-bottom: 1px solid black; background-color: #f0f0f0; margin-top: 5px; margin-bottom: 5px; background-color: #ccc;">C. DATA PERSONEL</div>
 
       <table style="width: 100%; border-collapse: collapse; margin-bottom: 5px;">
         <tr>
@@ -543,93 +558,180 @@
         </tr>
       </table>
 
-      <table style="width: 100%; border-collapse: collapse; margin-top: 15px; text-align: center;">
-          <thead>
-              <tr>
-                  <th style="width: 50%; border: 1px solid black; padding: 5px;">Catatan</th>
-                  <th style="width: 25%; border: 1px solid black; padding: 5px;">Petugas</th>
-                  <th style="width: 25%; border: 1px solid black; padding: 5px;">Nipp</th>
-                  <th style="width: 25%; border: 1px solid black; padding: 5px;">Paraf</th>
-              </tr>
-          </thead>
-          <tbody>
-              <tr>
-                  <td rowspan="3" style="vertical-align: top; border: 1px solid black; padding: 5px;">{{ optional($report->checksheetworkresult)->catatan ?? '-' }}</td>
-                  <td style="height: 10px; border: 1px solid black;">{{ ucwords(strtolower(optional($report->operator1)->name ?? '-')) }}</td>
-                  <td style="height: 10px; border: 1px solid black;">{{ optional($report->operator1)->username ?? '-' }}</td>
-                  <td style="height: 10px; border: 1px solid black;">{{ $report->operator_at1 ? \Carbon\Carbon::parse($report->operator_at1)->translatedFormat('d F Y') : '-' }}</td>
-              </tr>
-              <tr>
-                  <td style="height: 10px; border: 1px solid black;">{{ ucwords(strtolower(optional($report->operator2)->name ?? '-')) }}</td>
-                  <td style="height: 10px; border: 1px solid black;">{{ optional($report->operator2)->username ?? '-' }}</td>
-                  <td style="height: 10px; border: 1px solid black;">{{ $report->operator_at1 ? \Carbon\Carbon::parse($report->operator_at2)->translatedFormat('d F Y') : '-' }}</td>
-              </tr>
-              <tr>
-                  <td style="height: 10px; border: 1px solid black;">{{ ucwords(strtolower(optional($report->operator3)->name ?? '-')) }}</td>
-                  <td style="height: 10px; border: 1px solid black;">{{ optional($report->operator3)->username ?? '-' }}</td>
-                  <td style="height: 10px; border: 1px solid black;">{{ $report->operator_at1 ? \Carbon\Carbon::parse($report->operator_at3)->translatedFormat('d F Y') : '-' }}</td>
-              </tr>
-          </tbody>
-      </table><br><br>
+      <div class="page-break"></div>
       
-      @php
-          $checkpointRelations = [
-              'mglurusanawal' => '1. Foto MG 1 (Lurusan) - Awal',
-              'mglengkunganawal' => '2. Foto MG 2 (Lengkung) - Awal',
-              'mgweselawal' => '3. Foto MG 3 (Wesel) - Awal',
-              'pemeriksaansilangkpjr' => '4. Foto Pemeriksaan Silang KPJR',
-              'pemeriksaansilanglahan' => '5. Foto Pemeriksaan Silang Lahan',
-              'perekamanawal' => '6. Foto Perekaman Awal',
-              'mglurusanakhir' => '7. Foto MG 1 (Lurusan) - Akhir',
-              'mglengkunganakhir' => '8. Foto MG 2 (Lengkung) - Akhir',
-              'mgweselakhir' => '9. Foto MG 3 (Wesel) - Akhir',
-              'perekamanakhir' => '10. Foto Perekaman Akhir',
-          ];
-      @endphp
+        @php
+            $checkpointRelations = [
+                'mglurusanawal' => '1. Foto MG 1 (Lurusan) - Awal',
+                'mglengkunganawal' => '2. Foto MG 2 (Lengkung) - Awal',
+                'mgweselawal' => '3. Foto MG 3 (Wesel) - Awal',
+                'pemeriksaansilangkpjr' => '4. Foto Pemeriksaan Silang KPJR',
+                'pemeriksaansilanglahan' => '5. Foto Pemeriksaan Silang Lahan',
+                'perekamanawal' => '6. Foto Perekaman Awal',
+                'mglurusanakhir' => '7. Foto MG 1 (Lurusan) - Akhir',
+                'mglengkunganakhir' => '8. Foto MG 2 (Lengkung) - Akhir',
+                'mgweselakhir' => '9. Foto MG 3 (Wesel) - Akhir',
+                'perekamanakhir' => '10. Foto Perekaman Akhir',
+            ];
+        @endphp
 
-      <div style="text-align: center; margin-bottom: 15px;">
-          <h3 style="margin: 0; font-size: 11pt;">DOKUMENTASI FOTO HASIL PEKERJAAN</h3>
-      </div>
+        <div style="text-align: center; margin-bottom: 15px;">
+            <h3 style="margin: 0; font-size: 11pt;">DOKUMENTASI FOTO HASIL PEKERJAAN</h3>
+        </div>
 
-      @foreach ($checkpointRelations as $relationName => $title)
-          @php
-              $checkpoint = optional($report)->{$relationName};
-              $attachments = optional($checkpoint)->attachments; 
-          @endphp
+        @foreach ($checkpointRelations as $relationName => $title)
+            @php
+                $checkpoint = optional($report)->{$relationName};
+                $attachments = optional($checkpoint)->attachments; 
+            @endphp
 
-          <div style="margin-top: 10px;">
-              <h4 style="margin: 5px 0; border-bottom: 1px dashed #ccc; padding-bottom: 2px; font-size: 9pt;">{{ $title }}</h4>
-              
-              @if (optional($checkpoint)->ada == 1 && optional($attachments)->isNotEmpty())
-                  <table style="width: 100%; border-collapse: collapse;">
-                      <tr>
-                          @foreach ($attachments as $attachment)
-                              @php
-                                  // Panggil closure yang sekarang di-pass dari Controller
-                                  $imageUrl = $getAttachmentUrl($attachment); 
-                              @endphp
-                              
-                              <td style="width: 50%; padding: 5px; text-align: center; vertical-align: top;">
-                                  <div style="border: 1px solid #ddd; padding: 5px;">
-                                      <img src="{{ $imageUrl }}" style="max-width: 100%; height: auto; display: block; margin: 0 auto;">
-                                      <p style="text-align: center; font-size: 7pt; margin-top: 5px;">
-                                          {{ $attachment->description ?? 'Foto Lampiran' }}
-                                      </p>
-                                  </div>
-                              </td>
-                          @endforeach
-                      </tr>
-                  </table>
-              @else
-                  <p style="font-size: 8pt; color: #555;">Tidak ada foto lampiran, atau kolom 'Ada' tidak dipilih.</p>
-              @endif
-          </div>
-      @endforeach
+            <div style="margin-top: 10px;">
+                <h4 style="margin: 5px 0; border-bottom: 1px dashed #ccc; padding-bottom: 2px; font-size: 9pt;">{{ $title }}</h4>
+                
+                @if (optional($checkpoint)->ada == 1 && optional($attachments)->isNotEmpty())
+                    {{-- ADA FOTO → tampil 1 foto per baris --}}
+                    @foreach ($attachments as $attachment)
+                        @php
+                            $imageUrl = $getAttachmentUrl($attachment);
+                        @endphp
+                        <div style="margin: 20px 0; text-align: center;">
+                            <img src="{{ $imageUrl }}" 
+                                style="width: 60%; max-width: 500px; height: 400px; display: block; margin: 0 auto;">
+                            <p style="font-size: 8pt; margin-top: 5px;">
+                                {{ $loop->iteration }} {{ $attachment->description ?? '' }}
+                            </p>
+                        </div>
+                    @endforeach
+
+                    @else
+                        {{-- TIDAK ADA FOTO → tampil 2 kolom, isi TULISAN di tengah halaman --}}
+                        <div style="margin: 20px 0; text-align: center;">
+                            <div>
+                                <div style="width: 60%; max-width: 500px; height: 400px; display: block; margin: 0 auto;">
+                                    <span style="font-size: 10pt; color: #555;">Tidak ada foto lampiran</span>
+                                </div>
+                            </div>
+                        </div>
+                @endif
+
+            </div>
+        @endforeach
+
+        <div class="page-break"></div>
+
+        <div style="text-align: center; margin-bottom: 15px;">
+                <h3 style="margin: 0; font-size: 11pt;">LAMPIRAN DAILY CHECK RESULTS</h3><br>
+
+                <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 8pt;">
+                    <thead>
+                        <tr>
+                            <th style="width: 3%; border: 1px solid black; padding: 4px; background-color: #ccc;">No</th>
+                            <th style="width: 25%; border: 1px solid black; padding: 4px; background-color: #ccc; text-align: left;">Komponen</th>
+                            <th style="width: 10%; border: 1px solid black; padding: 4px; background-color: #ccc;">Rujukan</th>
+                            <th colspan="3" style="width: 15%; border: 1px solid black; padding: 4px; background-color: #ccc;">Kondisi</th>
+                            <th style="width: 10%; border: 1px solid black; padding: 4px; background-color: #ccc;">Nilai Rujukan</th>
+                            <th colspan="2" style="width: 15%; border: 1px solid black; padding: 4px; background-color: #ccc;">Hasil Cek</th>
+                            <th style="width: 5%; border: 1px solid black; padding: 4px; background-color: #ccc;">Sat.</th>
+                            <th style="width: 17%; border: 1px solid black; padding: 4px; background-color: #ccc;">Keterangan (App.)</th>
+                        </tr>
+                        <tr>
+                            <th style="border: 1px solid black; padding: 4px; background-color: #eee;"></th>
+                            <th style="border: 1px solid black; padding: 4px; background-color: #eee;"></th>
+                            <th style="border: 1px solid black; padding: 4px; background-color: #eee;"></th>
+                            <th style="border: 1px solid black; padding: 4px; background-color: #eee;">Cek</th>
+                            <th style="border: 1px solid black; padding: 4px; background-color: #eee;">Tambah</th>
+                            <th style="border: 1px solid black; padding: 4px; background-color: #eee;">Ganti</th>
+                            <th style="border: 1px solid black; padding: 4px; background-color: #eee;"></th>
+                            <th style="border: 1px solid black; padding: 4px; background-color: #eee;">Kr/Dpn</th>
+                            <th style="border: 1px solid black; padding: 4px; background-color: #eee;">Kn/Dpn</th>
+                            <th style="border: 1px solid black; padding: 4px; background-color: #eee;"></th>
+                            <th style="border: 1px solid black; padding: 4px; background-color: #eee;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @php
+                            $currentGroup = null;
+                            $i = 1;
+                        @endphp
+
+                        @foreach ($masters as $item)
+                            @if ($item->group_name !== $currentGroup)
+                                <tr>
+                                    <td colspan="11" style="border: 1px solid black; padding: 4px; text-align: left; background-color: #333; color: white; font-weight: bold;">
+                                        {{ strtoupper($item->group_name) }}
+                                    </td>
+                                </tr>
+                                @php
+                                    $currentGroup = $item->group_name;
+                                @endphp
+                            @endif
+                            
+                            {{-- Temukan hasil terkait dari mergedResults --}}
+                            @php
+                                // UBAH $results menjadi $mergedResults sesuai nama variabel di Controller
+                                $result = collect($mergedResults)->firstWhere('check_sheet_master_day_id', $item->id);
+                            @endphp
+                            
+                            @if ($result)
+                                <tr>
+                                    <td style="border: 1px solid black; padding: 4px;">{{ $item->urutan }}</td>
+                                    <td style="border: 1px solid black; padding: 4px; text-align: left;">{{ $item->komponen }}</td>
+                                    <td style="border: 1px solid black; padding: 4px;">{{ $item->rujukan }}</td>
+                                    
+                                    {{-- Kondisi (Cek, Tambah, Ganti) --}}
+                                    <td style="border: 1px solid black; padding: 4px;" class="check">{!! $result['cek'] == 1 ? '✓' : '-' !!}</td>
+                                    <td style="border: 1px solid black; padding: 4px;" class="check">{!! $result['tambahan'] == 1 ? '✓' : '-' !!}</td>
+                                    <td style="border: 1px solid black; padding: 4px;" class="check">{!! $result['ganti'] == 1 ? '✓' : '-' !!}</td>
+                                    
+                                    <td style="border: 1px solid black; padding: 4px;">{{ $item->nilai_rujukan }}</td>
+                                    
+                                    {{-- Hasil Cek (Kr/Dpn, Kn/Dpn) --}}
+                                    <td style="border: 1px solid black; padding: 4px;">{{ $result['kiri_depan'] ?? '-' }}</td>
+                                    <td style="border: 1px solid black; padding: 4px;">{{ $result['kanan_depan'] ?? '-' }}</td>
+                                    
+                                    <td style="border: 1px solid black; padding: 4px;">{{ $item->satuan }}</td>
+                                    <td style="border: 1px solid black; padding: 4px; text-align: left;">{{ $result['keterangan'] ?? '-' }}</td>
+                                </tr>
+                            @endif
+                        @endforeach
+                    </tbody>
+                </table>
+        </div>
+
+
+        <table style="width: 100%; border-collapse: collapse; margin-top: 15px; text-align: center;">
+            <thead>
+                <tr>
+                    <th style="width: 50%; border: 1px solid black; padding: 5px; background-color: #ccc;">Catatan</th>
+                    <th style="width: 25%; border: 1px solid black; padding: 5px; background-color: #ccc;">Petugas</th>
+                    <th style="width: 25%; border: 1px solid black; padding: 5px; background-color: #ccc;">Nipp</th>
+                    <th style="width: 25%; border: 1px solid black; padding: 5px; background-color: #ccc;">Paraf</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td rowspan="3" style="vertical-align: top; border: 1px solid black; padding: 5px;">{{ optional($report->checksheetworkresult)->catatan ?? '-' }}</td>
+                    <td style="height: 10px; border: 1px solid black;">{{ ucwords(strtolower(optional($report->operator1)->name ?? '-')) }}</td>
+                    <td style="height: 10px; border: 1px solid black;">{{ optional($report->operator1)->username ?? '-' }}</td>
+                    <td style="height: 50px; border: 1px solid black; text-align: center; vertical-align: bottom;">{{ $report->operator_at1 ? \Carbon\Carbon::parse($report->operator_at1)->translatedFormat('d F Y') : '-' }}</td>
+                </tr>
+                <tr>
+                    <td style="height: 10px; border: 1px solid black;">{{ ucwords(strtolower(optional($report->operator2)->name ?? '-')) }}</td>
+                    <td style="height: 10px; border: 1px solid black;">{{ optional($report->operator2)->username ?? '-' }}</td>
+                    <td style="height: 50px; border: 1px solid black; text-align: center; vertical-align: bottom;">{{ $report->operator_at1 ? \Carbon\Carbon::parse($report->operator_at2)->translatedFormat('d F Y') : '-' }}</td>
+                </tr>
+                <tr>
+                    <td style="height: 10px; border: 1px solid black;">{{ ucwords(strtolower(optional($report->operator3)->name ?? '-')) }}</td>
+                    <td style="height: 10px; border: 1px solid black;">{{ optional($report->operator3)->username ?? '-' }}</td>
+                    <td style="height: 50px; border: 1px solid black; text-align: center; vertical-align: bottom;">{{ $report->operator_at1 ? \Carbon\Carbon::parse($report->operator_at3)->translatedFormat('d F Y') : '-' }}</td>
+                </tr>
+            </tbody>
+        </table>
 
     @endif
 
     @if ($report->mode === 'warmingup') 
-      <div style="font-weight: bold; padding: 3px 0; border-top: 1px solid black; border-bottom: 1px solid black; background-color: #f0f0f0; margin-top: 5px; margin-bottom: 5px;">A. DATA OPERASI MESIN</div>
+      <div style="font-weight: bold; padding: 3px 0; border-top: 1px solid black; border-bottom: 1px solid black; background-color: #f0f0f0; margin-top: 5px; margin-bottom: 5px; background-color: #ccc;">A. DATA OPERASI MESIN</div>
 
       <table style="width: 100%; border-collapse: collapse; margin-bottom: 5px;">
           <tr>
@@ -722,7 +824,7 @@
           </tr>
       </table>
 
-      <div style="font-weight: bold; padding: 3px 0; border-top: 1px solid black; border-bottom: 1px solid black; background-color: #f0f0f0; margin-top: 5px; margin-bottom: 5px;">B. DATA PERSONEL</div>
+      <div style="font-weight: bold; padding: 3px 0; border-top: 1px solid black; border-bottom: 1px solid black; background-color: #f0f0f0; margin-top: 5px; margin-bottom: 5px; background-color: #ccc;">B. DATA PERSONEL</div>
 
       <table style="width: 100%; border-collapse: collapse; margin-bottom: 5px;">
         <tr>
@@ -767,34 +869,115 @@
         </tr>
       </table>
 
-      <table style="width: 100%; border-collapse: collapse; margin-top: 15px; text-align: center;">
-          <thead>
-              <tr>
-                  <th style="width: 50%; border: 1px solid black; padding: 5px;">Catatan</th>
-                  <th style="width: 25%; border: 1px solid black; padding: 5px;">Petugas</th>
-                  <th style="width: 25%; border: 1px solid black; padding: 5px;">Nipp</th>
-                  <th style="width: 25%; border: 1px solid black; padding: 5px;">Paraf</th>
-              </tr>
-          </thead>
-          <tbody>
-              <tr>
-                  <td rowspan="3" style="vertical-align: top; border: 1px solid black; padding: 5px;">{{ optional($report->checksheetworkresult)->catatan ?? '-' }}</td>
-                  <td style="height: 10px; border: 1px solid black;">{{ ucwords(strtolower(optional($report->operator1)->name ?? '-')) }}</td>
-                  <td style="height: 10px; border: 1px solid black;">{{ optional($report->operator1)->username ?? '-' }}</td>
-                  <td style="height: 10px; border: 1px solid black;">{{ $report->operator_at1 ? \Carbon\Carbon::parse($report->operator_at1)->translatedFormat('d F Y') : '-' }}</td>
-              </tr>
-              <tr>
-                  <td style="height: 10px; border: 1px solid black;">{{ ucwords(strtolower(optional($report->operator2)->name ?? '-')) }}</td>
-                  <td style="height: 10px; border: 1px solid black;">{{ optional($report->operator2)->username ?? '-' }}</td>
-                  <td style="height: 10px; border: 1px solid black;">{{ $report->operator_at1 ? \Carbon\Carbon::parse($report->operator_at2)->translatedFormat('d F Y') : '-' }}</td>
-              </tr>
-              <tr>
-                  <td style="height: 10px; border: 1px solid black;">{{ ucwords(strtolower(optional($report->operator3)->name ?? '-')) }}</td>
-                  <td style="height: 10px; border: 1px solid black;">{{ optional($report->operator3)->username ?? '-' }}</td>
-                  <td style="height: 10px; border: 1px solid black;">{{ $report->operator_at1 ? \Carbon\Carbon::parse($report->operator_at3)->translatedFormat('d F Y') : '-' }}</td>
-              </tr>
-          </tbody>
-      </table>
+      <div class="page-break"></div>
+
+        <div style="text-align: center; margin-bottom: 15px;">
+            <h3 style="margin: 0; font-size: 11pt;">LAMPIRAN DAILY CHECK RESULTS</h3><br>
+
+            <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 8pt;">
+                <thead>
+                    <tr>
+                        <th style="width: 3%; border: 1px solid black; padding: 4px; background-color: #ccc;">No</th>
+                        <th style="width: 25%; border: 1px solid black; padding: 4px; background-color: #ccc; text-align: left;">Komponen</th>
+                        <th style="width: 10%; border: 1px solid black; padding: 4px; background-color: #ccc;">Rujukan</th>
+                        <th colspan="3" style="width: 15%; border: 1px solid black; padding: 4px; background-color: #ccc;">Kondisi</th>
+                        <th style="width: 10%; border: 1px solid black; padding: 4px; background-color: #ccc;">Nilai Rujukan</th>
+                        <th colspan="2" style="width: 15%; border: 1px solid black; padding: 4px; background-color: #ccc;">Hasil Cek</th>
+                        <th style="width: 5%; border: 1px solid black; padding: 4px; background-color: #ccc;">Sat.</th>
+                        <th style="width: 17%; border: 1px solid black; padding: 4px; background-color: #ccc;">Keterangan (App.)</th>
+                    </tr>
+                    <tr>
+                        <th style="border: 1px solid black; padding: 4px; background-color: #eee;"></th>
+                        <th style="border: 1px solid black; padding: 4px; background-color: #eee;"></th>
+                        <th style="border: 1px solid black; padding: 4px; background-color: #eee;"></th>
+                        <th style="border: 1px solid black; padding: 4px; background-color: #eee;">Cek</th>
+                        <th style="border: 1px solid black; padding: 4px; background-color: #eee;">Tambah</th>
+                        <th style="border: 1px solid black; padding: 4px; background-color: #eee;">Ganti</th>
+                        <th style="border: 1px solid black; padding: 4px; background-color: #eee;"></th>
+                        <th style="border: 1px solid black; padding: 4px; background-color: #eee;">Kr/Dpn</th>
+                        <th style="border: 1px solid black; padding: 4px; background-color: #eee;">Kn/Dpn</th>
+                        <th style="border: 1px solid black; padding: 4px; background-color: #eee;"></th>
+                        <th style="border: 1px solid black; padding: 4px; background-color: #eee;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php
+                        $currentGroup = null;
+                        $i = 1;
+                    @endphp
+
+                    @foreach ($masters as $item)
+                        @if ($item->group_name !== $currentGroup)
+                            <tr>
+                                <td colspan="11" style="border: 1px solid black; padding: 4px; text-align: left; background-color: #333; color: white; font-weight: bold;">
+                                    {{ strtoupper($item->group_name) }}
+                                </td>
+                            </tr>
+                            @php
+                                $currentGroup = $item->group_name;
+                            @endphp
+                        @endif
+                        
+                        {{-- Temukan hasil terkait dari mergedResults --}}
+                        @php
+                            // UBAH $results menjadi $mergedResults sesuai nama variabel di Controller
+                            $result = collect($mergedResults)->firstWhere('check_sheet_master_day_id', $item->id);
+                        @endphp
+                        
+                        @if ($result)
+                            <tr>
+                                <td style="border: 1px solid black; padding: 4px;">{{ $item->urutan }}</td>
+                                <td style="border: 1px solid black; padding: 4px; text-align: left;">{{ $item->komponen }}</td>
+                                <td style="border: 1px solid black; padding: 4px;">{{ $item->rujukan }}</td>
+                                
+                                {{-- Kondisi (Cek, Tambah, Ganti) --}}
+                                <td style="border: 1px solid black; padding: 4px;" class="check">{!! $result['cek'] == 1 ? '✓' : '-' !!}</td>
+                                <td style="border: 1px solid black; padding: 4px;" class="check">{!! $result['tambahan'] == 1 ? '✓' : '-' !!}</td>
+                                <td style="border: 1px solid black; padding: 4px;" class="check">{!! $result['ganti'] == 1 ? '✓' : '-' !!}</td>
+                                
+                                <td style="border: 1px solid black; padding: 4px;">{{ $item->nilai_rujukan }}</td>
+                                
+                                {{-- Hasil Cek (Kr/Dpn, Kn/Dpn) --}}
+                                <td style="border: 1px solid black; padding: 4px;">{{ $result['kiri_depan'] ?? '-' }}</td>
+                                <td style="border: 1px solid black; padding: 4px;">{{ $result['kanan_depan'] ?? '-' }}</td>
+                                
+                                <td style="border: 1px solid black; padding: 4px;">{{ $item->satuan }}</td>
+                                <td style="border: 1px solid black; padding: 4px; text-align: left;">{{ $result['keterangan'] ?? '-' }}</td>
+                            </tr>
+                        @endif
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; margin-top: 15px; text-align: center;">
+            <thead>
+                <tr>
+                    <th style="width: 50%; border: 1px solid black; padding: 5px;  background-color: #ccc;">Catatan</th>
+                    <th style="width: 25%; border: 1px solid black; padding: 5px;  background-color: #ccc;">Petugas</th>
+                    <th style="width: 25%; border: 1px solid black; padding: 5px;  background-color: #ccc;">Nipp</th>
+                    <th style="width: 25%; border: 1px solid black; padding: 5px;  background-color: #ccc;">Paraf</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td rowspan="3" style="vertical-align: top; border: 1px solid black; padding: 5px;">{{ optional($report->checksheetworkresult)->catatan ?? '-' }}</td>
+                    <td style="height: 10px; border: 1px solid black;">{{ ucwords(strtolower(optional($report->operator1)->name ?? '-')) }}</td>
+                    <td style="height: 10px; border: 1px solid black;">{{ optional($report->operator1)->username ?? '-' }}</td>
+                    <td style="height: 50px; border: 1px solid black; text-align: center; vertical-align: bottom;">{{ $report->operator_at1 ? \Carbon\Carbon::parse($report->operator_at1)->translatedFormat('d F Y') : '-' }}</td>
+                </tr>
+                <tr>
+                    <td style="height: 10px; border: 1px solid black;">{{ ucwords(strtolower(optional($report->operator2)->name ?? '-')) }}</td>
+                    <td style="height: 10px; border: 1px solid black;">{{ optional($report->operator2)->username ?? '-' }}</td>
+                    <td style="height: 50px; border: 1px solid black; text-align: center; vertical-align: bottom;">{{ $report->operator_at1 ? \Carbon\Carbon::parse($report->operator_at2)->translatedFormat('d F Y') : '-' }}</td>
+                </tr>
+                <tr>
+                    <td style="height: 10px; border: 1px solid black;">{{ ucwords(strtolower(optional($report->operator3)->name ?? '-')) }}</td>
+                    <td style="height: 10px; border: 1px solid black;">{{ optional($report->operator3)->username ?? '-' }}</td>
+                    <td style="height: 50px; border: 1px solid black; text-align: center; vertical-align: bottom;">{{ $report->operator_at1 ? \Carbon\Carbon::parse($report->operator_at3)->translatedFormat('d F Y') : '-' }}</td>
+                </tr>
+            </tbody>
+        </table>
     @endif
 
 </body>
