@@ -1,8 +1,8 @@
 <script setup>
-import { ref,nextTick, computed, onMounted } from 'vue'
+import { ref,nextTick, computed, onMounted, watch  } from 'vue'
 import DashboardLayout from '@/Layouts/DashboardLayout.vue';
 import Welcome from '@/Jetstream/Welcome.vue';
-import { usePage, useForm } from '@inertiajs/inertia-vue3';
+import { usePage, useForm, Link } from '@inertiajs/inertia-vue3';
 import Modal from '@/Components/Modal.vue'
 import Close from '@/Components/Button/Close.vue'
 import Card from '@/Components/Card.vue'
@@ -11,6 +11,7 @@ import Th from '@/Components/DataTable/Th.vue'
 import Button from '@/Components/Button.vue'
 import BtnAttachment from '@/Components/Button/Attachment.vue'
 import axios from 'axios'
+import { Chart } from "chart.js/auto";
 
 const { user } = usePage().props.value
 
@@ -140,10 +141,6 @@ const selectedReport = ref(null);
 
 const openMachines = ref({});
 
-const toggleMachine = (machineName) => {
-    openMachines.value[machineName] = !openMachines.value[machineName];
-};
-
 const pbrFormattedTotals = computed(() => {
     if (!formatted_mesin_total) return {};
 
@@ -152,7 +149,7 @@ const pbrFormattedTotals = computed(() => {
     for (const machineName in formatted_mesin_total) {
         if (formatted_mesin_total.hasOwnProperty(machineName)) {
 
-            if (machineName.includes('U-RS') || machineName.includes('Ballast Regulator Machine')) {
+            if (machineName.includes('Profiling') || machineName.includes('Distributing and Profiling') || machineName.includes('Distributing and Cleaning')) {
                 filtered[machineName] = formatted_mesin_total[machineName];
             }
         }
@@ -167,7 +164,7 @@ const mttFormattedTotals = computed(() => {
 
     for (const machineName in formatted_mesin_total) {
         if (formatted_mesin_total.hasOwnProperty(machineName)) {
-            if (machineName.includes('CSM') || machineName.includes('Tamping Machine')) {
+            if (machineName.includes('Plain Line Tamping') || machineName.includes('Rail Switch Tamping')) {
                 filtered[machineName] = formatted_mesin_total[machineName];
             }
         }
@@ -183,7 +180,7 @@ const pbrFormattedGeneratorTotals = computed(() => {
     for (const machineName in formatted_generator_total) {
         if (formatted_generator_total.hasOwnProperty(machineName)) {
 
-            if (machineName.includes('U-RS') || machineName.includes('Ballast Regulator Machine')) {
+            if (machineName.includes('Profiling') || machineName.includes('Distributing and Profiling') || machineName.includes('Distributing and Cleaning')) {
                 filtered[machineName] = formatted_generator_total[machineName];
             }
         }
@@ -198,7 +195,7 @@ const mttFormattedGeneratorTotals = computed(() => {
 
     for (const machineName in formatted_generator_total) {
         if (formatted_generator_total.hasOwnProperty(machineName)) {
-            if (machineName.includes('CSM') || machineName.includes('Tamping Machine')) {
+            if (machineName.includes('Plain Line Tamping') || machineName.includes('Rail Switch Tamping')) {
                 filtered[machineName] = formatted_generator_total[machineName];
             }
         }
@@ -214,7 +211,7 @@ const pbrFormattedCounterTotals = computed(() => {
     for (const machineName in formatted_counter_total) {
         if (formatted_counter_total.hasOwnProperty(machineName)) {
 
-            if (machineName.includes('U-RS') || machineName.includes('Ballast Regulator Machine')) {
+            if (machineName.includes('Profiling') || machineName.includes('Distributing and Profiling') || machineName.includes('Distributing and Cleaning')) {
                 filtered[machineName] = formatted_counter_total[machineName];
             }
         }
@@ -229,7 +226,7 @@ const mttFormattedCounterTotals = computed(() => {
 
     for (const machineName in formatted_counter_total) {
         if (formatted_counter_total.hasOwnProperty(machineName)) {
-            if (machineName.includes('CSM') || machineName.includes('Tamping Machine')) {
+            if (machineName.includes('Plain Line Tamping') || machineName.includes('Rail Switch Tamping')) {
                 filtered[machineName] = formatted_counter_total[machineName];
             }
         }
@@ -245,7 +242,7 @@ const pbrFormattedOddometerTotals = computed(() => {
     for (const machineName in formatted_oddometer_total) {
         if (formatted_oddometer_total.hasOwnProperty(machineName)) {
 
-            if (machineName.includes('U-RS') || machineName.includes('Ballast Regulator Machine')) {
+            if (machineName.includes('Profiling') || machineName.includes('Distributing and Profiling') || machineName.includes('Distributing and Cleaning')) {
                 filtered[machineName] = formatted_oddometer_total[machineName];
             }
         }
@@ -260,7 +257,7 @@ const mttFormattedOddometerTotals = computed(() => {
 
     for (const machineName in formatted_oddometer_total) {
         if (formatted_oddometer_total.hasOwnProperty(machineName)) {
-            if (machineName.includes('CSM') || machineName.includes('Tamping Machine')) {
+            if (machineName.includes('Plain Line Tamping') || machineName.includes('Rail Switch Tamping')) {
                 filtered[machineName] = formatted_oddometer_total[machineName];
             }
         }
@@ -276,7 +273,7 @@ const pbrFormattedHsdTotals = computed(() => {
     for (const machineName in formatted_hsd_total) {
         if (formatted_hsd_total.hasOwnProperty(machineName)) {
 
-            if (machineName.includes('U-RS') || machineName.includes('Ballast Regulator Machine')) {
+            if (machineName.includes('Profiling') || machineName.includes('Distributing and Profiling') || machineName.includes('Distributing and Cleaning')) {
                 filtered[machineName] = formatted_hsd_total[machineName];
             }
         }
@@ -291,7 +288,7 @@ const mttFormattedHsdTotals = computed(() => {
 
     for (const machineName in formatted_hsd_total) {
         if (formatted_hsd_total.hasOwnProperty(machineName)) {
-            if (machineName.includes('CSM') || machineName.includes('Tamping Machine')) {
+            if (machineName.includes('Plain Line Tamping') || machineName.includes('Rail Switch Tamping')) {
                 filtered[machineName] = formatted_hsd_total[machineName];
             }
         }
@@ -304,7 +301,7 @@ const mlimFormattedTotals = computed(() => {
     const filtered = {};
     for (const machineName in formatted_mesin_total) {
         if (formatted_mesin_total.hasOwnProperty(machineName)) {
-            if (machineName.includes('Material Logistic And Inspection Machine')) {
+            if (machineName.includes('Material Transport Wagon') || machineName.includes('Material Handling Crane') || machineName.includes('Material Handling Carrier') || machineName.includes('Inspection Bridge')) {
                 filtered[machineName] = formatted_mesin_total[machineName];
             }
         }
@@ -317,7 +314,7 @@ const mlimFormattedGeneratorTotals = computed(() => {
     const filtered = {};
     for (const machineName in formatted_generator_total) {
         if (formatted_generator_total.hasOwnProperty(machineName)) {
-            if (machineName.includes('Material Logistic And Inspection Machine')) {
+            if (machineName.includes('Material Transport Wagon') || machineName.includes('Material Handling Crane') || machineName.includes('Material Handling Carrier') || machineName.includes('Inspection Bridge')) {
                 filtered[machineName] = formatted_generator_total[machineName];
             }
         }
@@ -330,7 +327,7 @@ const mlimFormattedCounterTotals = computed(() => {
     const filtered = {};
     for (const machineName in formatted_counter_total) {
         if (formatted_counter_total.hasOwnProperty(machineName)) {
-            if (machineName.includes('Material Logistic And Inspection Machine')) {
+            if (machineName.includes('Material Transport Wagon') || machineName.includes('Material Handling Crane') || machineName.includes('Material Handling Carrier') || machineName.includes('Inspection Bridge')) {
                 filtered[machineName] = formatted_counter_total[machineName];
             }
         }
@@ -343,7 +340,7 @@ const mlimFormattedOddometerTotals = computed(() => {
     const filtered = {};
     for (const machineName in formatted_oddometer_total) {
         if (formatted_oddometer_total.hasOwnProperty(machineName)) {
-            if (machineName.includes('Material Logistic And Inspection Machine')) {
+            if (machineName.includes('Material Transport Wagon') || machineName.includes('Material Handling Crane') || machineName.includes('Material Handling Carrier') || machineName.includes('Inspection Bridge')) {
                 filtered[machineName] = formatted_oddometer_total[machineName];
             }
         }
@@ -356,7 +353,7 @@ const mlimFormattedHsdTotals = computed(() => {
     const filtered = {};
     for (const machineName in formatted_hsd_total) {
         if (formatted_hsd_total.hasOwnProperty(machineName)) {
-            if (machineName.includes('Material Logistic And Inspection Machine')) {
+            if (machineName.includes('Material Transport Wagon') || machineName.includes('Material Handling Crane') || machineName.includes('Material Handling Carrier') || machineName.includes('Inspection Bridge')) {
                 filtered[machineName] = formatted_hsd_total[machineName];
             }
         }
@@ -369,7 +366,7 @@ const rmeFormattedTotals = computed(() => {
     const filtered = {};
     for (const machineName in formatted_mesin_total) {
         if (formatted_mesin_total.hasOwnProperty(machineName)) {
-            if (machineName.includes('Railway Maintenance Excavator')) {
+            if (machineName.includes('Dynamic Track Stabilization') || machineName.includes('Lateral Dynamic Impact')) {
                 filtered[machineName] = formatted_mesin_total[machineName];
             }
         }
@@ -382,7 +379,7 @@ const rmeFormattedGeneratorTotals = computed(() => {
     const filtered = {};
     for (const machineName in formatted_generator_total) {
         if (formatted_generator_total.hasOwnProperty(machineName)) {
-            if (machineName.includes('Railway Maintenance Excavator')) {
+            if (machineName.includes('Dynamic Track Stabilization') || machineName.includes('Lateral Dynamic Impact')) {
                 filtered[machineName] = formatted_generator_total[machineName];
             }
         }
@@ -395,7 +392,7 @@ const rmeFormattedCounterTotals = computed(() => {
     const filtered = {};
     for (const machineName in formatted_counter_total) {
         if (formatted_counter_total.hasOwnProperty(machineName)) {
-            if (machineName.includes('Railway Maintenance Excavator')) {
+            if (machineName.includes('Dynamic Track Stabilization') || machineName.includes('Lateral Dynamic Impact')) {
                 filtered[machineName] = formatted_counter_total[machineName];
             }
         }
@@ -408,7 +405,7 @@ const rmeFormattedOddometerTotals = computed(() => {
     const filtered = {};
     for (const machineName in formatted_oddometer_total) {
         if (formatted_oddometer_total.hasOwnProperty(machineName)) {
-            if (machineName.includes('Railway Maintenance Excavator')) {
+            if (machineName.includes('Dynamic Track Stabilization') || machineName.includes('Lateral Dynamic Impact')) {
                 filtered[machineName] = formatted_oddometer_total[machineName];
             }
         }
@@ -421,7 +418,7 @@ const rmeFormattedHsdTotals = computed(() => {
     const filtered = {};
     for (const machineName in formatted_hsd_total) {
         if (formatted_hsd_total.hasOwnProperty(machineName)) {
-            if (machineName.includes('Railway Maintenance Excavator')) {
+            if (machineName.includes('Dynamic Track Stabilization') || machineName.includes('Lateral Dynamic Impact')) {
                 filtered[machineName] = formatted_hsd_total[machineName];
             }
         }
@@ -435,7 +432,7 @@ const hasValidData = (machineName, type) => {
         totals = pbrFormattedTotals.value;
     } else if (type === 'MTT') {
         totals = mttFormattedTotals.value;
-    } else if (type === 'MTT') {
+    } else if (type === 'MLIM') {
         totals = mlimFormattedTotals.value;
     } else {
         return false;
@@ -449,87 +446,299 @@ const hasRole = (roles) => {
     return user.roles.some(role => roles.includes(role.name));
 };
 
+const chartColors = {
+    engine: 'rgba(59, 130, 246, 0.7)', 
+    generator: 'rgba(16, 185, 129, 0.7)', 
+    counter: 'rgba(239, 68, 68, 0.7)', 
+    odometer: 'rgba(124, 58, 237, 0.7)', 
+    hsd: 'rgba(249, 115, 22, 0.7)', 
+};
+
+const charts = {}; // Menyimpan instance Chart
+
+const renderMachineCharts = async (machineName) => {
+    // 1. PENTING: Tunggu DOM siap setelah v-show diubah
+    await nextTick();
+
+    // 2. AMBIL DATA DENGAN MENGGUNAKAN ALIAS COMPONENT/PROPS YANG BENAR
+    const machineData = {
+        engine: parseFloat(formatted_mesin_total[machineName]) || 0,
+        generator: parseFloat(formatted_generator_total[machineName]) || 0,
+        counter: parseFloat(formatted_counter_total[machineName]) || 0,
+        odometer: parseFloat(formatted_oddometer_total[machineName]) || 0,
+        hsd: parseFloat(formatted_hsd_total[machineName]) || 0,
+    };
+
+    const chartConfigs = [
+        { id: `engineChart-${machineName}`, label: "Engine Hours", value: machineData.engine, unit: 'Jam', color: chartColors.engine },
+        { id: `generatorChart-${machineName}`, label: "Generator Hours", value: machineData.generator, unit: 'Jam', color: chartColors.generator },
+        { id: `counterChart-${machineName}`, label: "Tamping Counter", value: machineData.counter, unit: 'Kali', color: chartColors.counter },
+        { id: `odometerChart-${machineName}`, label: "Odometer", value: machineData.odometer, unit: 'KM', color: chartColors.odometer },
+        { id: `hsdChart-${machineName}`, label: "HSD (Liter)", value: machineData.hsd, unit: 'Liter', color: chartColors.hsd },
+    ];
+
+    chartConfigs.forEach(cfg => {
+        const canvas = document.getElementById(cfg.id);
+        
+        if (!canvas) {
+            console.warn(`Canvas element with ID ${cfg.id} not found.`);
+            return; 
+        }
+
+        // Hancurkan instance Chart lama
+        if (charts[cfg.id]) {
+            charts[cfg.id].destroy();
+        }
+        
+        // Cek jika nilainya 0 atau positif (biarkan 0 dirender)
+        if (cfg.value >= 0) {
+             charts[cfg.id] = new Chart(canvas, {
+                type: "bar",
+                data: {
+                    labels: [cfg.label],
+                    datasets: [{
+                        label: cfg.label,
+                        data: [cfg.value],
+                        backgroundColor: cfg.color,
+                        borderColor: cfg.color.replace('0.7', '1'),
+                        borderWidth: 1,
+                        barPercentage: 0.8,
+                        categoryPercentage: 0.9 
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, 
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: `${cfg.label} (${cfg.unit})`
+                            }
+                        },
+                        y: {
+                            display: false 
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.x !== null) {
+                                        // Gunakan toLocaleString atau logic pemformatan sesuai kebutuhan Anda
+                                        label += context.parsed.x + ' ' + cfg.unit; 
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    });
+};
+
+
+const toggleMachine = (machineName) => {
+    openMachines.value[machineName] = !openMachines.value[machineName];
+
+    if (openMachines.value[machineName]) {
+        nextTick(() => {
+            renderMachineCharts(machineName);
+        });
+    }
+};
+
 </script>
 
 <template>
     <DashboardLayout title="Dashboard">
         <!-- <main class="p-0 py-0 mb-[1.25rem] ml-[1.25rem] mt-[1.25rem]"> -->
-        <main class="p-0 py-0 ">
-            <h2 class="font-bold text-2xl">Dashboard</h2>
-            <h3 class="text-base font-semibold pl-0 leading-6 text-gray-500">
-            Selamat Datang, {{user.positions?.position}} - {{ user.name }} - ({{ user.divisions?.division_name }})
-            </h3>
-        </main>
+        <header class="mb-6 p-4 md:p-6 bg-white shadow-md rounded-xl border-l-4 border-blue-500">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                
+                <div class="mb-3 sm:mb-0">
+                    <h2 class="text-3xl font-extrabold text-gray-800 tracking-tight">
+                        Dashboard
+                    </h2>
+                    
+                    <p class="text-lg text-gray-600 mt-1">
+                        Selamat Datang, <span class="font-semibold">{{ user.name }}</span>!
+                    </p>
+                </div>
+                
+                <div class="
+                    text-right 
+                    bg-blue-50 
+                    p-3 rounded-lg 
+                    border border-blue-200 
+                    text-blue-700 
+                    font-medium 
+                    text-sm 
+                    sm:text-base
+                ">
+                    <p class="font-bold">
+                        {{ user.positions?.position }}
+                    </p>
+                    <p class="text-xs text-blue-600 mt-0.5">
+                        ({{ user.divisions?.division_name }})
+                    </p>
+                </div>
+            </div>
+        </header>
         <div>
 
         <div class="min-h-screen bg-gray-50/50">
         <div class="p-1 ">
             <div class="">
-            <div class="grid gap-6 md:grid-cols-5 lg:grid-cols-5 mb-6">
-                <div class="bg-gradient-to-br bg-gray-500 rounded-xl shadow-lg p-6 text-white">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-blue-100 text-sm">Process WorkingOrder</p>
-                            <p class="text-3xl font-bold mt-2">{{ report.draft || 0}}</p>
+            <div class="mb-4">
+                <div class="grid grid-cols-1">
+                    <Link 
+                        :href="route('working-reports.create')"
+                        class="block w-full"
+                    >
+                        <Button
+                            v-if="can('create working report')"
+                            class="
+                                w-full                h-12 
+                                text-white 
+                                bg-green-600 
+                                hover:bg-green-700 
+                                focus:ring-4 focus:ring-green-300 
+                                font-extrabold 
+                                text-sm md:text-base 
+                                rounded-lg 
+                                shadow-lg shadow-green-500/50 
+                                transition-all duration-200 
+                                flex items-center justify-center space-x-2 
+                            "
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-3-3v6m-4 2H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2h-4" />
+                            </svg>
+                            
+                            <p class="uppercase tracking-wider">
+                                {{ __('Report Working Order') }}
+                            </p>
+                        </Button>
+                    </Link>
+                </div>   
+            </div>
+                
+            <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-5 lg:grid-cols-5 mb-6">
+    
+                <div class="
+                    bg-gray-700 hover:bg-gray-800 rounded-xl shadow-xl p-5 text-white 
+                    transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl 
+                    cursor-pointer
+                ">
+                    <div class="flex items-start justify-between">
+                        <div class="w-2/3">
+                            <p class="text-gray-300 text-sm font-medium uppercase tracking-wider">
+                                Process Draft
+                            </p>
+                            <p class="text-4xl font-extrabold mt-1">
+                                {{ report.draft || 0}}
+                            </p>
                         </div>
-                        <div class="bg-blue-400/30 rounded-full p-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <div class="bg-gray-600/50 rounded-full p-3 flex-shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-gradient-to-br bg-yellow-400 rounded-xl shadow-lg p-6 text-white">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-yellow-100 text-sm">Process Checksheet</p>
-                            <p class="text-3xl font-bold mt-2">{{ report.checksheet_done || 0 }}</p>
+                <div class="
+                    bg-yellow-600 hover:bg-yellow-700 rounded-xl shadow-xl p-5 text-white 
+                    transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl 
+                    cursor-pointer
+                ">
+                    <div class="flex items-start justify-between">
+                        <div class="w-2/3">
+                            <p class="text-yellow-100 text-sm font-medium uppercase tracking-wider">
+                                Process Checksheet
+                            </p>
+                            <p class="text-4xl font-extrabold mt-1">
+                                {{ report.checksheet_done || 0 }}
+                            </p>
                         </div>
-                        <div class="bg-yellow-400/30 rounded-full p-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <div class="bg-yellow-500/50 rounded-full p-3 flex-shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-gradient-to-br bg-blue-500 rounded-xl shadow-lg p-6 text-white">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-orange-100 text-sm">Process Working</p>
-                            <p class="text-3xl font-bold mt-2">{{ report.work_done || 0 }}</p>
+                <div class="
+                    bg-blue-600 hover:bg-blue-700 rounded-xl shadow-xl p-5 text-white 
+                    transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl 
+                    cursor-pointer
+                ">
+                    <div class="flex items-start justify-between">
+                        <div class="w-2/3">
+                            <p class="text-blue-100 text-sm font-medium uppercase tracking-wider">
+                                Process Working
+                            </p>
+                            <p class="text-4xl font-extrabold mt-1">
+                                {{ report.work_done || 0 }}
+                            </p>
                         </div>
-                        <div class="bg-orange-400/30 rounded-full p-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <div class="bg-blue-500/50 rounded-full p-3 flex-shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                             </svg>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-gradient-to-br bg-orange-600 rounded-xl shadow-lg p-6 text-white">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-orange-100 text-sm">Process Warming Up</p>
-                            <p class="text-3xl font-bold mt-2">{{ report.warming_up_done || 0 }}</p>
+                <div class="
+                    bg-orange-600 hover:bg-orange-700 rounded-xl shadow-xl p-5 text-white 
+                    transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl 
+                    cursor-pointer
+                ">
+                    <div class="flex items-start justify-between">
+                        <div class="w-2/3">
+                            <p class="text-orange-100 text-sm font-medium uppercase tracking-wider">
+                                Process Warming Up
+                            </p>
+                            <p class="text-4xl font-extrabold mt-1">
+                                {{ report.warming_up_done || 0 }}
+                            </p>
                         </div>
-                        <div class="bg-orange-400/30 rounded-full p-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <div class="bg-orange-500/50 rounded-full p-3 flex-shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 0118 10a8 8 0 10-15.657 8.657M18 12h2a2 2 0 012 2v2a2 2 0 01-2 2h-2m-4-2h-4m0 0v-4m0 4h-4m-4-2H2a2 2 0 01-2-2v-2a2 2 0 012-2h2" />
                             </svg>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-gradient-to-br bg-green-500 rounded-xl shadow-lg p-6 text-white">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-green-100 text-sm">Approve KUPT</p>
-                            <p class="text-3xl font-bold mt-2">{{ report.finished || 0 }}</p>
+                <div class="
+                    bg-green-600 hover:bg-green-700 rounded-xl shadow-xl p-5 text-white 
+                    transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl 
+                    cursor-pointer
+                ">
+                    <div class="flex items-start justify-between">
+                        <div class="w-2/3">
+                            <p class="text-green-100 text-sm font-medium uppercase tracking-wider">
+                                Approve KUPT
+                            </p>
+                            <p class="text-4xl font-extrabold mt-1">
+                                {{ report.finished || 0 }}
+                            </p>
                         </div>
-                        <div class="bg-green-400/30 rounded-full p-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <div class="bg-green-500/50 rounded-full p-3 flex-shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
@@ -538,363 +747,489 @@ const hasRole = (roles) => {
             </div>
             <!-- Card Components -->
             <!-- <div class="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-3"> -->
-                <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3 xl:grid-cols-3">
+                <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-4 xl:grid-cols-4">
                     
-                <div class="relative flex flex-col bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100 transition-shadow duration-300 hover:shadow-3xl">
+                <div class="relative flex flex-col bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100 transition-shadow duration-300 hover:shadow-2xl">
 
-                    <!-- <div class="p-2 flex justify-between items-center bg-blue-500">
-                        <div class="flex items-center space-x-2"> 
-                            <div class="bg-red-500 rounded-lg p-1 text-white shadow-md shadow-red-500/50">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.526.323 1.028.53 1.572.684.51-.157 1.012-.364 1.538-.684z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                            </div>
-                        </div>
-                        <h3 class="text-lg font-extrabold text-white text-center flex-grow">
+                    <div class="p-3 flex justify-center items-center bg-blue-700">
+                        <h3 class="text-xs font-medium uppercase tracking-wider text-white text-center">
                             Tamping Machine
                         </h3>
-                        <button class="text-sm font-semibold text-blue-600 hover:text-blue-800 transition duration-150">
-                            <img src="../../../public/assets/receive-message.png" class="w-5" alt="Laporan">
-                        </button>
-                    </div> -->
+                    </div>
 
-                    <div class="p-2 flex justify-between items-center bg-blue-500">
-                        <h3 class="text-lg font-semibold text-white text-center flex-grow">
-                            Tamping Machine
-                        </h3>
-                    </div>                    
-
-                    <div class="p-2 divide-y divide-gray-200">
-
+                    <div class="p-0 divide-y divide-gray-100">
+                        
                         <div
                             v-for="(duration, machineName) in mttFormattedTotals"
                             :key="machineName"
+                            class="transition duration-150 ease-in-out"
                         >
                             <div 
                                 @click="toggleMachine(machineName)" 
-                                class="w-full py-2 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition duration-150"
+                                class="w-full py-3 px-3 flex justify-between items-center cursor-pointer 
+                                        hover:bg-blue-50 border-b border-gray-100"
                             >
-                                <span class="font-semibold text-black text-sm">
+                                <span class="font-semibold text-black text-xs">
                                     {{ machineName }}
                                 </span>
                                 
-                                <span :class="{'text-green-600': hasValidData(machineName, 'MTT'), 'text-red-600': !hasValidData(machineName, 'MTT')}">
-                                    <svg :class="{'rotate-180': openMachines[machineName]}" class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                <span class="flex items-center space-x-2">
+                                    <svg v-if="hasValidData(machineName, 'MTT')" class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    <svg v-else class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    
+                                    <svg :class="{'rotate-180 text-blue-600': openMachines[machineName], 'text-gray-400': !openMachines[machineName]}" 
+                                        class="w-4 h-4 transform transition-transform duration-200" 
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
                                 </span>
                             </div>
 
-                            <div v-show="openMachines[machineName]" class="mt-2 pl-4 pr-2 pb-2 border-l-2 border-gray-300">
+                            <div v-show="openMachines[machineName]" class="p-4 bg-gray-50/50">
                                 
-                                <div v-if="hasValidData(machineName, 'MTT')">
+                                <div v-if="hasValidData(machineName, 'MTT')" class="grid grid-cols-1 gap-4">
                                     
-                                    <div class="flex justify-between items-center py-2">
-                                        <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-                                            <span class="text-blue-500">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                            </span>
-                                            <span>Engine Hours</span>
-                                        </span>
-                                        <span class="font-extrabold text-sm text-blue-800">{{ duration }}</span>
+                                    <div class="bg-white p-3 rounded-lg shadow-sm border border-blue-100">
+                                        <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
+                                            <h5 class="text-sm font-semibold text-blue-700 flex items-center space-x-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                <span>Engine Hours</span>
+                                            </h5>
+                                            <span class="font-extrabold text-base text-blue-700">{{ duration }}</span> 
+                                        </div>
+                                        <div class="w-full h-[120px] pt-2"> 
+                                            <canvas :id="`engineChart-${machineName}`"></canvas>
+                                        </div>
                                     </div>
 
-                                    <div v-if="mttFormattedGeneratorTotals[machineName] !== null" class="flex justify-between items-center py-2">
-                                        <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-                                            <span class="text-green-500">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                                            </span>
-                                            <span>Generator Hours (Meter)</span>
-                                        </span>
-                                        <span class="font-bold text-sm text-green-700">
-                                            {{ mttFormattedGeneratorTotals[machineName] }}
-                                        </span>
+                                    <div v-if="mttFormattedGeneratorTotals[machineName] !== null" class="bg-white p-3 rounded-lg shadow-sm border border-green-100">
+                                        <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
+                                            <h5 class="text-sm font-semibold text-green-700 flex items-center space-x-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                                <span>Generator Hours</span>
+                                            </h5>
+                                            <span class="font-extrabold text-base text-green-700">{{ mttFormattedGeneratorTotals[machineName] }}</span>
+                                        </div>
+                                        <div class="w-full h-[120px] pt-2">
+                                            <canvas :id="`generatorChart-${machineName}`"></canvas>
+                                        </div>
+                                    </div>
+                                    
+                                    <div v-if="mttFormattedCounterTotals[machineName] !== null" class="bg-white p-3 rounded-lg shadow-sm border border-red-100">
+                                        <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
+                                            <h5 class="text-sm font-semibold text-red-700 flex items-center space-x-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                                                <span>Tamping Counter</span>
+                                            </h5>
+                                            <span class="font-extrabold text-base text-red-700">{{ mttFormattedCounterTotals[machineName] }}</span>
+                                        </div>
+                                        <div class="w-full h-[120px] pt-2"> 
+                                            <canvas :id="`counterChart-${machineName}`"></canvas>
+                                        </div>
                                     </div>
 
-                                    <div v-if="pbrFormattedCounterTotals[machineName] !== null" class="flex justify-between items-center py-2">
-                                        <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-                                            <span class="text-red-500">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
-                                            </span>
-                                            <span>Tamping Counter</span>
-                                        </span>
-                                        <span class="font-bold text-sm text-red-700">
-                                            {{ mttFormattedCounterTotals[machineName] }}
-                                        </span>
+                                    <div v-if="mttFormattedOddometerTotals[machineName] !== null" class="bg-white p-3 rounded-lg shadow-sm border border-indigo-100">
+                                        <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
+                                            <h5 class="text-sm font-semibold text-indigo-700 flex items-center space-x-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                <span>Odometer</span>
+                                            </h5>
+                                            <span class="font-extrabold text-base text-indigo-700">{{ mttFormattedOddometerTotals[machineName] }}</span>
+                                        </div>
+                                        <div class="w-full h-[120px] pt-2"> 
+                                            <canvas :id="`odometerChart-${machineName}`"></canvas>
+                                        </div>
                                     </div>
 
-                                    <div v-if="mttFormattedOddometerTotals[machineName] !== null" class="flex justify-between items-center py-2">
-                                        <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-                                            <span class="text-indigo-500">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                            </span>
-                                            <span>Odometer</span>
-                                        </span>
-                                        <span class="font-bold text-sm text-indigo-700">
-                                            {{ mttFormattedOddometerTotals[machineName] }}
-                                        </span>
-                                    </div>
-
-                                    <div v-if="pbrFormattedHsdTotals[machineName] !== null" class="flex justify-between items-center py-2">
-                                        <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-                                            <span class="text-orange-500">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                            </span>
-                                            <span>HSD (Liter)</span>
-                                        </span>
-                                        <span class="font-bold text-sm text-orange-700">
-                                            {{ mttFormattedHsdTotals[machineName] }}
-                                        </span>
+                                    <div v-if="mttFormattedHsdTotals[machineName] !== null" class="bg-white p-3 rounded-lg shadow-sm border border-orange-100">
+                                        <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
+                                            <h5 class="text-sm font-semibold text-orange-700 flex items-center space-x-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                                <span>HSD (Liter)</span>
+                                            </h5>
+                                            <span class="font-extrabold text-base text-orange-700">{{ mttFormattedHsdTotals[machineName] }}</span>
+                                        </div>
+                                        <div class="w-full h-[120px] pt-2"> 
+                                            <canvas :id="`hsdChart-${machineName}`"></canvas>
+                                        </div>
                                     </div>
 
                                 </div>
-
-                                <div v-else class="text-center text-sm text-red-600 font-semibold p-2 bg-red-50 rounded-lg">
-                                    ⚠️ Mesin ini belum memiliki data perhitungan .
+                                
+                                <div v-else class="text-center text-sm text-red-600 font-semibold p-2 bg-red-100 rounded-lg">
+                                    ⚠️ Mesin ini belum memiliki data perhitungan.
                                 </div>
                             </div>
-                            <!-- <hr v-if="machineName !== Object.keys(pbrFormattedTotals)[Object.keys(pbrFormattedTotals).length - 1]" class="my-3 border-dashed border-gray-300" /> -->
+                            
                         </div>
 
-                        <div v-if="Object.keys(pbrFormattedTotals).length === 0" class="col-span-3 text-center text-sm text-gray-500 p-4">
-                            Tidak ada Ballast Regulator Machine yang terdaftar.
+                        <div v-if="Object.keys(mttFormattedTotals).length === 0" class="text-center text-sm text-gray-500 p-4">
+                            Tidak ada Tamping Machine yang terdaftar.
                         </div>
                     </div>
                 </div>
 
-                <div class="relative flex flex-col bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100 transition-shadow duration-300 hover:shadow-3xl">
+                <div class="relative flex flex-col bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100 transition-shadow duration-300 hover:shadow-2xl">
 
-                        <div class="p-2 flex justify-between items-center bg-blue-500">
-                            <h3 class="text-lg font-semibold text-white text-center flex-grow">
-                                Ballast Regulator Machine
-                            </h3>
-                        </div>
+                    <div class="p-3 flex justify-center items-center bg-blue-700">
+                        <h3 class="text-xs font-medium uppercase tracking-wider text-white text-center">
+                            Ballast Regulator Machine
+                        </h3>
+                    </div>
 
-                        <div class="p-2 divide-y divide-gray-200">
+                    <div class="p-0 divide-y divide-gray-100">
                         
                         <div
                             v-for="(duration, machineName) in pbrFormattedTotals"
                             :key="machineName"
+                            class="transition duration-150 ease-in-out"
                         >
                             <div 
                                 @click="toggleMachine(machineName)" 
-                                class="w-full py-2 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition duration-150"
+                                class="w-full py-3 px-3 flex justify-between items-center cursor-pointer 
+                                        hover:bg-blue-50 border-b border-gray-100"
                             >
-                                <span class="font-semibold text-black text-sm">
+                                <span class="font-semibold text-black text-xs">
                                     {{ machineName }}
                                 </span>
                                 
-                                <span :class="{'text-green-600': hasValidData(machineName, 'PBR'), 'text-red-600': !hasValidData(machineName, 'PBR')}">
-                                    <svg :class="{'rotate-180': openMachines[machineName]}" class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                <span class="flex items-center space-x-2">
+                                    <svg v-if="hasValidData(machineName, 'PBR')" class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    <svg v-else class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    
+                                    <svg :class="{'rotate-180 text-blue-600': openMachines[machineName], 'text-gray-400': !openMachines[machineName]}" 
+                                        class="w-4 h-4 transform transition-transform duration-200" 
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
                                 </span>
                             </div>
 
-                            <div v-show="openMachines[machineName]" class="mt-2 pl-4 pr-2 pb-2 border-l-2 border-gray-300">
+                            <div v-show="openMachines[machineName]" class="p-4 bg-gray-50/50">
                                 
-                                <div v-if="hasValidData(machineName, 'PBR')">
+                                <div v-if="hasValidData(machineName, 'PBR')" class="grid grid-cols-1 gap-4">
                                     
-                                    <div class="flex justify-between items-center py-2">
-                                        <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-                                            <span class="text-blue-500">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                            </span>
-                                            <span>Engine Hours</span>
-                                        </span>
-                                        <span class="font-extrabold text-sm text-blue-800">{{ duration }}</span>
+                                    <!-- ENGINE HOURS -->
+                                    <div class="bg-white p-3 rounded-lg shadow-sm border border-blue-100">
+                                        <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
+                                            <h5 class="text-sm font-semibold text-blue-700 flex items-center space-x-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                <span>Engine Hours</span>
+                                            </h5>
+                                            <span class="font-extrabold text-base text-blue-700">{{ duration }}</span>
+                                        </div>
+                                        <div class="w-full h-[120px] pt-2"> 
+                                            <canvas :id="`engineChart-${machineName}`"></canvas>
+                                        </div>
                                     </div>
 
-                                    <div v-if="pbrFormattedGeneratorTotals[machineName] !== null" class="flex justify-between items-center py-2">
-                                        <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-                                            <span class="text-green-500">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                                            </span>
-                                            <span>Generator Hours (Meter)</span>
-                                        </span>
-                                        <span class="font-bold text-sm text-green-700">
-                                            {{ pbrFormattedGeneratorTotals[machineName] }}
-                                        </span>
+                                    <!-- GENERATOR HOURS -->
+                                    <div v-if="pbrFormattedGeneratorTotals[machineName] !== null" class="bg-white p-3 rounded-lg shadow-sm border border-green-100">
+                                        <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
+                                            <h5 class="text-sm font-semibold text-green-700 flex items-center space-x-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                                <span>Generator Hours</span>
+                                            </h5>
+                                            <span class="font-extrabold text-base text-green-700">{{ pbrFormattedGeneratorTotals[machineName] }}</span>
+                                        </div>
+                                        <div class="w-full h-[120px] pt-2">
+                                            <canvas :id="`generatorChart-${machineName}`"></canvas>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- TAMPING COUNTER -->
+                                    <div v-if="pbrFormattedCounterTotals[machineName] !== null" class="bg-white p-3 rounded-lg shadow-sm border border-red-100">
+                                        <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
+                                            <h5 class="text-sm font-semibold text-red-700 flex items-center space-x-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                                                <span>Tamping Counter</span>
+                                            </h5>
+                                            <span class="font-extrabold text-base text-red-700">{{ pbrFormattedCounterTotals[machineName] }}</span>
+                                        </div>
+                                        <div class="w-full h-[120px] pt-2"> 
+                                            <canvas :id="`counterChart-${machineName}`"></canvas>
+                                        </div>
                                     </div>
 
-                                    <div v-if="pbrFormattedCounterTotals[machineName] !== null" class="flex justify-between items-center py-2">
-                                        <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-                                            <span class="text-red-500">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
-                                            </span>
-                                            <span>Tamping Counter</span>
-                                        </span>
-                                        <span class="font-bold text-sm text-red-700">
-                                            {{ pbrFormattedCounterTotals[machineName] }}
-                                        </span>
+                                    <!-- ODOMETER -->
+                                    <div v-if="pbrFormattedOddometerTotals[machineName] !== null" class="bg-white p-3 rounded-lg shadow-sm border border-indigo-100">
+                                        <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
+                                            <h5 class="text-sm font-semibold text-indigo-700 flex items-center space-x-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                <span>Odometer</span>
+                                            </h5>
+                                            <span class="font-extrabold text-base text-indigo-700">{{ pbrFormattedOddometerTotals[machineName] }}</span>
+                                        </div>
+                                        <div class="w-full h-[120px] pt-2"> 
+                                            <canvas :id="`odometerChart-${machineName}`"></canvas>
+                                        </div>
                                     </div>
 
-                                    <div v-if="pbrFormattedOddometerTotals[machineName] !== null" class="flex justify-between items-center py-2">
-                                        <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-                                            <span class="text-indigo-500">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                            </span>
-                                            <span>Odometer</span>
-                                        </span>
-                                        <span class="font-bold text-sm text-indigo-700">
-                                            {{ pbrFormattedOddometerTotals[machineName] }}
-                                        </span>
-                                    </div>
-
-                                    <div v-if="pbrFormattedHsdTotals[machineName] !== null" class="flex justify-between items-center py-2">
-                                        <span class="flex items-center space-x-2 text-sm font-medium text-gray-700">
-                                            <span class="text-orange-500">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                            </span>
-                                            <span>HSD (Liter)</span>
-                                        </span>
-                                        <span class="font-bold text-sm text-orange-700">
-                                            {{ pbrFormattedHsdTotals[machineName] }}
-                                        </span>
+                                    <!-- HSD (LITER) -->
+                                    <div v-if="pbrFormattedHsdTotals[machineName] !== null" class="bg-white p-3 rounded-lg shadow-sm border border-orange-100">
+                                        <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
+                                            <h5 class="text-sm font-semibold text-orange-700 flex items-center space-x-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                                <span>HSD (Liter)</span>
+                                            </h5>
+                                            <span class="font-extrabold text-base text-orange-700">{{ pbrFormattedHsdTotals[machineName] }}</span>
+                                        </div>
+                                        <div class="w-full h-[120px] pt-2"> 
+                                            <canvas :id="`hsdChart-${machineName}`"></canvas>
+                                        </div>
                                     </div>
 
                                 </div>
-
-                                <div v-else class="text-center text-sm text-red-600 font-semibold p-2 bg-red-50 rounded-lg">
+                                
+                                <div v-else class="text-center text-sm text-red-600 font-semibold p-2 bg-red-100 rounded-lg">
                                     ⚠️ Mesin ini belum memiliki data perhitungan.
                                 </div>
                             </div>
-                            <!-- <hr v-if="machineName !== Object.keys(pbrFormattedTotals)[Object.keys(pbrFormattedTotals).length - 1]" class="my-3 border-dashed border-gray-300" /> -->
+                            
                         </div>
 
-                        <div v-if="Object.keys(pbrFormattedTotals).length === 0" class="col-span-3 text-center text-sm text-gray-500 p-4">
+                        <div v-if="Object.keys(pbrFormattedTotals).length === 0" class="text-center text-sm text-gray-500 p-4">
                             Tidak ada Ballast Regulator Machine yang terdaftar.
                         </div>
                     </div>
                 </div>
 
-                <div class="relative flex flex-col bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100 transition-shadow duration-300 hover:shadow-3xl">
-                    <div class="p-2 flex justify-between items-center bg-blue-500">
-                        <h3 class="text-lg font-semibold text-white text-center flex-grow">
-                            Railway Maintenance Excavator
+                <div class="relative flex flex-col bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100 transition-shadow duration-300 hover:shadow-2xl">
+
+                    <div class="p-3 flex justify-center items-center bg-blue-700">
+                        <h3 class="text-xs font-medium uppercase tracking-wider text-white text-center">
+                            Stabilization & Consolidation 
                         </h3>
                     </div>
 
-                    <div class="p-2 divide-y divide-gray-200">
-                    
+                    <div class="p-0 divide-y divide-gray-100">
+                        
                         <div
-                            v-for="(duration, machineName) in rmeFormattedTotals"  :key="machineName"
+                            v-for="(duration, machineName) in rmeFormattedTotals"
+                            :key="machineName"
+                            class="transition duration-150 ease-in-out"
                         >
                             <div 
                                 @click="toggleMachine(machineName)" 
-                                class="w-full py-2 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition duration-150"
+                                class="w-full py-3 px-3 flex justify-between items-center cursor-pointer 
+                                        hover:bg-blue-50 border-b border-gray-100"
                             >
-                                <span class="font-semibold text-black text-sm">
+                                <span class="font-semibold text-black text-xs">
                                     {{ machineName }}
                                 </span>
                                 
-                                <span :class="{'text-green-600': hasValidData(machineName, 'RME'), 'text-red-600': !hasValidData(machineName, 'RME')}"> 
-                                    <svg :class="{'rotate-180': openMachines[machineName]}" class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                <span class="flex items-center space-x-2">
+                                    <svg v-if="hasValidData(machineName, 'RME')" class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    <svg v-else class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    
+                                    <svg :class="{'rotate-180 text-blue-600': openMachines[machineName], 'text-gray-400': !openMachines[machineName]}" 
+                                        class="w-4 h-4 transform transition-transform duration-200" 
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
                                 </span>
                             </div>
 
-                            <div v-show="openMachines[machineName]" class="mt-2 pl-4 pr-2 pb-2 border-l-2 border-gray-300">
+                            <div v-show="openMachines[machineName]" class="p-4 bg-gray-50/50">
                                 
-                                <div v-if="hasValidData(machineName, 'RME')"> <div class="flex justify-between items-center py-2">
-                                        <span>Engine Hours</span>
-                                        <span class="font-extrabold text-sm text-blue-800">{{ duration }}</span>
+                                <div v-if="hasValidData(machineName, 'RME')" class="grid grid-cols-1 gap-4">
+                                    
+                                    <div class="bg-white p-3 rounded-lg shadow-sm border border-blue-100">
+                                        <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
+                                            <h5 class="text-sm font-semibold text-blue-700 flex items-center space-x-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                <span>Engine Hours</span>
+                                            </h5>
+                                            <span class="font-extrabold text-base text-blue-700">{{ duration }}</span> 
+                                        </div>
+                                        <div class="w-full h-[120px] pt-2"> 
+                                            <canvas :id="`engineChart-${machineName}`"></canvas>
+                                        </div>
                                     </div>
 
-                                    <div v-if="rmeFormattedGeneratorTotals[machineName] !== null" class="flex justify-between items-center py-2"> <span>Generator Hours</span>
-                                        <span class="font-bold text-sm text-green-700">
-                                            {{ rmeFormattedGeneratorTotals[machineName] }} 
-                                        </span>
+                                    <div v-if="rmeFormattedGeneratorTotals[machineName] !== null" class="bg-white p-3 rounded-lg shadow-sm border border-green-100">
+                                        <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
+                                            <h5 class="text-sm font-semibold text-green-700 flex items-center space-x-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                                <span>Generator Hours</span>
+                                            </h5>
+                                            <span class="font-extrabold text-base text-green-700">{{ rmeFormattedGeneratorTotals[machineName] }}</span>
+                                        </div>
+                                        <div class="w-full h-[120px] pt-2">
+                                            <canvas :id="`generatorChart-${machineName}`"></canvas>
+                                        </div>
+                                    </div>
+                                    
+                                    <div v-if="rmeFormattedCounterTotals[machineName] !== null" class="bg-white p-3 rounded-lg shadow-sm border border-red-100">
+                                        <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
+                                            <h5 class="text-sm font-semibold text-red-700 flex items-center space-x-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                                                <span>Tamping Counter</span>
+                                            </h5>
+                                            <span class="font-extrabold text-base text-red-700">{{ rmeFormattedCounterTotals[machineName] }}</span>
+                                        </div>
+                                        <div class="w-full h-[120px] pt-2"> 
+                                            <canvas :id="`counterChart-${machineName}`"></canvas>
+                                        </div>
                                     </div>
 
-                                    <div v-if="rmeFormattedCounterTotals[machineName] !== null" class="flex justify-between items-center py-2"> <span>Counter / Tamping Count</span>
-                                        <span class="font-bold text-sm text-red-700">
-                                            {{ rmeFormattedCounterTotals[machineName] }} 
-                                        </span>
+                                    <div v-if="rmeFormattedOddometerTotals[machineName] !== null" class="bg-white p-3 rounded-lg shadow-sm border border-indigo-100">
+                                        <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
+                                            <h5 class="text-sm font-semibold text-indigo-700 flex items-center space-x-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                <span>Odometer</span>
+                                            </h5>
+                                            <span class="font-extrabold text-base text-indigo-700">{{ rmeFormattedOddometerTotals[machineName] }}</span>
+                                        </div>
+                                        <div class="w-full h-[120px] pt-2"> 
+                                            <canvas :id="`odometerChart-${machineName}`"></canvas>
+                                        </div>
                                     </div>
 
-                                    <div v-if="rmeFormattedOddometerTotals[machineName] !== null" class="flex justify-between items-center py-2"> <span>Oddometer / Jarak Tempuh</span>
-                                        <span class="font-bold text-sm text-indigo-700">
-                                            {{ rmeFormattedOddometerTotals[machineName] }} 
-                                        </span>
-                                    </div>
-
-                                    <div v-if="rmeFormattedHsdTotals[machineName] !== null" class="flex justify-between items-center py-2"> <span>HSD (Fuel)</span>
-                                        <span class="font-bold text-sm text-orange-700">
-                                            {{ rmeFormattedHsdTotals[machineName] }} 
-                                        </span>
+                                    <div v-if="rmeFormattedHsdTotals[machineName] !== null" class="bg-white p-3 rounded-lg shadow-sm border border-orange-100">
+                                        <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
+                                            <h5 class="text-sm font-semibold text-orange-700 flex items-center space-x-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                                <span>HSD (Liter)</span>
+                                            </h5>
+                                            <span class="font-extrabold text-base text-orange-700">{{ rmeFormattedHsdTotals[machineName] }}</span>
+                                        </div>
+                                        <div class="w-full h-[120px] pt-2"> 
+                                            <canvas :id="`hsdChart-${machineName}`"></canvas>
+                                        </div>
                                     </div>
 
                                 </div>
-
-                                <div v-else class="text-center text-sm text-red-600 font-semibold p-2 bg-red-50 rounded-lg">
+                                
+                                <div v-else class="text-center text-sm text-red-600 font-semibold p-2 bg-red-100 rounded-lg">
                                     ⚠️ Mesin ini belum memiliki data perhitungan.
                                 </div>
                             </div>
+                            
                         </div>
 
-                        <div v-if="Object.keys(rmeFormattedTotals).length === 0" class="col-span-3 text-center text-sm text-gray-500 p-4"> 
-                            Tidak ada Railway Maintenance Excavator (RME) yang terdaftar.
+                        <div v-if="Object.keys(rmeFormattedTotals).length === 0" class="text-center text-sm text-gray-500 p-4">
+                            Tidak ada Stabilization & Consolidation yang terdaftar.
                         </div>
                     </div>
                 </div>
 
-                <div class="relative flex flex-col bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100 transition-shadow duration-300 hover:shadow-3xl">
-    
-                    <div class="p-2 flex justify-between items-center bg-blue-500">
-                        <h3 class="text-lg font-semibold text-white text-center flex-grow">
-                            Material Logistic & Inspection Machine
+                <div class="relative flex flex-col bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100 transition-shadow duration-300 hover:shadow-2xl">
+
+                    <div class="p-3 flex justify-center items-center bg-blue-700">
+                        <h3 class="text-xs font-medium uppercase tracking-wider text-white text-center">
+                            Material & Logistic Machine
                         </h3>
                     </div>
 
-                    <div class="p-2 divide-y divide-gray-200">
-                    
+                    <div class="p-0 divide-y divide-gray-100">
+                        
                         <div
-                            v-for="(duration, machineName) in mlimFormattedTotals" :key="machineName"
+                            v-for="(duration, machineName) in mlimFormattedTotals"
+                            :key="machineName"
+                            class="transition duration-150 ease-in-out"
                         >
                             <div 
                                 @click="toggleMachine(machineName)" 
-                                class="w-full py-2 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition duration-150"
+                                class="w-full py-3 px-3 flex justify-between items-center cursor-pointer 
+                                        hover:bg-blue-50 border-b border-gray-100"
                             >
-                                <span class="font-semibold text-black text-sm">
+                                <span class="font-semibold text-black text-xs">
                                     {{ machineName }}
                                 </span>
                                 
-                                <span :class="{'text-green-600': hasValidData(machineName, 'MLIM'), 'text-red-600': !hasValidData(machineName, 'MLIM')}"> <svg :class="{'rotate-180': openMachines[machineName]}" class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                <span class="flex items-center space-x-2">
+                                    <svg v-if="hasValidData(machineName, 'MLIM')" class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    <svg v-else class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    
+                                    <svg :class="{'rotate-180 text-blue-600': openMachines[machineName], 'text-gray-400': !openMachines[machineName]}" 
+                                        class="w-4 h-4 transform transition-transform duration-200" 
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
                                 </span>
                             </div>
 
-                            <div v-show="openMachines[machineName]" class="mt-2 pl-4 pr-2 pb-2 border-l-2 border-gray-300">
+                            <div v-show="openMachines[machineName]" class="p-4 bg-gray-50/50">
                                 
-                                <div v-if="hasValidData(machineName, 'MLIM')"> <div class="flex justify-between items-center py-2">
-                                        <span class="font-extrabold text-sm text-blue-800">{{ duration }}</span>
+                                <div v-if="hasValidData(machineName, 'MLIM')" class="grid grid-cols-1 gap-4">
+                                    
+                                    <div class="bg-white p-3 rounded-lg shadow-sm border border-blue-100">
+                                        <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
+                                            <h5 class="text-sm font-semibold text-blue-700 flex items-center space-x-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                <span>Engine Hours</span>
+                                            </h5>
+                                            <span class="font-extrabold text-base text-blue-700">{{ duration }}</span> 
+                                        </div>
+                                        <div class="w-full h-[120px] pt-2"> 
+                                            <canvas :id="`engineChart-${machineName}`"></canvas>
+                                        </div>
                                     </div>
 
-                                    <div v-if="mlimFormattedGeneratorTotals[machineName] !== null" class="flex justify-between items-center py-2"> <span class="font-bold text-sm text-green-700">
-                                            {{ mlimFormattedGeneratorTotals[machineName] }} 
-                                        </span>
+                                    <div v-if="mlimFormattedGeneratorTotals[machineName] !== null" class="bg-white p-3 rounded-lg shadow-sm border border-green-100">
+                                        <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
+                                            <h5 class="text-sm font-semibold text-green-700 flex items-center space-x-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                                <span>Generator Hours</span>
+                                            </h5>
+                                            <span class="font-extrabold text-base text-green-700">{{ mlimFormattedGeneratorTotals[machineName] }}</span>
+                                        </div>
+                                        <div class="w-full h-[120px] pt-2">
+                                            <canvas :id="`generatorChart-${machineName}`"></canvas>
+                                        </div>
+                                    </div>
+                                    
+                                    <div v-if="mlimFormattedCounterTotals[machineName] !== null" class="bg-white p-3 rounded-lg shadow-sm border border-red-100">
+                                        <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
+                                            <h5 class="text-sm font-semibold text-red-700 flex items-center space-x-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                                                <span>Tamping Counter</span>
+                                            </h5>
+                                            <span class="font-extrabold text-base text-red-700">{{ mlimFormattedCounterTotals[machineName] }}</span>
+                                        </div>
+                                        <div class="w-full h-[120px] pt-2"> 
+                                            <canvas :id="`counterChart-${machineName}`"></canvas>
+                                        </div>
                                     </div>
 
-                                    <div v-if="mlimFormattedCounterTotals[machineName] !== null" class="flex justify-between items-center py-2"> <span class="font-bold text-sm text-red-700">
-                                            {{ mlimFormattedCounterTotals[machineName] }} 
-                                        </span>
+                                    <div v-if="mlimFormattedOddometerTotals[machineName] !== null" class="bg-white p-3 rounded-lg shadow-sm border border-indigo-100">
+                                        <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
+                                            <h5 class="text-sm font-semibold text-indigo-700 flex items-center space-x-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                <span>Odometer</span>
+                                            </h5>
+                                            <span class="font-extrabold text-base text-indigo-700">{{ mlimFormattedOddometerTotals[machineName] }}</span>
+                                        </div>
+                                        <div class="w-full h-[120px] pt-2"> 
+                                            <canvas :id="`odometerChart-${machineName}`"></canvas>
+                                        </div>
                                     </div>
 
-                                    <div v-if="mlimFormattedOddometerTotals[machineName] !== null" class="flex justify-between items-center py-2"> <span class="font-bold text-sm text-indigo-700">
-                                            {{ mlimFormattedOddometerTotals[machineName] }} 
-                                        </span>
-                                    </div>
-
-                                    <div v-if="mlimFormattedHsdTotals[machineName] !== null" class="flex justify-between items-center py-2"> <span class="font-bold text-sm text-orange-700">
-                                            {{ mlimFormattedHsdTotals[machineName] }} 
-                                        </span>
+                                    <div v-if="mlimFormattedHsdTotals[machineName] !== null" class="bg-white p-3 rounded-lg shadow-sm border border-orange-100">
+                                        <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
+                                            <h5 class="text-sm font-semibold text-orange-700 flex items-center space-x-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                                <span>HSD (Liter)</span>
+                                            </h5>
+                                            <span class="font-extrabold text-base text-orange-700">{{ mlimFormattedHsdTotals[machineName] }}</span>
+                                        </div>
+                                        <div class="w-full h-[120px] pt-2"> 
+                                            <canvas :id="`hsdChart-${machineName}`"></canvas>
+                                        </div>
                                     </div>
 
                                 </div>
-
-                                <div v-else class="text-center text-sm text-red-600 font-semibold p-2 bg-red-50 rounded-lg">
+                                
+                                <div v-else class="text-center text-sm text-red-600 font-semibold p-2 bg-red-100 rounded-lg">
                                     ⚠️ Mesin ini belum memiliki data perhitungan.
                                 </div>
                             </div>
+                            
                         </div>
 
-                        <div v-if="Object.keys(mlimFormattedTotals).length === 0" class="col-span-3 text-center text-sm text-gray-500 p-4"> Tidak ada Material Logistic & Inspection Machine yang terdaftar.
+                        <div v-if="Object.keys(mlimFormattedTotals).length === 0" class="text-center text-sm text-gray-500 p-4">
+                            Tidak ada Material & Logistic Machine yang terdaftar.
                         </div>
                     </div>
                 </div>
