@@ -414,6 +414,39 @@ const close = () => {
   })
 }
 
+const isRowValid = (item) => {
+    return (
+        item.cek == 1 ||
+        item.tambahan == 1 ||
+        item.ganti == 1 ||
+        (item.kiri_depan && item.kiri_depan.trim() !== "") ||
+        (item.kanan_depan && item.kanan_depan.trim() !== "")
+    );
+};
+
+const isCurrentGroupValid = computed(() => {
+    return currentGroupResults.value.every(item => isRowValid(item));
+});
+
+const isAllGroupValid = computed(() => {
+    return groups.value.every(groupName => {
+        const rows = props.results.filter(r => r.group_name === groupName);
+        return rows.every(item => isRowValid(item));
+    });
+});
+
+const isAllGroupsFilled = computed(() => {
+  if (!props.results || props.results.length === 0) return false;
+
+  return props.results.every(item => {
+    const hasCheckbox = item.cek == 1 || item.tambahan == 1 || item.ganti == 1;
+    const hasValue = (item.kiri_depan && item.kiri_depan !== "") || 
+                     (item.kanan_depan && item.kanan_depan !== "");
+
+    return hasCheckbox || hasValue;
+  });
+});
+
 const currentStep = ref(1)
 const currentStep1 = ref(1)
 const showNextButton = ref(false)
@@ -425,31 +458,34 @@ const groups = computed(() => {
 })
 
 const currentGroupResults = computed(() => {
-  return props.results.filter(r => r.group_name === groups.value[currentGroupIndex.value])
-})
+    if (groups.value.length === 0) return [];
+    return props.results.filter(r => r.group_name === groups.value[currentGroupIndex.value]);
+});
+
+const isFirstGroup = computed(() => currentGroupIndex.value === 0);
+
+const isLastGroup = computed(() => currentGroupIndex.value === groups.value.length - 1);
 
 const nextGroup = () => {
-  if (currentGroupIndex.value === groups.value.length - 1) {
-    currentStep.value = 3
-  } else if (currentGroupIndex.value < groups.value.length - 1) {
-    currentGroupIndex.value++
+  if (!isCurrentGroupValid.value) {
+      Swal.fire({
+          icon: "warning",
+          title: "Data belum lengkap!",
+          text: "Setiap baris wajib mengisi minimal satu kolom (cek/tambahan/Ganti).",
+      });
+      return;
   }
-}
 
-const goToStep1 = () => {
-  if (currentStep.value === 2) {
-    currentStep.value = 1
+  if (!isLastGroup.value) {
+      currentGroupIndex.value++;
   }
-}
+};
 
 const prevGroup = () => {
-  if (currentGroupIndex.value > 0) {
-    currentGroupIndex.value--
-  }
-  else if (currentStep.value === 2) {
-    goToStep1()
-  }
-}
+    if (!isFirstGroup.value) {
+        currentGroupIndex.value--;
+    }
+};
 
 const approve = (level) => {
     Swal.fire({
@@ -619,7 +655,7 @@ const toggleResult = async (item, field) => {
 
   try {
     const response = await axios.post(route("checksheetday-results.autosave"), {
-      check_sheet_day_id: form1.id,
+      working_report_id: props.report.id,
       check_sheet_master_day_id: item.check_sheet_master_day_id,
       cek: item.cek ?? 0,
       tambahan: item.tambahan ?? 0,
@@ -646,7 +682,7 @@ const toggleResult = async (item, field) => {
 const saveTextField = async (item) => {
   try {
     await axios.post(route("checksheetday-results.autosave"), {
-      check_sheet_day_id: form1.id,
+      working_report_id: props.report.id,
       check_sheet_master_day_id: item.check_sheet_master_day_id,
       cek: item.cek ?? 0,
       tambahan: item.tambahan ?? 0,
@@ -836,22 +872,15 @@ const canApprove = computed(() => {
 })
 
 const canChangeMode = computed(() => {
-  const result = props.checksheetday?.checksheetworkresult
   const report = props.report
 
-  if (!result || !report || !user?.id) return false
+  if (!report || !user?.id) return false
 
   if (user.id !== report.created_by_id) return false
 
-  if (result.mode) return false
+  if (!isAllGroupsFilled.value) return false
 
-  const pendingApproval =
-    (result.operator_by1 && result.operator_at1) ||
-    (result.operator_by2 && result.operator_at2) ||
-    (result.operator_by3 && result.operator_at3) ||
-    (result.operator_by4 && result.operator_at4)
-
-  return pendingApproval
+  return true
 })
 
 const approvechecksheetworkresult = async () => {
@@ -921,12 +950,12 @@ const setMode = async (mode) => {
       allowOutsideClick: false,
     });
 
-    await axios.post(route("checksheet-workresult.setmode"), {
-      id: form2.id,
-      working_report_id: form2.working_report_id,
-      check_sheet_day_id: form2.check_sheet_day_id,
+    await axios.post(route("working-reports.setMode"), {
+      working_report_id: props.report.id,
       mode: mode,
     });
+
+    props.report.mode = mode;
 
     Swal.fire({
       icon: "success",
@@ -935,9 +964,7 @@ const setMode = async (mode) => {
       showConfirmButton: false,
     });
 
-    setTimeout(() => window.location.reload(), 1000);
-
-    form2.mode = mode;
+    // setTimeout(() => window.location.reload(), 1000);
 
   } catch (error) {
     console.error(error);
@@ -1070,51 +1097,6 @@ const approvewarmingup = async (index) => {
         });
     }
 };
-
-
-// const approvewarmingup = async () => {
-//   const result = props.warmingup
-//   if (!result) return
-
-//   const confirm = await Swal.fire({
-//     title: "Apakah Anda yakin?",
-//     text: "Anda akan menyetujui data ini.",
-//     icon: "question",
-//     showCancelButton: true,
-//     confirmButtonColor: "#3085d6",
-//     cancelButtonColor: "#d33",
-//     confirmButtonText: "Ya, setujui",
-//     cancelButtonText: "Batal",
-//   });
-//     setTimeout(() => window.location.reload(), 1000);
-
-//   if (!confirm.isConfirmed) return
-
-//   try {
-//     const res = await axios.post(route("warming-up.approve"), {
-//       id: result.id,
-//     })
-
-//     const now = new Date().toISOString()
-//     if (result.operator_by1 === user.id) result.operator_at1 = now
-//     if (result.operator_by2 === user.id) result.operator_at2 = now
-//     if (result.operator_by3 === user.id) result.operator_at3 = now
-
-//     Swal.fire({
-//       icon: "success",
-//       title: res.data.message || "Berhasil disetujui!",
-//       timer: 1500,
-//       showConfirmButton: false,
-//     })
-//   } catch (error) {
-//     console.error(error)
-//     Swal.fire({
-//       icon: "error",
-//       title: "Gagal approve!",
-//       text: error.response?.data?.message || error.message || "Terjadi kesalahan saat menyetujui.",
-//     })
-//   }
-// }
 
 const totalDistance = computed(() => {
     return (
@@ -1362,18 +1344,23 @@ const hasWorkingOrder = computed(() => !!props.report.id);
 
 const hasCheckSheet = computed(() => !!props.checksheetworkresult)
 
-const isWarmingUpMode = computed(() => {
-  const result = props.checksheetworkresult
-  return result?.mode === 'warmingup'
-})
+const isDailyCheckCompleted = computed(() => {
+  return isAllGroupValid.value;
+});
 
-const isWorkingOrderMode = computed(() => {
-  const result = props.checksheetworkresult
-  return result?.mode === 'working'
-})
+const isWarmingUpMode = computed(() => props.report?.mode === 'warmingup');
+const isWorkingOrderMode = computed(() => props.report?.mode === 'working');
+
+const canAccessWarmingUp = computed(() => {
+  return isWarmingUpMode.value && isAllGroupValid.value;
+});
+
+const canAccessWorking = computed(() => {
+  return isWorkingOrderMode.value && isAllGroupValid.value;
+});
 
 const isWorkResult = computed(() => {
-  const result = props.checksheetworkresult
+  const result = props.report
   // return result?.mode === 'working'
   return ['working', 'warmingup'].includes(result?.mode)
 })
@@ -1428,103 +1415,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
 <template>
 
   <DashboardLayout :title="__('Working Order')">
-    <!-- <div class="flex flex-col space-y-2 border rounded bg-white dark:bg-white dark:text-black">
-      <div class="flex flex-row overflow-x-auto md:overflow-x-visible space-x-0.5 w-full rounded">
-        <div
-          class="border rounded p-1 text-center text-sm flex-1 flex-shrink"
-          :class="{
-              'bg-blue-700 text-white font-bold': currentSection === 'report',
-              'bg-blue-500 text-white font-bold': currentSection !== 'report' && report.id,
-              'bg-red-300 text-black': currentSection !== 'report' && !report.id
-          }"
-          @click.prevent="fetch('report', report)"
-        >
-          <a href="#list-report" id="list-report-list" role="tab" aria-controls="report">
-            <p class="text-[11px] font-bold">Working Order</p>
-          </a>
-        </div>
-
-        <div
-          class="border rounded p-1 text-center text-sm flex-1 flex-shrink"
-          :class="{
-              'bg-blue-700 text-white font-bold': currentSection === 'checksheetday' && hasWorkingOrder,
-              'bg-blue-500 text-white font-bold': currentSection !== 'checksheetday' && report.checksheetday?.checksheetworkresult?.id && hasWorkingOrder,
-              'bg-red-500 text-black cursor-not-allowed': !hasWorkingOrder,
-              'bg-red-500 text-black': currentSection !== 'checksheetday' && !report.checksheetday?.checksheetworkresult?.id && hasWorkingOrder
-          }"
-          @click.prevent="hasWorkingOrder && fetch('checksheetday', report)"
-        >
-          <a href="#list-checksheetday" id="list-checksheetday-list" role="tab" aria-controls="checksheetday" :class="!hasWorkingOrder"
-          >
-            <div class="flex items-center justify-center space-x-0.5 md:space-x-1">
-              <Icon v-if="!hasWorkingOrder" name="lock" class="w-3 h-4 md:w-3 md:h-3 text-black" />
-              <p class="text-[11px] font-bold">Daily Check</p>
-            </div>
-          </a>
-        </div>
-
-        <div
-          class="border rounded p-1 text-center text-sm flex-1 flex-shrink"
-          :class="{
-            'bg-blue-700 text-white font-bold': currentSection === 'warmingup' && isWarmingUpMode,
-            'bg-blue-500 text-white font-bold': currentSection !== 'warmingup' && report.warmingup?.id && isWarmingUpMode,
-            'bg-red-500 text-black cursor-not-allowed': !isWarmingUpMode,
-            'bg-red-500 text-black': currentSection !== 'warmingup' && !report.warmingup?.id && isWarmingUpMode
-          }"
-          @click.prevent="isWarmingUpMode && fetch('warmingup', report)"
-        >
-          <a href="#list-warmingup" id="list-warmingup-list" role="tab" aria-controls="warmingup" :class="!report.sectionFiveOpen || !isWarmingUpMode "
-          >
-            <div class="flex items-center justify-center space-x-0.5 md:space-x-1">
-              <Icon v-if="!isWarmingUpMode" name="lock" class="w-3 h-4 md:w-3 md:h-3 text-black" />
-              <p class="text-[11px] font-bold">Warming Up</p>
-            </div>
-          </a>
-        </div>
-
-        <div
-          class="border rounded p-1 text-center text-sm flex-1 flex-shrink"
-            :class="{
-              'bg-blue-700 text-white font-bold': currentSection === 'workresult',
-              'bg-blue-500 text-white font-bold': currentSection !== 'workresult' && report.workresult?.id && isWorkingOrderMode,
-              'bg-red-500 text-black cursor-not-allowed': !isWorkingOrderMode,
-              'bg-red-500 text-black': currentSection !== 'workresult' && !report.workresult?.id && isWorkingOrderMode
-            }"
-            @click.prevent="isWorkingOrderMode && fetch('workresult', report)"
-        >
-          <a href="#list-workresult" id="list-workresult-list" role="tab" aria-controls="workresult" :class="!isWorkingOrderMode ">
-            <div class="flex items-center justify-center space-x-0.5 md:space-x-1">
-              <Icon v-if="!isWorkingOrderMode" name="lock" class="w-3 h-4 md:w-3 md:h-3 text-black" />
-              <p class="text-[11px] font-bold">Working</p>
-            </div>
-          </a>
-        </div>
-
-        <div
-          v-if="isWorkResult"
-          class="border rounded p-1 text-center text-sm flex-1 flex-shrink transition-colors duration-200"
-          :class="{
-            'bg-blue-700 text-white font-bold': currentSection === 'workresultok',
-            'bg-red-500 text-black cursor-not-allowed': !report.workresult?.id && !warmingup?.id,
-            'bg-blue-500 text-white font-bold': currentSection !== 'workresultok' && (report.workresult?.id || warmingup?.id),
-          }"
-          @click.prevent="(report.workresult?.id || warmingup?.id) && fetch('workresultok', report)"
-        >
-          <a
-            href="#list-workresultok"
-            id="list-workresultok-list"
-            role="tab"
-            aria-controls="workresultok">
-            <div class="flex items-center justify-center space-x-0.5 md:space-x-1">
-              <Icon v-if="!report.workresult?.id && !warmingup?.id" name="lock" class="w-3 h-4 md:w-3 md:h-3 text-black" />
-              <p class="text-[11px] font-bold">Work Result</p>
-            </div>
-          </a>
-        </div>
-
-      </div>
-    </div> -->
-
     <div class="flex items-center w-full overflow-x-auto py-2  rounded">
 
       <!-- STEP 1 - WORKING ORDER -->
@@ -1552,10 +1442,9 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
 
         <div class="step-circle"
             :class="{
-              'bg-blue-700 text-white font-bold': currentSection === 'checksheetday' && hasWorkingOrder,
-              'bg-green-500 text-white font-bold': currentSection !== 'checksheetday' && report.checksheetday?.checksheetworkresult?.id && hasWorkingOrder,
-              'bg-gray-500 text-white cursor-not-allowed': !hasWorkingOrder,
-              'bg-gray-500 text-white': currentSection !== 'checksheetday' && !report.checksheetday?.checksheetworkresult?.id && hasWorkingOrder
+              'bg-blue-700 text-white font-bold': currentSection === 'checksheetday', 
+              'bg-green-500 text-white font-bold': currentSection !== 'checksheetday' && isDailyCheckCompleted, 
+              'bg-gray-500 text-white': currentSection !== 'checksheetday' && !isDailyCheckCompleted && hasWorkingOrder,
             }">
           2
         </div>
@@ -1566,15 +1455,15 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
 
       <!-- STEP 3 - WARMING UP -->
       <div class="step-wrapper"
-          @click.prevent="isWarmingUpMode && fetch('warmingup', report)"
-          :class="{ 'cursor-pointer': isWarmingUpMode }">
+          @click.prevent="canAccessWarmingUp && fetch('warmingup', report)"
+          :class="{ 'cursor-pointer': canAccessWarmingUp }">
 
         <div class="step-circle"
             :class="{
-              'bg-blue-700 text-white font-bold': currentSection === 'warmingup' && isWarmingUpMode,
-              'bg-green-500 text-white font-bold': currentSection !== 'warmingup' && report.warmingup?.id && isWarmingUpMode,
-              'bg-red-500 text-white cursor-not-allowed': !isWarmingUpMode,
-              'bg-gray-500 text-white': currentSection !== 'warmingup' && !report.warmingup?.id && isWarmingUpMode
+              'bg-blue-700 text-white font-bold': currentSection === 'warmingup', 
+              'bg-green-500 text-white font-bold': currentSection !== 'warmingup' && report.warmingup?.id,
+              'bg-red-500 text-white cursor-not-allowed': !canAccessWarmingUp,
+              'bg-gray-500 text-white': currentSection !== 'warmingup' && canAccessWarmingUp && !report.warmingup?.id
             }">
           3
         </div>
@@ -1585,15 +1474,15 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
 
       <!-- STEP 4 - WORKING -->
       <div class="step-wrapper"
-          @click.prevent="isWorkingOrderMode && fetch('workresult', report)"
-          :class="{ 'cursor-pointer': isWorkingOrderMode }">
+          @click.prevent="canAccessWorking && fetch('workresult', report)"
+          :class="{ 'cursor-pointer': canAccessWorking }">
 
         <div class="step-circle"
             :class="{
               'bg-blue-700 text-white font-bold': currentSection === 'workresult',
-              'bg-green-500 text-white font-bold': currentSection !== 'workresult' && report.workresult?.id && isWorkingOrderMode,
-              'bg-red-500 text-white cursor-not-allowed': !isWorkingOrderMode,
-              'bg-gray-500 text-white': currentSection !== 'workresult' && !report.workresult?.id && isWorkingOrderMode
+              'bg-green-500 text-white font-bold': currentSection !== 'workresult' && report.workresult?.id,
+              'bg-red-500 text-white cursor-not-allowed': !canAccessWorking,
+              'bg-gray-500 text-white cursor-not-allowed': currentSection !== 'workresult' && canAccessWorking && !report.workresult?.id,
             }">
           4
         </div>
@@ -2456,124 +2345,9 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
 
             <!-- section checksheetday -->
             <div v-if="currentSection === 'checksheetday'" class="tab-pane fade" id="list-checksheetday" role="tabpanel" aria-labelledby="list-checksheetday-list">
-              <div class="flex flex-col space-y-4" v-if="currentStep === 1">
-
-                <!-- Bagian Informasi Mesin -->
-                <!-- <div class="grid grid-cols-2 gap-4 mb-4"> -->
-                <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">
-                  <div class="flex flex-col items-start space-y-1">
-                    <label for="machine_id" class="font-bold text-xs">
-                    {{ __('Nama Mesin') }}
-                    </label>
-
-                      <div class="w-full">
-                        <Select
-                          v-model="form.machine_id"
-                          :options="machines.map(machine => ({
-                            label: `[${machine.nomor}] ${machine.name} ${machine.type} - ${machine.no_sarana} (${machine.region.name})`,
-                            value: machine.id,
-                          }))"
-                          :searchable="true"
-                          placeholder="Pilih Mesin"
-                          style="font-size: 0.7rem;"
-                          disabled
-                          class="w-full border-none text-center text-xs"
-                        >
-                          <template #option="{ option }">
-                            <span class="text-xs antialiased">
-                                {{ option.label }}
-                            </span>
-                          </template>
-                        </Select>
-                      <InputError :error="form.errors.machine_id" />
-                      </div>
-                  </div>
-
-                  <!-- <div class="flex flex-col items-start space-y-1">
-                    <label class="font-bold text-xs">Jenis / Tipe KPJR</label>
-                    <Input v-model="form1.jenis" :placeholder="__('Jenis / Tipe KPJR')" type="text" class="w-full text-xs" />
-                    <InputError :error="form1.errors.jenis" />
-                  </div> -->
-
-                  <div class="flex flex-col items-start space-y-1">
-                    <label class="font-bold text-xs">Hari / Tanggal</label>
-                    <Input v-model="form1.tanggal" required type="date" class="w-full text-xs"/>
-                    <InputError :error="form1.errors.tanggal" />
-                  </div>
-
-                  <div class="flex flex-col items-start space-y-1">
-                    <label class="font-bold text-xs">Jam Mesin</label>
-                    <Input v-model="form1.jam_mesin" :placeholder="__('Jam Mesin')" required type="time" class="w-full text-xs" />
-                    <InputError :error="form1.errors.jam_mesin" />
-                  </div>
-
-                  <div class="flex flex-col items-start space-y-1">
-                    <label class="font-bold text-xs">Lokasi Pelaksanaan</label>
-                    <Input v-model="form1.lokasi" required type="text" :placeholder="__('Lokasi Pelaksanaan')" class="w-full text-xs"/>
-                    <InputError :error="form1.errors.lokasi" />
-                  </div>
-
-                  <div class="flex flex-col items-start space-y-1">
-                    <label class="font-bold text-xs">Counter Pecok</label>
-                    <Input v-model="form1.counter_pecok" required type="number" :placeholder="__('Counter Pecok')" class="w-full text-xs"/>
-                    <InputError :error="form1.errors.counter_pecok" />
-                  </div>
-
-                  <div class="flex flex-col items-start space-y-1">
-                    <label class="font-bold text-xs">Wilayah Resort</label>
-                    <Input v-model="form1.wilayah" required type="text" :placeholder="__('Wilayah Resort')" class="w-full text-xs"/>
-                    <InputError :error="form1.errors.wilayah" />
-                  </div>
-
-                  <div class="flex flex-col items-start space-y-1">
-                    <label class="font-bold text-xs">Kilometer Mesin</label>
-                    <Input v-model="form1.kilometer_mesin" required type="number" step="0.01" :placeholder="__('Kilometer Mesin')" class="w-full text-xs"/>
-                    <InputError :error="form1.errors.kilometer_mesin" />
-                  </div>
-
-                  <div class="flex flex-col items-start space-y-1">
-                    <label class="font-bold text-xs">Daop / Divre</label>
-
-                    <div class="w-full text-xs">
-                    <Select
-                      v-model="form1.region_id"
-                      :options="regions.map(region => ({
-                        label: region.name,
-                        value: region.id,
-                      }))"
-                      :searchable="true"
-                      placeholder="Pilih Daop / Divre"
-                      required
-                        class="w-full border-none text-center text-xs"
-                        style="font-size: 0.7rem;"
-                    >
-                      <template #option="{ option }">
-                        <span class="text-xs antialiased">
-                            {{ option.label }}
-                        </span>
-                      </template>
-                    </Select>
-                    <InputError :error="form1.errors.region_id" />
-                    </div>
-                  </div>
-
-                  <div class="flex flex-col items-start space-y-1">
-                    <label class="font-bold text-xs">No Seri</label>
-                    <Input v-model="form1.no_seri" required type="number" :placeholder="__('No Seri')" class="w-full text-xs"/>
-                    <InputError :error="form1.errors.no_seri" />
-                  </div>
-
-                </div>
-
-                <div class="flex justify-end mt-3 w-full text-xs">
-                  <Button v-if="!report.checksheetday?.id" class="bg-green-700 hover:bg-green-900 px-4 py-1 rounded float-right mr-2 text-xs" @click.prevent="submitchecksheetday()">Simpan</Button>
-                  <!-- <Button v-if="report.checksheetday?.id" class="bg-green-700 hover:bg-green-900 px-4 py-1 rounded float-right mr-2 text-xs" @click.prevent="updatechecksheetday()">Edit</Button> -->
-                  <Button v-if="report.checksheetday?.id || showNextButton" class="bg-blue-700 hover:bg-blue-900 text-white px-4 py-1 rounded disabled:opacity-50 text-xs" @click="currentStep = 2" > Lanjut → </Button>
-                </div>
-              </div>
 
               <!-- Tabel Unit Komponen -->
-              <div v-else-if="currentStep === 2">
+              <div>
                 <div class="overflow-x-auto">
                   <table class="table-auto border-collapse border border-black w-full min-w-full text-[10px] md:text-xs">
                     <thead class="bg-gray-300 text-black">
@@ -2640,301 +2414,24 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     </tbody>
                   </table>
                   <div class="flex justify-between mt-4">
-                    <Button class="bg-gray-600 text-white px-4 py-1 rounded disabled:opacity-50 text-xs" @click="prevGroup"> ← Kembali </Button>
-
-                    <Button class="bg-blue-600 text-white px-4 py-1 rounded disabled:opacity-50 text-xs" @click="nextGroup"> Lanjut → </Button>
+                    <Button v-if="!isFirstGroup" class="bg-gray-600 text-white px-4 py-1 rounded disabled:opacity-50 text-xs" @click="prevGroup">   ← Kembali </Button>
+                    <div v-else></div> 
+                    <Button v-if="!isLastGroup" class="bg-blue-600 text-white px-4 py-1 rounded disabled:opacity-50 text-xs" @click="nextGroup"> Lanjut → </Button>
+                    <Button v-if="canChangeMode && isLastGroup" class="bg-orange-600 hover:bg-orange-800 float-right mr-2 text-xs" @click.prevent="setMode('working')">Mode Working >></Button>
+                    <Button v-if="canChangeMode && isLastGroup" class="bg-red-600 hover:bg-red-800 float-right mr-2 text-xs" @click.prevent="setMode('warmingup')">Mode Warming Up >></Button>
                   </div>
                   <br>
                 </div>
-                </div>
-
-                <div v-else-if="currentStep === 3">
-                  <table class="w-full table-auto">
-                    <tfoot>
-                      <tr class="flex flex-col lg:flex-row"> <td colspan="9" class="border border-black align-top px-2 py-2 font-semibold text-sm w-full lg:w-1/2 bg-white">
-                              Catatan riwayat gangguan :
-                              <textarea
-                                  v-model="form2.catatan_gangguan"
-                                  class="w-full border text-sm resize-none mt-1 p-1"
-                                  rows="5"
-                                  placeholder="Tuliskan catatan riwayat gangguan di sini..."
-                                  @change="saveWorkResult"
-                              ></textarea>
-                          </td>
-
-                          <td colspan="4" class="border border-black align-top px-0 py-0 w-full lg:w-1/2">
-                              <table class="w-full border-collapse">
-                                  <thead>
-                                      <tr>
-                                          <th colspan="5" class="border border-black bg-white text-center font-bold py-1 text-sm">
-                                              Hasil Kerja:
-                                          </th>
-                                      </tr>
-                                      <tr class="bg-white text-center font-semibold text-xs bg-white">
-                                          <th colspan="3" class="border bg-white border-black px-1 py-1 w-[70%]">Lokasi dan Jam beroperasi</th>
-                                          <th class="border bg-white border-black px-1 py-1 w-[15%]">hu / hi</th>
-                                          <th class="border bg-white border-black px-1 py-1 w-[15%]">Jumlah</th>
-                                      </tr>
-                                  </thead>
-                                  <tbody>
-                                      <tr>
-                                          <td colspan="3" class="border border-black px-1 py-0 text-left bg-white">
-                                              <input
-                                                  v-model="form2.lokasi_dan_jam1"
-                                                  type="text"
-                                                  class="w-full border-none text-xs p-0.5"
-                                                  placeholder="Isi lokasi dan jam beroperasi"
-                                                  @change="saveWorkResult"
-                                              />
-                                          </td>
-                                          <td class="border border-black px-1 py-0 text-center bg-white">
-                                            <select
-                                                v-model="form2.hu_hi_1"
-                                                class="w-full border-none text-center text-xs p-0.5"
-                                                @change="saveWorkResult"
-                                            >
-                                                <option value="Hulu">Hulu</option>
-                                                <option value="Hilir">Hilir</option>
-                                            </select>
-                                          </td>
-                                          <td class="border border-black px-1 py-0 text-center bg-white">
-                                              <input
-                                                  v-model="form2.jumlah_1"
-                                                  type="text"
-                                                  placeholder="...."
-                                                  class="w-full border-none text-center text-xs p-0.5"
-                                                  @change="saveWorkResult"
-                                              />
-                                          </td>
-                                      </tr>
-                                      <tr>
-                                          <td colspan="3" class="border border-black px-1 py-0 text-left bg-white">
-                                              <input
-                                                  v-model="form2.lokasi_dan_jam2"
-                                                  type="text"
-                                                  class="w-full border-none text-xs p-0.5"
-                                                  placeholder="Isi lokasi dan jam beroperasi"
-                                                  @change="saveWorkResult"
-                                              />
-                                          </td>
-                                          <td class="border border-black px-1 py-0 text-center bg-white">
-                                            <select
-                                                v-model="form2.hu_hi_2"
-                                                class="w-full border-none text-center text-xs p-0.5"
-                                                @change="saveWorkResult"
-                                            >
-                                                <option value="Hulu">Hulu</option>
-                                                <option value="Hilir">Hilir</option>
-                                            </select>
-                                          </td>
-                                          <td class="border border-black px-1 py-0 text-center bg-white">
-                                              <input
-                                                  v-model="form2.jumlah_2"
-                                                  type="text"
-                                                  placeholder="...."
-                                                  class="w-full border-none text-center text-xs p-0.5"
-                                                  @change="saveWorkResult"
-                                              />
-                                          </td>
-                                      </tr>
-                                      <tr>
-                                          <td colspan="3" class="border border-black px-1 py-0 text-left bg-white">
-                                              <input
-                                                  v-model="form2.lokasi_dan_jam3"
-                                                  type="text"
-                                                  class="w-full border-none text-xs p-0.5"
-                                                  placeholder="Isi lokasi dan jam beroperasi"
-                                                  @change="saveWorkResult"
-                                              />
-                                          </td>
-                                          <td class="border border-black px-1 py-0 text-center bg-white">
-                                            <select
-                                                v-model="form2.hu_hi_3"
-                                                class="w-full border-none text-center text-xs p-0.5"
-                                                @change="saveWorkResult"
-                                            >
-                                                <option value="Hulu">Hulu</option>
-                                                <option value="Hilir">Hilir</option>
-                                            </select>
-                                          </td>
-                                          <td class="border border-black px-1 py-0 text-center bg-white">
-                                              <input
-                                                  v-model="form2.jumlah_3"
-                                                  type="text"
-                                                  placeholder="...."
-                                                  class="w-full border-none text-center text-xs p-0.5"
-                                                  @change="saveWorkResult"
-                                              />
-                                          </td>
-                                      </tr>
-
-                                      <tr class="bg-white text-center font-bold text-xs">
-                                          <td colspan="2" class="border border-black py-1">Operator</td>
-                                          <td class="border border-black py-1">Paraf</td>
-                                          <td colspan="2" class="border border-black py-1">Validasi</td>
-                                      </tr>
-
-                                      <tr class="bg-white text-center font-semibold text-xs">
-                                          <td colspan="2" class="border border-black text-left w-64">
-                                              <Select
-                                                  v-model="form2.operator_by1"
-                                                  :options="users.filter(user => user.id !== 1).map(user => ({
-                                                      label: `[${user.username}] ${user.name.toUpperCase()}`,
-                                                      value: user.id,
-                                                  }))"
-                                                  :searchable="true"
-                                                  placeholder="Pilih"
-                                                  class="w-full border-none text-center text-xs"
-                                                  style="font-size: 0.7rem;"
-                                                  @change="saveWorkResult"
-                                              >
-                                                <template #option="{ option }">
-                                                  <span class="text-xs antialiased">
-                                                      {{ option.label }}
-                                                  </span>
-                                                </template>
-                                              </Select>
-                                          </td>
-                                          <td class="border border-black text-center text-xs py-1">
-                                              Disetujui Pada : <br>
-                                              {{ formatDate(localChecksheetDay.checksheetworkresult?.operator_at1) }}
-                                          </td>
-                                          <td colspan="2" class="border border-black text-center p-0 m-0 relative">
-                                              <input
-                                                  v-model="form2.validasi1"
-                                                  type="text"
-                                                  class="absolute inset-0 w-full h-full border-none text-center text-[10px] p-0 m-0"
-                                                  placeholder="...."
-                                                  @change="saveWorkResult"
-                                              />
-                                          </td>
-                                      </tr>
-
-                                      <tr class="bg-white text-center font-semibold text-xs">
-                                          <td colspan="2" class="border border-black text-left w-64">
-                                              <Select
-                                                  v-model="form2.operator_by2"
-                                                  :options="users.filter(user => user.id !== 1).map(user => ({
-                                                      label: `[${user.username}] ${user.name.toUpperCase()}`,
-                                                      value: user.id,
-                                                  }))"
-                                                  :searchable="true"
-                                                  placeholder="Pilih"
-                                                  class="w-full border-none text-center text-xs"
-                                                  style="font-size: 0.7rem;"
-                                                  @change="saveWorkResult"
-                                              >
-                                                <template #option="{ option }">
-                                                  <span class="text-xs antialiased">
-                                                      {{ option.label }}
-                                                  </span>
-                                                </template>
-                                              </Select>
-                                          </td>
-                                          <td class="border border-black text-center text-xs py-1">
-                                              Disetujui Pada : <br>
-                                              {{ formatDate(localChecksheetDay.checksheetworkresult?.operator_at2) }}
-                                          </td>
-                                          <td colspan="2" class="border border-black text-center p-0 m-0 relative">
-                                              <input
-                                                  v-model="form2.validasi2"
-                                                  type="text"
-                                                  class="absolute inset-0 w-full h-full border-none text-center text-[10px] p-0 m-0"
-                                                  placeholder="...."
-                                                  @change="saveWorkResult"
-                                              />
-                                          </td>
-                                      </tr>
-
-                                      <tr class="bg-white text-center font-semibold text-xs">
-                                          <td colspan="2" class="border border-black text-left w-64">
-                                              <Select
-                                                  v-model="form2.operator_by3"
-                                                  :options="users.filter(user => user.id !== 1).map(user => ({
-                                                      label: `[${user.username}] ${user.name.toUpperCase()}`,
-                                                      value: user.id,
-                                                  }))"
-                                                  :searchable="true"
-                                                  placeholder="Pilih"
-                                                  class="w-full border-none text-center text-xs"
-                                                  style="font-size: 0.7rem;"
-                                                  @change="saveWorkResult"
-                                              >
-                                                <template #option="{ option }">
-                                                  <span class="text-xs antialiased">
-                                                      {{ option.label }}
-                                                  </span>
-                                                </template>
-                                              </Select>
-                                          </td>
-                                          <td class="border border-black text-center text-xs py-1">
-                                              Disetujui Pada : <br>
-                                              {{ formatDate(localChecksheetDay.checksheetworkresult?.operator_at3) }}
-                                          </td>
-                                          <td colspan="2" class="border border-black text-center p-0 m-0 relative">
-                                              <input
-                                                  v-model="form2.validasi3"
-                                                  type="text"
-                                                  class="absolute inset-0 w-full h-full border-none text-center text-[10px] p-0 m-0"
-                                                  placeholder="...."
-                                                  @change="saveWorkResult"
-                                              />
-                                          </td>
-                                      </tr>
-
-                                      <tr class="bg-white text-center font-semibold text-xs">
-                                          <td colspan="2" class="border border-black text-left w-64">
-                                              <Select
-                                                  v-model="form2.operator_by4"
-                                                  :options="users.filter(user => user.id !== 1).map(user => ({
-                                                      label: `[${user.username}] ${user.name.toUpperCase()}`,
-                                                      value: user.id,
-                                                  }))"
-                                                  :searchable="true"
-                                                  placeholder="Pilih"
-                                                  class="w-full border-none text-center text-xs"
-                                                  style="font-size: 0.7rem;"
-                                                  @change="saveWorkResult"
-                                              >
-                                                <template #option="{ option }">
-                                                  <span class="text-xs antialiased">
-                                                      {{ option.label }}
-                                                  </span>
-                                                </template>
-                                              </Select>
-                                          </td>
-                                          <td class="border border-black text-center text-xs py-1">
-                                              Disetujui Pada : <br>
-                                              {{ formatDate(localChecksheetDay.checksheetworkresult?.operator_at4) }}
-                                          </td>
-                                          <td colspan="2" class="border border-black text-center p-0 m-0 relative">
-                                              <input
-                                                  v-model="form2.validasi4"
-                                                  type="text"
-                                                  class="absolute inset-0 w-full h-full border-none text-center text-[10px] p-0 m-0"
-                                                  placeholder="...."
-                                                  @change="saveWorkResult"
-                                              />
-                                          </td>
-                                      </tr>
-
-                                  </tbody>
-                              </table>
-                          </td>
-                      </tr>
-                    </tfoot>
-                  </table>
-
+                
                   <div class="d-flex justify-content-end mt-3">
-                      <Button v-if="!report.checksheetday?.checksheetworkresult?.id" class="bg-green-700 hover:bg-green-900 px-4 py-1 rounded float-right mr-2 text-xs" @click.prevent="submitchecksheetworkresult()">Simpan</Button>
+                      <!-- <Button v-if="!report.checksheetday?.checksheetworkresult?.id" class="bg-green-700 hover:bg-green-900 px-4 py-1 rounded float-right mr-2 text-xs" @click.prevent="submitchecksheetworkresult()">Simpan</Button> -->
                       <!-- <Button v-if="report.checksheetday?.checksheetworkresult?.id" class="bg-blue-700 hover:bg-blue-900 px-4 py-1 rounded float-right mr-2 text-xs" @click.prevent="updatechecksheetworkresult()">Edit</Button> -->
-                      <Button v-if="canApprove" class="bg-blue-700 hover:bg-blue-900 float-right mr-2 text-xs" @click.prevent="approvechecksheetworkresult()">Approve</Button>
-                      <Button v-if="canChangeMode" class="bg-orange-600 hover:bg-orange-800 float-right mr-2 text-xs" @click.prevent="setMode('working')">Mode Working >></Button>
-                      <Button v-if="canChangeMode" class="bg-red-600 hover:bg-red-800 float-right mr-2 text-xs" @click.prevent="setMode('warmingup')"> Mode Warming Up >></Button>
-                      <Button v-if="report.checksheetday?.id || currentStep === 2" class="bg-gray-700 hover:bg-gray-900 px-4 py-1 rounded text-xs " @click="currentStep = 2" > ← Kembali</Button>
+                      <!-- <Button v-if="canApprove" class="bg-blue-700 hover:bg-blue-900 float-right mr-2 text-xs" @click.prevent="approvechecksheetworkresult()">Approve</Button> -->
+                      <!-- <Button v-if="canChangeMode" class="bg-orange-600 hover:bg-orange-800 float-right mr-2 text-xs" @click.prevent="setMode('working')">Mode Working >></Button>
+                      <Button v-if="canChangeMode" class="bg-red-600 hover:bg-red-800 float-right mr-2 text-xs" @click.prevent="setMode('warmingup')"> Mode Warming Up >></Button> -->
+                      <!-- <Button v-if="report.checksheetday?.id || currentStep === 2" class="bg-gray-700 hover:bg-gray-900 px-4 py-1 rounded text-xs " @click="currentStep = 2" > ← Kembali</Button> -->
                   </div>
-
-              </div>
+                </div>
 						</div>
             <!-- section checksheetday -->
 
@@ -4173,7 +3670,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
             <!-- section workresult -->
 
             <!-- section workresultok -->
-            <div v-if="currentSection === 'workresultok' && report?.checksheetday?.checksheetworkresult?.mode === 'working'" class="tab-pane fade" id="list-workresultok" role="tabpanel" aria-labelledby="list-warmingup-list">
+            <div v-if="currentSection === 'workresultok' && report?.mode === 'working'" class="tab-pane fade" id="list-workresultok" role="tabpanel" aria-labelledby="list-warmingup-list">
               <div class="grid grid-cols-1 gap-2 mb-4 md:grid-cols-2">
                 <!-- <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2"> -->
 
@@ -5131,7 +4628,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
 
             </div>
 
-            <div v-if="currentSection === 'workresultok' && report?.checksheetday?.checksheetworkresult?.mode === 'warmingup'" class="tab-pane fade" id="list-workresultok" role="tabpanel" aria-labelledby="list-warmingup-list">
+            <div v-if="currentSection === 'workresultok' && report?.mode === 'warmingup'" class="tab-pane fade" id="list-workresultok" role="tabpanel" aria-labelledby="list-warmingup-list">
               <div class="grid grid-cols-1 gap-2 mb-4 md:grid-cols-2">
 
                   <!-- <div class="flex items-center text-xs border-b border-gray-200 py-1">
