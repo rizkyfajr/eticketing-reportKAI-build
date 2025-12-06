@@ -337,6 +337,21 @@ const submitForms = () => {
 
 };
 
+const formatDateTime = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
+onMounted(() => {
+    const now = new Date();
+    form.date = formatDateTime(now);
+});
+
 const esc = e => e.key === 'Escape' && close()
 onMounted(() => window.addEventListener('keydown', esc))
 onUnmounted(() => window.removeEventListener('keydown', esc))
@@ -353,6 +368,23 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
           <template #body>
             <form @submit.prevent="submit" class="gap-6 p-4">
               <div v-if="!showForm1" class="space-y-4">
+                
+
+                <!-- QR Code Scanner Section -->
+                <div class="mb-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                  <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-bold text-purple-800">
+                      Scan QR Code Mesin
+                    </h3>
+                    <p class="text-xs text-gray-600">
+                      Scan QR code untuk input otomatis data mesin
+                    </p>
+                  </div>
+                  <QrScanner
+                    @scanned="handleQrScanned"
+                    @error="handleQrError"
+                  />
+                </div>
                 
                 <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">     
 
@@ -374,6 +406,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <select
                       v-model="form.mode"
                       class="border border-gray-300 rounded-md px-2 py-1 h-9 text-xs bg-white focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                      required
                     >
                       <option value="" disabled>Pilih</option>
                       <option value="warmingup">Warming Up</option>
@@ -382,7 +415,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <InputError :error="form.errors.approved_by1" />
                   </div>
 
-                  <div class="flex flex-col">
+                  <!-- <div class="flex flex-col">
                     <label class="block text-xs font-semibold">Nama Mesin</label>
                     <Select
                       v-model="form.machine_id"
@@ -402,33 +435,19 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       </template>
                     </Select>
                     <InputError :error="form.errors.machine_id" />
-                  </div>
+                  </div> -->
 
-                </div>
-
-                <!-- QR Code Scanner Section -->
-                <div class="mb-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
-                  <div class="flex items-center justify-between mb-3">
-                    <h3 class="text-sm font-bold text-purple-800">
-                      Scan QR Code Mesin
-                    </h3>
-                    <p class="text-xs text-gray-600">
-                      Scan QR code untuk input otomatis data mesin
-                    </p>
-                  </div>
-                  <QrScanner
-                    @scanned="handleQrScanned"
-                    @error="handleQrError"
-                  />
                 </div>
 
                 <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">
 
                   <div class="flex flex-col">
-                    <label class="block text-xs font-semibold">Wilayah</label>
+                    <label for="region_id" class="block text-xs font-semibold">
+                      {{ __('Wilayah') }}
+                    </label>
+
                     <Select
                       v-model="form.region_id"
-                      class="w-full border rounded-md px-2 py-2 bg-white text-xs"
                       :options="regions.map(region => ({
                         label: `${region.name}`,
                         value: region.id,
@@ -455,6 +474,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <select 
                       v-model="form.cuaca"
                       class="border border-gray-300 rounded-md px-2 py-1 h-9 text-xs bg-white focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                      required
                     >
                       <option value="" disabled>Pilih</option>
                       <option value="Cerah">Cerah</option>
