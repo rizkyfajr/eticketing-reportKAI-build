@@ -212,5 +212,10 @@ class WorkingReport extends Model
     {
         return $this->belongsTo(User::class, 'kupt_by1');
     }
+    
+    public function dayresults()
+    {
+        return $this->hasMany(CheckSheetDayResult::class, 'working_report_id');
+    }
 
 }
