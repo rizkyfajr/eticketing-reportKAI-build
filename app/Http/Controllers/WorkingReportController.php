@@ -803,12 +803,13 @@ class WorkingReportController extends Controller
             // return $pdf->download('working-report-'.$report->id.'.pdf');
 
             $machineType = $report->machine?->name;
-            $filterType = $machineType;
+            $machineClassification = $report->machine?->classification?->name; 
+            $filterType = null;
 
-            if ($machineType === 'Tamping Machine') {
-                $filterType = 'MTT';
-            } elseif ($machineType === 'Ballast Regulator Machine') {
-                $filterType = 'PBR';
+            if ($machineClassification === 'Tamping Machine' || $machineClassification === 'Material and Logistic Machine' || $machineClassification === 'Stabilization and Consolidation Machine') {
+                $filterType = 'MTT'; 
+            } elseif ($machineClassification === 'Ballast Regulator Machine' || $machineClassification === 'Distributing and Profiling') {
+                $filterType = 'PBR'; 
             }
 
             $masters = CheckSheetMasterDay::when($filterType, function ($query, $filterType) {
