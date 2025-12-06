@@ -75,6 +75,8 @@ class WarmingUpController extends Controller
   public function store(Request $request)
   {
     try {
+        DB::beginTransaction();
+
         $validated = $request->validate([
             'working_report_id'     => 'required|exists:working_reports,id',
             'tanggal'               => 'nullable|date',
@@ -144,6 +146,9 @@ class WarmingUpController extends Controller
             'created_by_id'         => auth()->id(),
         ]);
 
+        WorkingReport::where('id', $validated['working_report_id'])
+            ->update(['status' => 'warming_up_done']);
+
         if (!empty($validated['user_id'])) {
             $crewPivotData = collect($validated['user_id'])->map(function ($userId) use ($warmingup) {
                 return [
@@ -164,6 +169,7 @@ class WarmingUpController extends Controller
     } catch (\Illuminate\Validation\ValidationException $e) {
         return redirect()->back()->withErrors($e->errors())->withInput();
     } catch (\Exception $e) {
+        DB::rollBack();
         return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
     }
   }
