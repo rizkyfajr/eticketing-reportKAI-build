@@ -385,6 +385,29 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     @error="handleQrError"
                   />
                 </div>
+
+                <div class="grid grid-cols-1 gap-4 mb-4">
+                  <div class="flex flex-col">
+                    <label class="block text-xs font-semibold">Nama Mesin</label>
+                    <Select
+                      v-model="form.machine_id"
+                      :options="machines.map(machine => ({
+                        label: `[${machine.nomor}] ${machine.name} - ${machine.type} - ${machine.no_sarana} (${machine.region.name})`,
+                        value: machine.id,
+                      }))"
+                      :searchable="true"
+                      placeholder="Pilih Mesin"
+                      style="font-size: 0.7rem;"
+                    >
+                      <template #option="{ option }">
+                        <span class="text-xs antialiased">
+                            {{ option.label }}
+                        </span>
+                      </template>
+                    </Select>
+                    <InputError :error="form.errors.machine_id" />
+                  </div>
+                </div>
                 
                 <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">     
 
