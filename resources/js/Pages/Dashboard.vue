@@ -793,9 +793,9 @@ const toggleMachine = (machineName) => {
                                         <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
                                             <h5 class="text-sm font-semibold text-blue-700 flex items-center space-x-2">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                                <span>Engine Hours</span>
+                                                <span class="text-xs">Engine Hours</span>
                                             </h5>
-                                            <span class="font-extrabold text-base text-blue-700">{{ duration }}</span> 
+                                            <span class="font-extrabold text-base text-blue-700 text-xs">{{ duration }}</span> 
                                         </div>
                                         <div class="w-full h-[120px] pt-2"> 
                                             <canvas :id="`engineChart-${machineName}`"></canvas>
@@ -806,9 +806,9 @@ const toggleMachine = (machineName) => {
                                         <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
                                             <h5 class="text-sm font-semibold text-green-700 flex items-center space-x-2">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                                                <span>Generator Hours</span>
+                                                <span class="text-xs">Generator Hours</span>
                                             </h5>
-                                            <span class="font-extrabold text-base text-green-700">{{ mttFormattedGeneratorTotals[machineName] }}</span>
+                                            <span class="font-extrabold text-base text-green-700 text-xs">{{ mttFormattedGeneratorTotals[machineName] }}</span>
                                         </div>
                                         <div class="w-full h-[120px] pt-2">
                                             <canvas :id="`generatorChart-${machineName}`"></canvas>
@@ -819,9 +819,9 @@ const toggleMachine = (machineName) => {
                                         <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
                                             <h5 class="text-sm font-semibold text-red-700 flex items-center space-x-2">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
-                                                <span>Tamping Counter</span>
+                                                <span class="text-xs">Tamping Counter</span>
                                             </h5>
-                                            <span class="font-extrabold text-base text-red-700">{{ mttFormattedCounterTotals[machineName] }}</span>
+                                            <span class="font-extrabold text-base text-red-700 text-xs">{{ mttFormattedCounterTotals[machineName] }}</span>
                                         </div>
                                         <div class="w-full h-[120px] pt-2"> 
                                             <canvas :id="`counterChart-${machineName}`"></canvas>
@@ -832,9 +832,9 @@ const toggleMachine = (machineName) => {
                                         <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
                                             <h5 class="text-sm font-semibold text-indigo-700 flex items-center space-x-2">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                                <span>Odometer</span>
+                                                <span class="text-xs">Odometer</span>
                                             </h5>
-                                            <span class="font-extrabold text-base text-indigo-700">{{ mttFormattedOddometerTotals[machineName] }}</span>
+                                            <span class="font-extrabold text-base text-indigo-700 text-xs">{{ mttFormattedOddometerTotals[machineName] }}</span>
                                         </div>
                                         <div class="w-full h-[120px] pt-2"> 
                                             <canvas :id="`odometerChart-${machineName}`"></canvas>
@@ -845,9 +845,9 @@ const toggleMachine = (machineName) => {
                                         <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
                                             <h5 class="text-sm font-semibold text-orange-700 flex items-center space-x-2">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                                <span>HSD (Liter)</span>
+                                                <span class="text-xs">HSD (Liter)</span>
                                             </h5>
-                                            <span class="font-extrabold text-base text-orange-700">{{ mttFormattedHsdTotals[machineName] }}</span>
+                                            <span class="font-extrabold text-base text-orange-700 text-xs">{{ mttFormattedHsdTotals[machineName] }}</span>
                                         </div>
                                         <div class="w-full h-[120px] pt-2"> 
                                             <canvas :id="`hsdChart-${machineName}`"></canvas>
@@ -856,14 +856,14 @@ const toggleMachine = (machineName) => {
 
                                 </div>
                                 
-                                <div v-else class="text-center text-sm text-red-600 font-semibold p-2 bg-red-100 rounded-lg">
+                                <div v-else class="text-center text-xs text-red-600 font-semibold p-2 bg-red-100 rounded-lg">
                                     ⚠️ Mesin ini belum memiliki data perhitungan.
                                 </div>
                             </div>
                             
                         </div>
 
-                        <div v-if="Object.keys(mttFormattedTotals).length === 0" class="text-center text-sm text-gray-500 p-4">
+                        <div v-if="Object.keys(mttFormattedTotals).length === 0" class="text-center text-xs text-gray-500 p-4">
                             Tidak ada Tamping Machine yang terdaftar.
                         </div>
                     </div>
@@ -914,9 +914,9 @@ const toggleMachine = (machineName) => {
                                         <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
                                             <h5 class="text-sm font-semibold text-blue-700 flex items-center space-x-2">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                                <span>Engine Hours</span>
+                                                <span class="text-xs">Engine Hours</span>
                                             </h5>
-                                            <span class="font-extrabold text-base text-blue-700">{{ duration }}</span>
+                                            <span class="font-extrabold text-base text-blue-700 text-xs">{{ duration }}</span>
                                         </div>
                                         <div class="w-full h-[120px] pt-2"> 
                                             <canvas :id="`engineChart-${machineName}`"></canvas>
@@ -928,9 +928,9 @@ const toggleMachine = (machineName) => {
                                         <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
                                             <h5 class="text-sm font-semibold text-green-700 flex items-center space-x-2">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                                                <span>Generator Hours</span>
+                                                <span class="text-xs">Generator Hours</span>
                                             </h5>
-                                            <span class="font-extrabold text-base text-green-700">{{ pbrFormattedGeneratorTotals[machineName] }}</span>
+                                            <span class="font-extrabold text-base text-green-700 text-xs">{{ pbrFormattedGeneratorTotals[machineName] }}</span>
                                         </div>
                                         <div class="w-full h-[120px] pt-2">
                                             <canvas :id="`generatorChart-${machineName}`"></canvas>
@@ -942,9 +942,9 @@ const toggleMachine = (machineName) => {
                                         <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
                                             <h5 class="text-sm font-semibold text-red-700 flex items-center space-x-2">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
-                                                <span>Tamping Counter</span>
+                                                <span class="text-xs">Tamping Counter</span>
                                             </h5>
-                                            <span class="font-extrabold text-base text-red-700">{{ pbrFormattedCounterTotals[machineName] }}</span>
+                                            <span class="font-extrabold text-base text-red-700 text-xs">{{ pbrFormattedCounterTotals[machineName] }}</span>
                                         </div>
                                         <div class="w-full h-[120px] pt-2"> 
                                             <canvas :id="`counterChart-${machineName}`"></canvas>
@@ -956,9 +956,9 @@ const toggleMachine = (machineName) => {
                                         <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
                                             <h5 class="text-sm font-semibold text-indigo-700 flex items-center space-x-2">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                                <span>Odometer</span>
+                                                <span class="text-xs">Odometer</span>
                                             </h5>
-                                            <span class="font-extrabold text-base text-indigo-700">{{ pbrFormattedOddometerTotals[machineName] }}</span>
+                                            <span class="font-extrabold text-base text-indigo-700 text-xs">{{ pbrFormattedOddometerTotals[machineName] }}</span>
                                         </div>
                                         <div class="w-full h-[120px] pt-2"> 
                                             <canvas :id="`odometerChart-${machineName}`"></canvas>
@@ -970,9 +970,9 @@ const toggleMachine = (machineName) => {
                                         <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
                                             <h5 class="text-sm font-semibold text-orange-700 flex items-center space-x-2">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                                <span>HSD (Liter)</span>
+                                                <span class="text-xs">HSD (Liter)</span>
                                             </h5>
-                                            <span class="font-extrabold text-base text-orange-700">{{ pbrFormattedHsdTotals[machineName] }}</span>
+                                            <span class="font-extrabold text-base text-orange-700 text-xs">{{ pbrFormattedHsdTotals[machineName] }}</span>
                                         </div>
                                         <div class="w-full h-[120px] pt-2"> 
                                             <canvas :id="`hsdChart-${machineName}`"></canvas>
@@ -981,14 +981,14 @@ const toggleMachine = (machineName) => {
 
                                 </div>
                                 
-                                <div v-else class="text-center text-sm text-red-600 font-semibold p-2 bg-red-100 rounded-lg">
+                                <div v-else class="text-center text-xs text-red-600 font-semibold p-2 bg-red-100 rounded-lg">
                                     ⚠️ Mesin ini belum memiliki data perhitungan.
                                 </div>
                             </div>
                             
                         </div>
 
-                        <div v-if="Object.keys(pbrFormattedTotals).length === 0" class="text-center text-sm text-gray-500 p-4">
+                        <div v-if="Object.keys(pbrFormattedTotals).length === 0" class="text-center text-xs text-gray-500 p-4">
                             Tidak ada Ballast Regulator Machine yang terdaftar.
                         </div>
                     </div>
@@ -1038,9 +1038,9 @@ const toggleMachine = (machineName) => {
                                         <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
                                             <h5 class="text-sm font-semibold text-blue-700 flex items-center space-x-2">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                                <span>Engine Hours</span>
+                                                <span class="text-xs">Engine Hours</span>
                                             </h5>
-                                            <span class="font-extrabold text-base text-blue-700">{{ duration }}</span> 
+                                            <span class="font-extrabold text-base text-blue-700 text-xs">{{ duration }}</span> 
                                         </div>
                                         <div class="w-full h-[120px] pt-2"> 
                                             <canvas :id="`engineChart-${machineName}`"></canvas>
@@ -1051,9 +1051,9 @@ const toggleMachine = (machineName) => {
                                         <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
                                             <h5 class="text-sm font-semibold text-green-700 flex items-center space-x-2">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                                                <span>Generator Hours</span>
+                                                <span class="text-xs">Generator Hours</span>
                                             </h5>
-                                            <span class="font-extrabold text-base text-green-700">{{ rmeFormattedGeneratorTotals[machineName] }}</span>
+                                            <span class="font-extrabold text-base text-green-700 text-xs">{{ rmeFormattedGeneratorTotals[machineName] }}</span>
                                         </div>
                                         <div class="w-full h-[120px] pt-2">
                                             <canvas :id="`generatorChart-${machineName}`"></canvas>
@@ -1064,9 +1064,9 @@ const toggleMachine = (machineName) => {
                                         <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
                                             <h5 class="text-sm font-semibold text-red-700 flex items-center space-x-2">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
-                                                <span>Tamping Counter</span>
+                                                <span class="text-xs">Tamping Counter</span>
                                             </h5>
-                                            <span class="font-extrabold text-base text-red-700">{{ rmeFormattedCounterTotals[machineName] }}</span>
+                                            <span class="font-extrabold text-base text-red-700 text-xs">{{ rmeFormattedCounterTotals[machineName] }}</span>
                                         </div>
                                         <div class="w-full h-[120px] pt-2"> 
                                             <canvas :id="`counterChart-${machineName}`"></canvas>
@@ -1077,9 +1077,9 @@ const toggleMachine = (machineName) => {
                                         <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
                                             <h5 class="text-sm font-semibold text-indigo-700 flex items-center space-x-2">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                                <span>Odometer</span>
+                                                <span class="text-xs">Odometer</span>
                                             </h5>
-                                            <span class="font-extrabold text-base text-indigo-700">{{ rmeFormattedOddometerTotals[machineName] }}</span>
+                                            <span class="font-extrabold text-base text-indigo-700 text-xs">{{ rmeFormattedOddometerTotals[machineName] }}</span>
                                         </div>
                                         <div class="w-full h-[120px] pt-2"> 
                                             <canvas :id="`odometerChart-${machineName}`"></canvas>
@@ -1090,9 +1090,9 @@ const toggleMachine = (machineName) => {
                                         <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
                                             <h5 class="text-sm font-semibold text-orange-700 flex items-center space-x-2">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                                <span>HSD (Liter)</span>
+                                                <span class="text-xs">HSD (Liter)</span>
                                             </h5>
-                                            <span class="font-extrabold text-base text-orange-700">{{ rmeFormattedHsdTotals[machineName] }}</span>
+                                            <span class="font-extrabold text-base text-orange-700 text-xs">{{ rmeFormattedHsdTotals[machineName] }}</span>
                                         </div>
                                         <div class="w-full h-[120px] pt-2"> 
                                             <canvas :id="`hsdChart-${machineName}`"></canvas>
@@ -1101,14 +1101,14 @@ const toggleMachine = (machineName) => {
 
                                 </div>
                                 
-                                <div v-else class="text-center text-sm text-red-600 font-semibold p-2 bg-red-100 rounded-lg">
+                                <div v-else class="text-center text-xs text-red-600 font-semibold p-2 bg-red-100 rounded-lg">
                                     ⚠️ Mesin ini belum memiliki data perhitungan.
                                 </div>
                             </div>
                             
                         </div>
 
-                        <div v-if="Object.keys(rmeFormattedTotals).length === 0" class="text-center text-sm text-gray-500 p-4">
+                        <div v-if="Object.keys(rmeFormattedTotals).length === 0" class="text-center text-xs text-gray-500 p-4">
                             Tidak ada Stabilization & Consolidation yang terdaftar.
                         </div>
                     </div>
@@ -1158,9 +1158,9 @@ const toggleMachine = (machineName) => {
                                         <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
                                             <h5 class="text-sm font-semibold text-blue-700 flex items-center space-x-2">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                                <span>Engine Hours</span>
+                                                <span class="text-xs">Engine Hours</span>
                                             </h5>
-                                            <span class="font-extrabold text-base text-blue-700">{{ duration }}</span> 
+                                            <span class="font-extrabold text-base text-blue-700 text-xs">{{ duration }}</span> 
                                         </div>
                                         <div class="w-full h-[120px] pt-2"> 
                                             <canvas :id="`engineChart-${machineName}`"></canvas>
@@ -1171,9 +1171,9 @@ const toggleMachine = (machineName) => {
                                         <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
                                             <h5 class="text-sm font-semibold text-green-700 flex items-center space-x-2">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                                                <span>Generator Hours</span>
+                                                <span class="text-xs">Generator Hours</span>
                                             </h5>
-                                            <span class="font-extrabold text-base text-green-700">{{ mlimFormattedGeneratorTotals[machineName] }}</span>
+                                            <span class="font-extrabold text-base text-green-700 text-xs">{{ mlimFormattedGeneratorTotals[machineName] }}</span>
                                         </div>
                                         <div class="w-full h-[120px] pt-2">
                                             <canvas :id="`generatorChart-${machineName}`"></canvas>
@@ -1184,7 +1184,7 @@ const toggleMachine = (machineName) => {
                                         <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
                                             <h5 class="text-sm font-semibold text-red-700 flex items-center space-x-2">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
-                                                <span>Tamping Counter</span>
+                                                <span class="text-xs">Tamping Counter</span>
                                             </h5>
                                             <span class="font-extrabold text-base text-red-700">{{ mlimFormattedCounterTotals[machineName] }}</span>
                                         </div>
@@ -1197,9 +1197,9 @@ const toggleMachine = (machineName) => {
                                         <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
                                             <h5 class="text-sm font-semibold text-indigo-700 flex items-center space-x-2">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                                <span>Odometer</span>
+                                                <span class="text-xs">Odometer</span>
                                             </h5>
-                                            <span class="font-extrabold text-base text-indigo-700">{{ mlimFormattedOddometerTotals[machineName] }}</span>
+                                            <span class="font-extrabold text-base text-indigo-700 text-xs">{{ mlimFormattedOddometerTotals[machineName] }}</span>
                                         </div>
                                         <div class="w-full h-[120px] pt-2"> 
                                             <canvas :id="`odometerChart-${machineName}`"></canvas>
@@ -1210,9 +1210,9 @@ const toggleMachine = (machineName) => {
                                         <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
                                             <h5 class="text-sm font-semibold text-orange-700 flex items-center space-x-2">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                                <span>HSD (Liter)</span>
+                                                <span class="text-xs">HSD (Liter)</span>
                                             </h5>
-                                            <span class="font-extrabold text-base text-orange-700">{{ mlimFormattedHsdTotals[machineName] }}</span>
+                                            <span class="font-extrabold text-base text-orange-700 text-xs">{{ mlimFormattedHsdTotals[machineName] }}</span>
                                         </div>
                                         <div class="w-full h-[120px] pt-2"> 
                                             <canvas :id="`hsdChart-${machineName}`"></canvas>
@@ -1221,14 +1221,14 @@ const toggleMachine = (machineName) => {
 
                                 </div>
                                 
-                                <div v-else class="text-center text-sm text-red-600 font-semibold p-2 bg-red-100 rounded-lg">
+                                <div v-else class="text-center text-xs text-red-600 font-semibold p-2 bg-red-100 rounded-lg">
                                     ⚠️ Mesin ini belum memiliki data perhitungan.
                                 </div>
                             </div>
                             
                         </div>
 
-                        <div v-if="Object.keys(mlimFormattedTotals).length === 0" class="text-center text-sm text-gray-500 p-4">
+                        <div v-if="Object.keys(mlimFormattedTotals).length === 0" class="text-center text-xs text-gray-500 p-4">
                             Tidak ada Material & Logistic Machine yang terdaftar.
                         </div>
                     </div>
