@@ -231,7 +231,7 @@
       <table style="width: 100%; border-collapse: collapse; margin-bottom: 5px;">
           <tr>
               <td style="width: 5px;">a.</td>
-              <td style="width: 250px;">MG 1 (Lurusan)</td>
+              <td style="width: 250px;">IP 2 (Lurusan)</td>
               <td style="width: 80px; text-align: right; white-space: nowrap;">Ada 
                   <span style="border: 1px solid black; padding: 0 0 0 0; margin-left: 5px; font-family: 'DejaVu Sans', sans-serif; display: inline-block; width: 10px; height: 10px; line-height: 1; vertical-align: middle;">
                       {!! optional($report->mglurusanawal)->ada == 1 ? '&#10003;' : '&nbsp;&nbsp;&nbsp;' !!}
@@ -246,7 +246,7 @@
           </tr>
           <tr>
               <td>b.</td>
-              <td>MG 2 (Lengkung)</td>
+              <td>IG 2 (Lengkung)</td>
               
               <td style="text-align: right; white-space: nowrap;">Ada 
                   <span style="border: 1px solid black; padding: 0 0 0 0; margin-left: 5px; font-family: 'DejaVu Sans', sans-serif; display: inline-block; width: 10px; height: 10px; line-height: 1; vertical-align: middle;">
@@ -262,7 +262,7 @@
           </tr>
           <tr>
               <td>c.</td>
-              <td>MG 3 (Wesel)</td>
+              <td>IG 3 (Wesel)</td>
               
               <td style="text-align: right; white-space: nowrap;">Ada 
                   <span style="border: 1px solid black; padding: 0 0 0 0; margin-left: 5px; font-family: 'DejaVu Sans', sans-serif; display: inline-block; width: 10px; height: 10px; line-height: 1; vertical-align: middle;">
@@ -344,7 +344,7 @@
       <table style="width: 100%; border-collapse: collapse; margin-bottom: 5px;">
           <tr>
               <td style="width: 5px;">a.</td>
-              <td style="width: 250px;">MG 1 (Lurusan)</td>
+              <td style="width: 250px;">IP 2 (Lurusan)</td>
               
               <td style="width: 80px; text-align: right; white-space: nowrap;">Ada 
                   {{-- Kotak Ceklis Ada --}}
@@ -362,7 +362,7 @@
           </tr>
           <tr>
               <td>b.</td>
-              <td>MG 2 (Lengkung)</td>
+              <td>IG 2 (Lengkung)</td>
               
               <td style="text-align: right; white-space: nowrap;">Ada 
                   {{-- Kotak Ceklis Ada --}}
@@ -380,7 +380,7 @@
           </tr>
           <tr>
               <td>c.</td>
-              <td>MG 3 (Wesel)</td>
+              <td>IG 3 (Wesel)</td>
               
               <td style="text-align: right; white-space: nowrap;">Ada 
                   {{-- Kotak Ceklis Ada --}}
@@ -562,15 +562,15 @@
       
         @php
             $checkpointRelations = [
-                'mglurusanawal' => '1. Foto MG 1 (Lurusan) - Awal',
-                'mglengkunganawal' => '2. Foto MG 2 (Lengkung) - Awal',
-                'mgweselawal' => '3. Foto MG 3 (Wesel) - Awal',
+                'mglurusanawal' => '1. Foto IP 2 (Lurusan) - Awal',
+                'mglengkunganawal' => '2. Foto IG 2 (Lengkung) - Awal',
+                'mgweselawal' => '3. Foto IG 3 (Wesel) - Awal',
                 'pemeriksaansilangkpjr' => '4. Foto Pemeriksaan Silang KPJR',
                 'pemeriksaansilanglahan' => '5. Foto Pemeriksaan Silang Lahan',
                 'perekamanawal' => '6. Foto Perekaman Awal',
-                'mglurusanakhir' => '7. Foto MG 1 (Lurusan) - Akhir',
-                'mglengkunganakhir' => '8. Foto MG 2 (Lengkung) - Akhir',
-                'mgweselakhir' => '9. Foto MG 3 (Wesel) - Akhir',
+                'mglurusanakhir' => '7. Foto IP 2 (Lurusan) - Akhir',
+                'mglengkunganakhir' => '8. Foto IG 2 (Lengkung) - Akhir',
+                'mgweselakhir' => '9. Foto IG 3 (Wesel) - Akhir',
                 'perekamanakhir' => '10. Foto Perekaman Akhir',
             ];
         @endphp

@@ -238,7 +238,7 @@ const validateForms = () => {
         (props.mgweselawal_attachments?.length > 0);
 
     if (!isOneOfMgUploaded) {
-        failedValidations.push("Data Opname Rel Jalan Awal (MG 1, MG 2, atau MG 3) (Wajib pilih salah satu)");
+        failedValidations.push("Data Opname Rel Jalan Awal (IP 2, IG 2, atau IG 3) (Wajib pilih salah satu)");
     }
     
     if (!(props.pemeriksaansilangkpjr_attachments?.length > 0)) {
@@ -764,7 +764,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                           <div class="flex flex-row items-start justify-between text-sm">
 
                               <label for="mg1_awal" class="flex-1 text-xs text-black font-semi-bold pr-2">
-                                  a. MG 1 (Lurusan)
+                                  a. IP 2 (Lurusan)
                               </label>
 
                               <div class="flex space-x-4 flex-shrink-0 text-xs">
@@ -803,7 +803,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                             <AttachmentInline
                               :model="mglurusanawal ?? {}"
                               type="MgLurusanAwal"
-                              :redaction="`Lampiran (MG 1 Lurusan)`"
+                              :redaction="`Lampiran (IP 2 Lurusan)`"
                               :attachments="mglurusanawal_attachments"
                             />
                           </div>
@@ -813,7 +813,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                           <div class="flex flex-row items-start justify-between text-sm">
 
                               <label for="mg2_awal" class="flex-1 text-xs text-black font-semi-bold pr-2">
-                                  b. MG 2 (Lengkungan)
+                                  b. IG 2 (Lengkungan)
                               </label>
 
                               <div class="flex space-x-4 flex-shrink-0 text-xs">
@@ -852,7 +852,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                             <AttachmentInline
                               :model="mglengkunganawal ?? {}"
                               type="MgLengkunganAwal"
-                              :redaction="`Lampiran (MG 2 Lengkungan)`"
+                              :redaction="`Lampiran (IG 2 Lengkungan)`"
                               :attachments="mglengkunganawal_attachments"
                             />
                           </div>
@@ -862,7 +862,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                           <div class="flex flex-row items-start justify-between text-sm">
 
                               <label for="mg3_awal" class="flex-1 text-xs text-black font-semi-bold pr-2">
-                                  c. MG 3 (Wesel)
+                                  c. IG 3 (Wesel)
                               </label>
 
                               <div class="flex space-x-4 flex-shrink-0 text-xs">
@@ -901,7 +901,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                             <AttachmentInline
                               :model="mgweselawal ?? {}"
                               type="MgWeselAwal"
-                              :redaction="`Lampiran (MG 3 Wesel)`"
+                              :redaction="`Lampiran (IG 3 Wesel)`"
                               :attachments="mgweselawal_attachments"
                             />
                           </div>

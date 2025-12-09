@@ -1696,7 +1696,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                           <div class="flex flex-row items-start justify-between text-sm">
 
                               <label for="mg1_awal" class="flex-1 text-xs text-black font-semi-bold pr-2">
-                                  a. MG 1 (Lurusan)
+                                  a. IP 2 (Lurusan)
                               </label>
 
                               <div class="flex space-x-4 flex-shrink-0 text-xs">
@@ -1735,7 +1735,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                             <AttachmentInline
                               :model="mglurusanawal ?? {}"
                               type="MgLurusanAwal"
-                              :redaction="`Lampiran (MG 1 Lurusan Awal)`"
+                              :redaction="`Lampiran (IP 2 Lurusan Awal)`"
                               :attachments="mglurusanawal_attachments"
                             />
                           </div>
@@ -1745,7 +1745,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                         <div class="flex flex-row items-start justify-between text-sm">
 
                             <label for="mg1_awal" class="flex-1 text-xs text-black font-semi-bold pr-2">
-                                a. MG 2 (Lengkungan)
+                                a. IG 2 (Lengkungan)
                             </label>
 
                             <div class="flex space-x-4 flex-shrink-0 text-xs">
@@ -1784,7 +1784,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                           <AttachmentInline
                             :model="mglengkunganawal ?? {}"
                             type="MgLengkunganAwal"
-                            :redaction="`Lampiran (MG 2 Lengkungan Awal)`"
+                            :redaction="`Lampiran (IG 2 Lengkungan Awal)`"
                             :attachments="mglengkunganawal_attachments"
                           />
                         </div>
@@ -1794,7 +1794,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                         <div class="flex flex-row items-start justify-between text-sm">
 
                             <label for="mg1_awal" class="flex-1 text-xs text-black font-semi-bold pr-2">
-                                a. MG 3 (Wesel)
+                                a. IG 3 (Wesel)
                             </label>
 
                             <div class="flex space-x-4 flex-shrink-0 text-xs">
@@ -1833,7 +1833,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                           <AttachmentInline
                             :model="mgweselawal ?? {}"
                             type="MgWeselAwal"
-                            :redaction="`Lampiran (MG 3 Wesel Awal)`"
+                            :redaction="`Lampiran (IG 3 Wesel Awal)`"
                             :attachments="mgweselawal_attachments"
                           />
                         </div>
@@ -3463,7 +3463,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                           <div class="flex flex-row items-start justify-between text-sm">
 
                               <label for="mg1_awal" class="flex-1 text-xs text-black font-semi-bold pr-2">
-                                  a. MG 1 (Lurusan)
+                                  a. IP 2 (Lurusan)
                               </label>
 
                               <div class="flex space-x-4 flex-shrink-0 text-xs">
@@ -3502,7 +3502,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                             <AttachmentInline
                               :model="mglurusanakhir ?? {}"
                               type="MgLurusanAkhir"
-                              :redaction="`Lampiran (MG 1 Lurusan Akhir)`"
+                              :redaction="`Lampiran (IP 2 Lurusan Akhir)`"
                               :attachments="mglurusanakhir_attachments"
                             />
                           </div>
@@ -3512,7 +3512,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                           <div class="flex flex-row items-start justify-between text-sm">
 
                               <label for="mg1_awal" class="flex-1 text-xs text-black font-semi-bold pr-2">
-                                  a. MG 2 (Lengkung)
+                                  a. IG 2 (Lengkung)
                               </label>
 
                               <div class="flex space-x-4 flex-shrink-0 text-xs">
@@ -3551,7 +3551,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                             <AttachmentInline
                               :model="mglengkunganakhir ?? {}"
                               type="MgLengkunganAkhir"
-                              :redaction="`Lampiran (MG 2 Lengkungan Akhir)`"
+                              :redaction="`Lampiran (IG 2 Lengkungan Akhir)`"
                               :attachments="mglengkunganakhir_attachments"
                             />
                           </div>
@@ -3561,7 +3561,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                           <div class="flex flex-row items-start justify-between text-sm">
 
                               <label for="mg1_awal" class="flex-1 text-xs text-black font-semi-bold pr-2">
-                                  a. MG 3 (Wesel)
+                                  a. IG 3 (Wesel)
                               </label>
 
                               <div class="flex space-x-4 flex-shrink-0 text-xs">
@@ -3600,7 +3600,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                             <AttachmentInline
                               :model="mgweselakhir ?? {}"
                               type="MgWeselAkhir"
-                              :redaction="`Lampiran (MG 3 Wesel Akhir)`"
+                              :redaction="`Lampiran (IG 3 Wesel Akhir)`"
                               :attachments="mgweselakhir_attachments"
                             />
                           </div>
@@ -3613,7 +3613,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                         <div class="flex flex-row items-start justify-between text-sm">
 
                               <label for="mg1_awal" class="flex-1 text-xs text-black font-semi-bold pr-2">
-                                  a. MG 1 (Lurusan)
+                                  a. IP 2 (Lurusan)
                               </label>
 
                               <div class="flex space-x-4 flex-shrink-0 text-xs">
@@ -3949,12 +3949,12 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                         <div class="flex flex-row items-start justify-between text-sm">
 
                             <label for="mg1_awal" class="flex items-center gap-4 text-xs text-black font-semibold pr-2">
-                              a. MG 1 (Lurusan) &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                              a. IP 2 (Lurusan) &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
 
                               <AttachmentInline
                                   :model="mglurusanawal ?? {}"
                                   type="MgLurusanAwal"
-                                  :redaction="`Lampiran (MG 1 Lurusan)`"
+                                  :redaction="`Lampiran (IP 2 Lurusan)`"
                                   :attachments="mglurusanawal_attachments"
                               />
                           </label>
@@ -3996,12 +3996,12 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                         <div class="flex flex-row items-start justify-between text-sm">
 
                             <label for="mg1_awal" class="flex items-center gap-4 text-xs text-black font-semibold pr-2">
-                              b. MG 2 (Lengkung) &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                              b. IG 2 (Lengkung) &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
 
                               <AttachmentInline
                                   :model="mglengkunganawal ?? {}"
                                   type="MgLengkunganAwal"
-                                  :redaction="`Lampiran (MG 2 Lengkung)`"
+                                  :redaction="`Lampiran (IG 2 Lengkung)`"
                                   :attachments="mglengkunganawal_attachments"
                               />
                           </label>
@@ -4043,12 +4043,12 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                         <div class="flex flex-row items-start justify-between text-sm">
 
                             <label for="mg1_awal" class="flex items-center gap-4 text-xs text-black font-semibold pr-2">
-                              c. MG 3 (Wesel) &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                              c. IG 3 (Wesel) &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
 
                               <AttachmentInline
                                   :model="mgweselawal ?? {}"
                                   type="MgWeselanAwal"
-                                  :redaction="`Lampiran (MG 3 Wesel)`"
+                                  :redaction="`Lampiran (IG 3 Wesel)`"
                                   :attachments="mgweselawal_attachments"
                               />
                           </label>
@@ -4254,12 +4254,12 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                         <div class="flex flex-row items-start justify-between text-sm">
 
                             <label for="mg1_awal" class="flex items-center gap-4 text-xs text-black font-semibold pr-2">
-                              a. MG 1 (Lurusan) &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                              a. IP 2 (Lurusan) &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
 
                               <AttachmentInline
                                   :model="mglurusanakhir ?? {}"
                                   type="MgLurusanAkhir"
-                                  :redaction="`Lampiran (MG 1 Lurusan Akhir)`"
+                                  :redaction="`Lampiran (IP 2 Lurusan Akhir)`"
                                   :attachments="mglurusanakhir_attachments"
                               />
                           </label>
@@ -4301,12 +4301,12 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                         <div class="flex flex-row items-start justify-between text-sm">
 
                             <label for="mg1_awal" class="flex items-center gap-4 text-xs text-black font-semibold pr-2">
-                              b. MG 2 (Lengkung) &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                              b. IG 2 (Lengkung) &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
 
                               <AttachmentInline
                                   :model="mglengkunganakhir ?? {}"
                                   type="MgLengkunganAkhir"
-                                  :redaction="`Lampiran (MG 2 Lengkung Akhir)`"
+                                  :redaction="`Lampiran (IG 2 Lengkung Akhir)`"
                                   :attachments="mglengkunganakhir_attachments"
                               />
                           </label>
@@ -4348,12 +4348,12 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                         <div class="flex flex-row items-start justify-between text-sm">
 
                             <label for="mg1_awal" class="flex items-center gap-4 text-xs text-black font-semibold pr-2">
-                              c. MG 3 (Wesel) &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                              c. IG 3 (Wesel) &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
 
                               <AttachmentInline
                                   :model="mgweselakhir ?? {}"
                                   type="MgWeselanAkhir"
-                                  :redaction="`Lampiran (MG 3 Wesel Akhir)`"
+                                  :redaction="`Lampiran (IG 3 Wesel Akhir)`"
                                   :attachments="mgweselakhir_attachments"
                               />
                           </label>
