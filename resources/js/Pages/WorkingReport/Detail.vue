@@ -4565,27 +4565,27 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     </div>
 
                     <div class="flex items-center text-xs border-b border-gray-200 py-1">
-                      <div class="w-48 font-semibold text-xs">Pengawal 1</div>
-                      <div class="pr-2 text-xs">:</div>
-                      <div class="uppercase">[{{ report?.nipp }}] {{ report?.nama_pengawal || '-' }}  </div>
-                    </div>
-
-                    <div class="flex items-center text-xs border-b border-gray-200 py-1">
                       <div class="w-48 font-semibold text-xs">Operator 2</div>
                       <div class="pr-2 text-xs">:</div>
                       <div class="uppercase">[{{ report?.operator2?.username }}] {{ report?.operator2?.name || '-' }} </div>
                     </div>
 
                     <div class="flex items-center text-xs border-b border-gray-200 py-1">
-                      <div class="w-48 font-semibold text-xs">Pengawal 2</div>
-                      <div class="pr-2 text-xs">:</div>
-                      <div class="uppercase">[{{ report?.nipp1 }}] {{ report?.nama_pengawal1 || '-' }}  </div>
-                    </div>
-
-                    <div class="flex items-center text-xs border-b border-gray-200 py-1">
                       <div class="w-48 font-semibold text-xs">Operator 3</div>
                       <div class="pr-2 text-xs">:</div>
                       <div class="uppercase">[{{ report?.operator3?.username }}] {{ report?.operator3?.name || '-' }} </div>
+                    </div>
+
+                    <div class="flex items-center text-xs border-b border-gray-200 py-1">
+                      <div class="w-48 font-semibold text-xs">Pengawal 1</div>
+                      <div class="pr-2 text-xs">:</div>
+                      <div class="uppercase">[{{ report?.nipp }}] {{ report?.nama_pengawal || '-' }}  </div>
+                    </div>
+
+                    <div class="flex items-center text-xs border-b border-gray-200 py-1">
+                      <div class="w-48 font-semibold text-xs">Pengawal 2</div>
+                      <div class="pr-2 text-xs">:</div>
+                      <div class="uppercase">[{{ report?.nipp1 }}] {{ report?.nama_pengawal1 || '-' }}  </div>
                     </div>
                 </div>
 
@@ -4824,27 +4824,27 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     </div>
 
                     <div class="flex items-center text-xs border-b border-gray-200 py-1">
-                      <div class="w-48 font-semibold text-xs">Pengawal 1</div>
-                      <div class="pr-2 text-xs">:</div>
-                      <div class="uppercase">[{{ report?.nipp }}] {{ report?.nama_pengawal || '-' }}  </div>
-                    </div>
-
-                    <div class="flex items-center text-xs border-b border-gray-200 py-1">
                       <div class="w-48 font-semibold text-xs">Operator 2</div>
                       <div class="pr-2 text-xs">:</div>
                       <div class="uppercase">[{{ report?.operator2?.username }}] {{ report?.operator2?.name || '-' }} </div>
                     </div>
 
                     <div class="flex items-center text-xs border-b border-gray-200 py-1">
-                      <div class="w-48 font-semibold text-xs">Pengawal 2</div>
-                      <div class="pr-2 text-xs">:</div>
-                      <div class="uppercase">[{{ report?.nipp1 }}] {{ report?.nama_pengawal1 || '-' }}  </div>
-                    </div>
-
-                    <div class="flex items-center text-xs border-b border-gray-200 py-1">
                       <div class="w-48 font-semibold text-xs">Operator 3</div>
                       <div class="pr-2 text-xs">:</div>
                       <div class="uppercase">[{{ report?.operator3?.username }}] {{ report?.operator3?.name || '-' }} </div>
+                    </div>
+
+                    <div class="flex items-center text-xs border-b border-gray-200 py-1">
+                      <div class="w-48 font-semibold text-xs">Pengawal 1</div>
+                      <div class="pr-2 text-xs">:</div>
+                      <div class="uppercase">[{{ report?.nipp }}] {{ report?.nama_pengawal || '-' }}  </div>
+                    </div>
+
+                    <div class="flex items-center text-xs border-b border-gray-200 py-1">
+                      <div class="w-48 font-semibold text-xs">Pengawal 2</div>
+                      <div class="pr-2 text-xs">:</div>
+                      <div class="uppercase">[{{ report?.nipp1 }}] {{ report?.nama_pengawal1 || '-' }}  </div>
                     </div>
                 </div>
 
