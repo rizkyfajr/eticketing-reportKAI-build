@@ -66,12 +66,15 @@ const form = useForm({
     date: props.report?.date || '',
     status: props.report?.status || '',
     cuaca: props.report?.cuaca || '',
+    klasifikasi: props.report?.klasifikasi || '',
+    type: props.report?.type || '',
+    lokasi_stabling_awal: props.report?.lokasi_stabling_awal || '',
     jenis_kpjr: props.report?.jenis_kpjr || '',
     nomor_mesin: props.report?.nomor_mesin || '',
     nomor_sarana: props.report?.nomor_sarana || '',
     waktu_start_engine: props.report?.waktu_start_engine?.slice(0, 5) || '',
     jam_traveling_awal: props.report?.jam_traveling_awal || '',
-    jam_kerja_awal: props.report?.jam_kerja_awal || '',
+    jam_kerja_awal: props.report?.jam_kerja_awal?.slice(0, 5)  || '',
     jam_mesin_awal: props.report?.jam_mesin_awal || '',
     jam_generator_awal: props.report?.jam_generator_awal || '',
     counter_tamping_awal: props.report?.counter_tamping_awal || '',
@@ -668,10 +671,18 @@ const toggleResult = async (item, field) => {
     // console.log(`Autosaved ${field}: ${item[field]}`);
 
     Swal.fire({
+      toast: true,
+      position: "top-end",
       icon: "success",
-      title: previousValue == null ? "Berhasil Disimpan" : "Berhasil Diperbarui",
-      timer: 1000,
+      title: previousValue == null ? "Berhasil Disimpan" : "Berhasil Tersimpan",
+      timer: 600,  
+      timerProgressBar: true,
       showConfirmButton: false,
+      showCloseButton: false,
+      backdrop: false,
+      didOpen: (toast) => {
+        toast.style.animation = "none"; 
+      }
     });
   } catch (error) {
     console.error("Autosave failed:", error);
@@ -1544,7 +1555,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
 
                 <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2 pb-3 border-b border-gray-200">
 
-                  <div class="flex flex-col items-start space-y-1">
+                  <!-- <div class="flex flex-col items-start space-y-1">
                     <label for="machine_id" class="font-bold text-xs">
                       {{ __('Nama Mesin') }}
                     </label>
@@ -1569,6 +1580,86 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                         </template>
                       </Select>
                       <InputError :error="form.errors.machine_id" />
+                    </div>
+                  </div> -->                            
+
+                  <div class="flex flex-col items-start space-y-1">
+                    <label for="klasifikasi" class="font-bold text-xs">
+                      {{ __('Klasifikasi') }}
+                    </label>
+
+                    <div class="w-full">
+                      <Input
+                        v-model="form.klasifikasi"
+                        :placeholder="__('Klasifikasi')"
+                        type="text"
+                        class="text-xs"
+                      />
+                      <InputError :error="form.errors.klasifikasi"/>
+                    </div>
+                  </div>          
+
+                  <div class="flex flex-col items-start space-y-1">
+                    <label for="type" class="font-bold text-xs">
+                      {{ __('Type') }}
+                    </label>
+
+                    <div class="w-full">
+                      <Input
+                        v-model="form.type"
+                        :placeholder="__('Type')"
+                        type="text"
+                        class="text-xs"
+                      />
+                      <InputError :error="form.errors.type"/>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col items-start space-y-1">
+                    <label for="jenis_kpjr" class="font-bold text-xs">
+                      {{ __('Merk') }}
+                    </label>
+
+                    <div class="w-full">
+                      <Input
+                        v-model="form.jenis_kpjr"
+                        :placeholder="__('Merk')"
+                        type="text"
+                        class="text-xs"
+                      />
+                      <InputError :error="form.errors.jenis_kpjr"/>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col items-start space-y-1">
+                    <label for="nomor_sarana" class="font-bold text-xs">
+                      {{ __('Nomor Sarana') }}
+                    </label>
+
+                    <div class="w-full">
+                      <Input
+                        v-model="form.nomor_sarana"
+                        :placeholder="__('Nomor Sarana')"
+                        type="text"
+                        class="text-xs"
+                      />
+                      <InputError :error="form.errors.nomor_sarana"/>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col items-start space-y-1">
+                    <label for="nomor_mesin" class="font-bold text-xs">
+                      {{ __('Nomor Mesin') }}
+                    </label>
+
+                    <div class="w-full">
+                      <Input
+                        v-model="form.nomor_mesin"
+                        :placeholder="__('Nomor Mesin')"
+                        type="text"
+                        class="text-xs"
+                      />
+                      <InputError :error="form.errors.nomor_mesin"/>
                     </div>
                   </div>
 
@@ -1604,52 +1695,21 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     </div>
                   </div>
 
-                  <div class="flex flex-col items-start space-y-1">
-                    <label for="jenis_kpjr" class="font-bold text-xs">
-                      {{ __('Jenis KPJR') }}
+                  <div class="flex flex-col">
+                    <label for="mode" class="block text-xs font-semibold">
+                      {{ __('Mode') }}
                     </label>
 
-                    <div class="w-full">
-                      <Input
-                        v-model="form.jenis_kpjr"
-                        :placeholder="__('Jenis KPJR')"
-                        type="text"
-                        class="text-xs"
-                      />
-                      <InputError :error="form.errors.jenis_kpjr"/>
-                    </div>
-                  </div>
-
-                  <div class="flex flex-col items-start space-y-1">
-                    <label for="nomor_mesin" class="font-bold text-xs">
-                      {{ __('Nomor Mesin') }}
-                    </label>
-
-                    <div class="w-full">
-                      <Input
-                        v-model="form.nomor_mesin"
-                        :placeholder="__('Nomor Mesin')"
-                        type="text"
-                        class="text-xs"
-                      />
-                      <InputError :error="form.errors.nomor_mesin"/>
-                    </div>
-                  </div>
-
-                  <div class="flex flex-col items-start space-y-1">
-                    <label for="nomor_sarana" class="font-bold text-xs">
-                      {{ __('Nomor Sarana') }}
-                    </label>
-
-                    <div class="w-full">
-                      <Input
-                        v-model="form.nomor_sarana"
-                        :placeholder="__('Nomor Sarana')"
-                        type="text"
-                        class="text-xs"
-                      />
-                      <InputError :error="form.errors.nomor_sarana"/>
-                    </div>
+                    <select
+                      v-model="form.mode"
+                      class="border border-gray-300 rounded-md px-2 py-1 h-9 text-xs bg-white focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                      required
+                    >
+                      <option value="" disabled>Pilih</option>
+                      <option value="warmingup">Warming Up</option>
+                      <option value="working">Working</option>
+                    </select>
+                    <InputError :error="form.errors.mode" />
                   </div>
 
                   <!-- <div class="flex flex-col items-start space-y-1">
@@ -2022,7 +2082,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     </div>
                   </div>
 
-                  <div class="flex flex-col items-start space-y-1">
+                  <div class="flex flex-col items-start space-y-1" v-if="form.mode === 'working'">
                     <label for="jam_traveling_awal" class="font-bold text-xs">
                       {{ __('Jam Traveling Awal') }}
                     </label>
@@ -2040,13 +2100,13 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
 
                   <div class="flex flex-col items-start space-y-1">
                     <label for="jam_kerja_awal" class="font-bold text-xs">
-                      {{ __('Jam Kerja Awal') }}
+                      {{ __('Awal Jam Kerja Operator') }}
                     </label>
 
                     <div class="w-full">
                       <Input
                         v-model="form.jam_kerja_awal"
-                        :placeholder="__('Jam Kerja Awal')"
+                        :placeholder="__('Awal Jam Kerja Operator')"
                         type="time"
                         class="text-xs"
                       />
@@ -2212,7 +2272,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <InputError :error="form.errors.operator_by3" />
                   </div>
 
-                  <div class="flex flex-col items-start space-y-1">
+                  <div class="flex flex-col items-start space-y-1" v-if="form.mode === 'working'">
                     <label for="hsd_awal_kerja" class="font-bold text-xs">
                       {{ __('NIPP Pengawal 1') }}
                     </label>
@@ -2228,7 +2288,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     </div>
                   </div>
 
-                  <div class="flex flex-col items-start space-y-1">
+                  <div class="flex flex-col items-start space-y-1" v-if="form.mode === 'working'">
                     <label for="hsd_awal_kerja" class="font-bold text-xs">
                       {{ __('Nama Pengawal 1') }}
                     </label>
@@ -2244,7 +2304,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     </div>
                   </div>
 
-                  <div class="flex flex-col items-start space-y-1">
+                  <div class="flex flex-col items-start space-y-1" v-if="form.mode === 'working'">
                     <label for="hsd_awal_kerja" class="font-bold text-xs">
                       {{ __('NIPP Pengawal 2') }}
                     </label>
@@ -2260,7 +2320,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     </div>
                   </div>
 
-                  <div class="flex flex-col items-start space-y-1">
+                  <div class="flex flex-col items-start space-y-1" v-if="form.mode === 'working'">
                     <label for="hsd_awal_kerja" class="font-bold text-xs">
                       {{ __('Nama Pengawal 2') }}
                     </label>
@@ -2417,8 +2477,19 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <Button v-if="!isFirstGroup" class="bg-gray-600 text-white px-4 py-1 rounded disabled:opacity-50 text-xs" @click="prevGroup">   ← Kembali </Button>
                     <div v-else></div> 
                     <Button v-if="!isLastGroup" class="bg-blue-600 text-white px-4 py-1 rounded disabled:opacity-50 text-xs" @click="nextGroup"> Lanjut → </Button>
-                    <Button v-if="canChangeMode && isLastGroup" class="bg-orange-600 hover:bg-orange-800 float-right mr-2 text-xs" @click.prevent="setMode('working')">Mode Working >></Button>
-                    <Button v-if="canChangeMode && isLastGroup" class="bg-red-600 hover:bg-red-800 float-right mr-2 text-xs" @click.prevent="setMode('warmingup')">Mode Warming Up >></Button>
+                    <div v-if="canChangeMode && isLastGroup" class="flex space-x-3">
+                        <Button 
+                            class="bg-orange-600 hover:bg-orange-700 text-white px-5 py-1 rounded text-xs shadow-md"
+                            @click.prevent="setMode('working')">
+                            Working >>
+                        </Button>
+
+                        <Button 
+                            class="bg-red-600 hover:bg-red-700 text-white px-5 py-1 rounded text-xs shadow-md"
+                            @click.prevent="setMode('warmingup')">
+                            WarmingUp >>
+                        </Button>
+                    </div>
                   </div>
                   <br>
                 </div>
@@ -2581,12 +2652,12 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
 
                 <div class="flex flex-col items-start space-y-1">
                   <label for="jam_kerja_awal" class="font-bold text-xs">
-                    {{ __('Jam Kerja Awal') }}
+                    {{ __('Awal Jam Kerja Operator') }}
                   </label>
 
                   <Input
                     v-model="form3.jam_kerja_awal"
-                    :placeholder="__('Jam Kerja Awal')"
+                    :placeholder="__('Awal Jam Kerja Operator')"
                     type="time"
                     class="text-xs"
                     required
@@ -2675,7 +2746,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   <InputError :error="form3.errors.hsd_awal_kerja"/>
                 </div>                 -->
 
-                <div class="flex flex-col items-start space-y-1">
+                <!-- <div class="flex flex-col items-start space-y-1">
                   <label for="konsumsi_hsd" class="font-bold text-xs">
                     {{ __('Konsumsi HSD') }}
                   </label>
@@ -2689,7 +2760,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   />
 
                   <InputError :error="form3.errors.konsumsi_hsd"/>
-                </div>
+                </div> -->
 
                 <div class="flex flex-col items-start space-y-1">
                   <label for="waktu_stop_engine" class="font-bold text-xs">
@@ -2707,7 +2778,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   <InputError :error="form3.errors.waktu_stop_engine"/>
                 </div>
 
-                <div class="flex flex-col items-start space-y-1">
+                <!-- <div class="flex flex-col items-start space-y-1">
                   <label for="jam_traveling_akhir" class="font-bold text-xs">
                     {{ __('Jam Traveling Akhir') }}
                   </label>
@@ -2721,16 +2792,16 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   />
 
                   <InputError :error="form3.errors.jam_traveling_akhir"/>
-                </div>
+                </div> -->
 
                 <div class="flex flex-col items-start space-y-1">
                   <label for="jam_kerja_akhir" class="font-bold text-xs">
-                    {{ __('Jam Kerja Akhir') }}
+                    {{ __('Akhir Jam Kerja Operator') }}
                   </label>
 
                   <Input
                     v-model="form3.jam_kerja_akhir"
-                    :placeholder="__('Jam Kerja Akhir')"
+                    :placeholder="__('Akhir Jam Kerja Operator')"
                     type="time"
                     class="text-xs"
                     required
@@ -3339,12 +3410,12 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
 
                   <div class="flex flex-col items-start space-y-1">
                     <label for="jam_kerja_akhir" class="font-bold text-xs">
-                      {{ __('Jam Kerja Akhir') }}
+                      {{ __('Akhir Jam Kerja Operator') }}
                     </label>
 
                     <Input
                       v-model="form4.jam_kerja_akhir"
-                      :placeholder="__('Jam Kerja Akhir')"
+                      :placeholder="__('Akhir Jam Kerja Operator')"
                       type="time"
                       class="w-full text-xs"
                     />
@@ -3427,7 +3498,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <InputError :error="form4.errors.hsd_akhir_kerja" />
                   </div>
 
-                  <div class="flex flex-col items-start space-y-1">
+                  <!-- <div class="flex flex-col items-start space-y-1">
                     <label for="konsumsi_hsd" class="font-bold text-xs">
                       {{ __('Konsumsi HSD') }}
                     </label>
@@ -3440,7 +3511,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     />
 
                     <InputError :error="form4.errors.konsumsi_hsd" />
-                  </div>
+                  </div> -->
                 <!-- </div> -->
                 <div></div>
 
@@ -3687,21 +3758,21 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   </div> -->
 
                   <div class="flex items-center text-xs border-b border-gray-200 py-1">
-                    <div class="w-48 font-semibold text-xs">Hari / Tanggal</div>
+                    <div class="w-48 font-semibold text-xs">Klasifikasi</div>
                     <div class="pr-2 text-xs">:</div>
-                    <div class="">{{ formatDateDay(report?.date || '-' ) }}</div>
+                    <div class=""> {{ report?.klasifikasi || '-' }}</div>
                   </div>
 
                   <div class="flex items-center text-xs border-b border-gray-200 py-1">
-                      <div class="w-48 font-semibold text-xs">Nomor Mesin</div>
-                      <div class="pr-2 text-xs">:</div>
-                      <div class="lowercase first-letter:capitalize"> {{ report?.nomor_mesin || '-' }}</div>
+                    <div class="w-48 font-semibold text-xs">Type</div>
+                    <div class="pr-2 text-xs">:</div>
+                    <div class=""> {{ report?.type || '-' }}</div>
                   </div>
 
                   <div class="flex items-center text-xs border-b border-gray-200 py-1">
-                    <div class="w-48 font-semibold text-xs">Cuaca</div>
+                    <div class="w-48 font-semibold text-xs">Merk</div>
                     <div class="pr-2 text-xs">:</div>
-                    <div class="lowercase first-letter:capitalize"> {{ report?.cuaca || '-' }}</div>
+                    <div class=""> {{ report?.jenis_kpjr || '-' }}</div>
                   </div>
 
                   <div class="flex items-center text-xs border-b border-gray-200 py-1">
@@ -3711,9 +3782,21 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   </div>
 
                   <div class="flex items-center text-xs border-b border-gray-200 py-1">
-                    <div class="w-48 font-semibold text-xs">Jenis / Tipe KPJR</div>
+                      <div class="w-48 font-semibold text-xs">Nomor Mesin</div>
+                      <div class="pr-2 text-xs">:</div>
+                      <div class="lowercase first-letter:capitalize"> {{ report?.nomor_mesin || '-' }}</div>
+                  </div>
+
+                  <div class="flex items-center text-xs border-b border-gray-200 py-1">
+                    <div class="w-48 font-semibold text-xs">Hari / Tanggal</div>
                     <div class="pr-2 text-xs">:</div>
-                    <div class=""> {{ report?.jenis_kpjr || '-' }}</div>
+                    <div class="">{{ formatDateDay(report?.date || '-' ) }}</div>
+                  </div>
+
+                  <div class="flex items-center text-xs border-b border-gray-200 py-1">
+                    <div class="w-48 font-semibold text-xs">Cuaca</div>
+                    <div class="pr-2 text-xs">:</div>
+                    <div class="lowercase first-letter:capitalize"> {{ report?.cuaca || '-' }}</div>
                   </div>
 
                   <!-- <div class="flex items-center text-xs border-b border-gray-200 py-1">
@@ -4477,13 +4560,13 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   </div>
 
                   <div class="flex items-center text-xs border-b border-gray-200 py-1">
-                    <div class="w-48 font-semibold text-xs">Jam Kerja Awal</div>
+                    <div class="w-48 font-semibold text-xs">Awal Jam Kerja Operator</div>
                     <div class="pr-2 text-xs">:</div>
                     <div class="lowercase first-letter:capitalize"> {{ report?.jam_kerja_awal?.slice(0, 5) || '-' }} WIB</div>
                   </div>
 
                   <div class="flex items-center text-xs border-b border-gray-200 py-1">
-                    <div class="w-48 font-semibold text-xs">Jam Kerja Akhir</div>
+                    <div class="w-48 font-semibold text-xs">Akhir Jam Kerja Operator</div>
                     <div class="pr-2 text-xs">:</div>
                     <div class="lowercase first-letter:capitalize"> {{ report?.workresult?.jam_kerja_akhir?.slice(0, 5) || '-' }} WIB</div>
                   </div>
@@ -4548,11 +4631,11 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <div class="lowercase first-letter:capitalize"> {{ report?.workresult?.hsd_akhir_kerja || '-' }} %</div>
                   </div>
 
-                  <div class="flex items-center text-xs border-b border-gray-200 py-1">
+                  <!-- <div class="flex items-center text-xs border-b border-gray-200 py-1">
                     <div class="w-48 font-semibold text-xs">Konsumsi HSD</div>
                     <div class="pr-2 text-xs">:</div>
                     <div class="lowercase first-letter:capitalize"> {{ report?.workresult?.konsumsi_hsd || '-' }}</div>
-                  </div>
+                  </div> -->
                 </div>
 
                 <div class="font-bold rounded-md text-xs py-1">C. DATA PERSONEL</div>
@@ -4644,21 +4727,21 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   </div> -->
 
                   <div class="flex items-center text-xs border-b border-gray-200 py-1">
-                    <div class="w-48 font-semibold text-xs">Hari / Tanggal</div>
+                    <div class="w-48 font-semibold text-xs">Klasifikasi</div>
                     <div class="pr-2 text-xs">:</div>
-                    <div class="">{{ formatDateDay(report?.date || '-' ) }}</div>
+                    <div class=""> {{ report?.klasifikasi || '-' }}</div>
                   </div>
 
                   <div class="flex items-center text-xs border-b border-gray-200 py-1">
-                      <div class="w-48 font-semibold text-xs">Nomor Mesin</div>
-                      <div class="pr-2 text-xs">:</div>
-                      <div class="capitalize"> {{ report?.nomor_mesin || '-' }}</div>
+                    <div class="w-48 font-semibold text-xs">Type</div>
+                    <div class="pr-2 text-xs">:</div>
+                    <div class=""> {{ report?.type || '-' }}</div>
                   </div>
 
                   <div class="flex items-center text-xs border-b border-gray-200 py-1">
-                    <div class="w-48 font-semibold text-xs">Cuaca</div>
+                    <div class="w-48 font-semibold text-xs">Merk</div>
                     <div class="pr-2 text-xs">:</div>
-                    <div class="capitalize"> {{ report?.cuaca || '-' }}</div>
+                    <div class=""> {{ report?.jenis_kpjr || '-' }}</div>
                   </div>
 
                   <div class="flex items-center text-xs border-b border-gray-200 py-1">
@@ -4668,9 +4751,21 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   </div>
 
                   <div class="flex items-center text-xs border-b border-gray-200 py-1">
-                    <div class="w-48 font-semibold text-xs">Jenis / Tipe KPJR</div>
+                      <div class="w-48 font-semibold text-xs">Nomor Mesin</div>
+                      <div class="pr-2 text-xs">:</div>
+                      <div class="lowercase first-letter:capitalize"> {{ report?.nomor_mesin || '-' }}</div>
+                  </div>
+
+                  <div class="flex items-center text-xs border-b border-gray-200 py-1">
+                    <div class="w-48 font-semibold text-xs">Hari / Tanggal</div>
                     <div class="pr-2 text-xs">:</div>
-                    <div class=""> {{ report?.jenis_kpjr || '-' }}</div>
+                    <div class="">{{ formatDateDay(report?.date || '-' ) }}</div>
+                  </div>
+
+                  <div class="flex items-center text-xs border-b border-gray-200 py-1">
+                    <div class="w-48 font-semibold text-xs">Cuaca</div>
+                    <div class="pr-2 text-xs">:</div>
+                    <div class="lowercase first-letter:capitalize"> {{ report?.cuaca || '-' }}</div>
                   </div>
 
                   <!-- <div class="flex items-center text-xs border-b border-gray-200 py-1">
@@ -4735,13 +4830,13 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   </div>
 
                   <div class="flex items-center text-xs border-b border-gray-200 py-1">
-                    <div class="w-48 font-semibold text-xs">Jam Kerja Awal</div>
+                    <div class="w-48 font-semibold text-xs">Awal Jam Kerja Operator</div>
                     <div class="pr-2 text-xs">:</div>
                     <div class="capitalize"> {{ report?.jam_kerja_awal?.slice(0, 5) || '-' }} WIB</div>
                   </div>
 
                   <div class="flex items-center text-xs border-b border-gray-200 py-1">
-                    <div class="w-48 font-semibold text-xs">Jam Kerja Akhir</div>
+                    <div class="w-48 font-semibold text-xs">Akhir Jam Kerja Operator</div>
                     <div class="pr-2 text-xs">:</div>
                     <div class="capitalize"> {{ report?.warmingup?.jam_kerja_akhir?.slice(0, 5) || '-' }} WIB</div>
                   </div>
@@ -4806,11 +4901,11 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <div class="capitalize"> {{ report?.warmingup?.hsd_akhir_kerja || '-' }} %</div>
                   </div>
 
-                  <div class="flex items-center text-xs border-b border-gray-200 py-1">
+                  <!-- <div class="flex items-center text-xs border-b border-gray-200 py-1">
                     <div class="w-48 font-semibold text-xs">Konsumsi HSD</div>
                     <div class="pr-2 text-xs">:</div>
                     <div class="capitalize"> {{ report?.warmingup?.konsumsi_hsd || '-' }}</div>
-                  </div>
+                  </div> -->
 
                 </div>
 
@@ -4835,7 +4930,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       <div class="uppercase">[{{ report?.operator3?.username }}] {{ report?.operator3?.name || '-' }} </div>
                     </div>
 
-                    <div class="flex items-center text-xs border-b border-gray-200 py-1">
+                    <!-- <div class="flex items-center text-xs border-b border-gray-200 py-1">
                       <div class="w-48 font-semibold text-xs">Pengawal 1</div>
                       <div class="pr-2 text-xs">:</div>
                       <div class="uppercase">[{{ report?.nipp }}] {{ report?.nama_pengawal || '-' }}  </div>
@@ -4845,7 +4940,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       <div class="w-48 font-semibold text-xs">Pengawal 2</div>
                       <div class="pr-2 text-xs">:</div>
                       <div class="uppercase">[{{ report?.nipp1 }}] {{ report?.nama_pengawal1 || '-' }}  </div>
-                    </div>
+                    </div> -->
                 </div>
 
                 <p v-if="report?.operator_at1" class="text-xs font-bold text-blue-600">Operator 1 telah menyetujui pada tanggal : {{ formatDate(report?.operator_at1)}}</p>

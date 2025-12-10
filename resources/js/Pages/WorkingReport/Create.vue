@@ -38,6 +38,9 @@ const form = useForm({
   has_trouble: props.report?.has_trouble || '',
   status: props.report?.status || '',
   cuaca: props.report?.cuaca || '',
+  klasifikasi: props.report?.klasifikasi || '',
+  type: props.report?.type || '',
+  lokasi_stabling_awal: props.report?.lokasi_stabling_awal || '',
   jenis_kpjr: props.report?.jenis_kpjr || '',
   nomor_mesin: props.report?.nomor_mesin || '',
   nomor_sarana: props.report?.nomor_sarana || '',
@@ -112,16 +115,21 @@ watch(
       form.nomor_mesin = ''
       form.nomor_sarana = ''
       form.region_id = ''
+      form.klasifikasi = ''
+      form.type = ''
       return
     }
 
     const selected = props.machines.find(m => m.id === newVal)
 
     if (selected) {
-      form.jenis_kpjr = `${selected.name} ${selected.type}`
+      // form.jenis_kpjr = `${selected.name} ${selected.type}`
+      form.jenis_kpjr = selected.type || ''
       form.nomor_mesin = selected.nomor || ''
       form.nomor_sarana = selected.no_sarana || ''
       form.region_id = selected.region_id || ''
+      form.klasifikasi = selected.classification?.name || ''
+      form.type = selected.name || ''
     }
   }
 )
@@ -409,7 +417,57 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   </div>
                 </div>
                 
-                <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">     
+                <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">    
+
+                  <div class="flex flex-col">
+                    <label class="block text-xs font-semibold">Klasifikasi</label>
+                    <Input
+                      v-model="form.klasifikasi"
+                      type="text"
+                      class="w-full border rounded-md px-2 py-2 text-xs"
+                      placeholder="Isi Klasifikasi"
+                    />
+                  </div>
+
+                  <div class="flex flex-col">
+                    <label class="block text-xs font-semibold">Type</label>
+                    <Input
+                      v-model="form.type"
+                      type="text"
+                      class="w-full border rounded-md px-2 py-2 text-xs"
+                      placeholder="Isi Type"
+                    />
+                  </div>
+
+                  <div class="flex flex-col">
+                    <label class="block text-xs font-semibold">Merk</label>
+                    <Input
+                      v-model="form.jenis_kpjr"
+                      type="text"
+                      class="w-full border rounded-md px-2 py-2 text-xs"
+                      placeholder="Isi Merk"
+                    />
+                  </div>
+
+                  <div class="flex flex-col">
+                    <label class="block text-xs font-semibold">Nomor Sarana</label>
+                    <Input
+                      v-model="form.nomor_sarana"
+                      type="text"
+                      class="w-full border rounded-md px-2 py-2 text-xs"
+                      placeholder="Isi Nomor Sarana"
+                    />
+                  </div>
+
+                  <div class="flex flex-col">
+                    <label class="block text-xs font-semibold">Nomor Mesin</label>
+                    <Input
+                      v-model="form.nomor_mesin"
+                      type="text"
+                      class="w-full border rounded-md px-2 py-2 text-xs"
+                      placeholder="Isi Nomor Mesin"
+                    />
+                  </div> 
 
                   <div class="flex flex-col">
                     <label class="block text-xs font-semibold">Tanggal</label>
@@ -422,7 +480,28 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   </div>             
 
                   <div class="flex flex-col">
-                    <label for="approved_by1" class="block text-xs font-semibold">
+                    <label for="cuaca" class="block text-xs font-semibold">
+                      {{ __('Cuaca') }}
+                    </label>
+                    
+                    <select 
+                      v-model="form.cuaca"
+                      class="border border-gray-300 rounded-md px-2 py-1 h-9 text-xs bg-white focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                      required
+                    >
+                      <option value="" disabled>Pilih</option>
+                      <option value="Cerah">Cerah</option>
+                      <option value="Berawan">Berawan</option>
+                      <option value="Hujan">Hujan</option>
+                      <option value="Panas">Panas</option>
+                      <option value="Dingin">Dingin</option>
+                      <option value="Berangin">Berangin</option>
+                    </select>
+                    <InputError :error="form.errors.cuaca" />
+                  </div>
+
+                  <div class="flex flex-col">
+                    <label for="mode" class="block text-xs font-semibold">
                       {{ __('Mode') }}
                     </label>
 
@@ -435,7 +514,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       <option value="warmingup">Warming Up</option>
                       <option value="working">Working</option>
                     </select>
-                    <InputError :error="form.errors.approved_by1" />
+                    <InputError :error="form.errors.mode" />
                   </div>
 
                   <!-- <div class="flex flex-col">
@@ -490,57 +569,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   </div>
 
                   <div class="flex flex-col">
-                    <label for="cuaca" class="block text-xs font-semibold">
-                      {{ __('Cuaca') }}
-                    </label>
-                    
-                    <select 
-                      v-model="form.cuaca"
-                      class="border border-gray-300 rounded-md px-2 py-1 h-9 text-xs bg-white focus:ring-blue-500 focus:border-blue-500 shadow-sm"
-                      required
-                    >
-                      <option value="" disabled>Pilih</option>
-                      <option value="Cerah">Cerah</option>
-                      <option value="Berawan">Berawan</option>
-                      <option value="Hujan">Hujan</option>
-                      <option value="Panas">Panas</option>
-                      <option value="Dingin">Dingin</option>
-                      <option value="Berangin">Berangin</option>
-                    </select>
-                    <InputError :error="form.errors.cuaca" />
-                  </div>
-
-                  <div class="flex flex-col">
-                    <label class="block text-xs font-semibold">Jenis KPJR</label>
-                    <Input
-                      v-model="form.jenis_kpjr"
-                      type="text"
-                      class="w-full border rounded-md px-2 py-2 text-xs"
-                      placeholder="Isi Jenis KPJR"
-                    />
-                  </div>
-
-                  <div class="flex flex-col">
-                    <label class="block text-xs font-semibold">Nomor Mesin</label>
-                    <Input
-                      v-model="form.nomor_mesin"
-                      type="text"
-                      class="w-full border rounded-md px-2 py-2 text-xs"
-                      placeholder="Isi Nomor Mesin"
-                    />
-                  </div>
-
-                  <div class="flex flex-col">
-                    <label class="block text-xs font-semibold">Nomor Sarana</label>
-                    <Input
-                      v-model="form.nomor_sarana"
-                      type="text"
-                      class="w-full border rounded-md px-2 py-2 text-xs"
-                      placeholder="Isi Nomor Sarana"
-                    />
-                  </div>
-
-                  <div class="flex flex-col">
                     <label class="block text-xs font-semibold">Waktu Start Engine</label>
                     <Input
                       v-model="form.waktu_start_engine"
@@ -550,7 +578,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     />
                   </div>
 
-                  <div class="flex flex-col">
+                  <div class="flex flex-col" v-if="form.mode === 'working'">
                     <label class="block text-xs font-semibold">Jam Traveling Awal</label>
                     <Input
                       v-model="form.jam_traveling_awal"
@@ -561,12 +589,12 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   </div>
 
                   <div class="flex flex-col">
-                    <label class="block text-xs font-semibold">Jam Kerja Awal</label>
+                    <label class="block text-xs font-semibold">Awal Jam Kerja Operator</label>
                     <Input
                       v-model="form.jam_kerja_awal"
                       type="time"
                       class="w-full border rounded-md px-2 py-2 text-xs"
-                      placeholder="Isi Jam Kerja Awal"
+                      placeholder="Isi Awal Jam Kerja Operator"
                     />
                   </div>
 
@@ -692,7 +720,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <InputError :error="form.errors.operator_by3" />
                   </div>    
 
-                  <div class="flex flex-col">
+                  <div class="flex flex-col" v-if="form.mode === 'working'">
                     <label class="block text-xs font-semibold">NIPP Pengawal 1</label>
                     <Input
                       v-model="form.nipp"
@@ -702,7 +730,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     />
                   </div>
 
-                  <div class="flex flex-col">
+                  <div class="flex flex-col" v-if="form.mode === 'working'">
                     <label class="block text-xs font-semibold">Nama Pengawal 1</label>
                     <Input
                       v-model="form.nama_pengawal"
@@ -712,7 +740,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     />
                   </div>
 
-                  <div class="flex flex-col">
+                  <div class="flex flex-col" v-if="form.mode === 'working'">
                     <label class="block text-xs font-semibold">NIPP Pengawal 2</label>
                     <Input
                       v-model="form.nipp1"
@@ -722,7 +750,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     />
                   </div>
 
-                  <div class="flex flex-col">
+                  <div class="flex flex-col" v-if="form.mode === 'working'">
                     <label class="block text-xs font-semibold">Nama Pengawal 2</label>
                     <Input
                       v-model="form.nama_pengawal1"

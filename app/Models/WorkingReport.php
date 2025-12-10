@@ -49,6 +49,9 @@ class WorkingReport extends Model
         'nipp',
         'nama_pengawal1',
         'nipp1',
+        'klasifikasi',
+        'type',
+        'lokasi_stabling_awal',
     ];
 
     protected $with = [

@@ -208,7 +208,7 @@ class WorkingReportController extends Controller
       // Menampilkan data mesin sesuai daop user
       $user = auth()->user();
 
-      $machineQuery = MasterMachine::with('region')->select('id', 'name', 'type', 'nomor', 'no_sarana', 'region_id');
+      $machineQuery = MasterMachine::with('region', 'classification')->select('id', 'name', 'type', 'nomor', 'no_sarana', 'region_id', 'classification_id');
 
       if ($user->division_id == 4) {
         $machineQuery->where('region_id', 2);
@@ -273,6 +273,9 @@ class WorkingReportController extends Controller
           'has_trouble' => 'nullable',
           'status'      => 'nullable|in:draft,checksheet_done,warming_up_done,photo_uploaded,work_done,verification,finished',
           'cuaca'                => 'nullable|string',
+          'lokasi_stabling_awal' => 'nullable|string',
+          'klasifikasi'          => 'nullable|string',
+          'type'                 => 'nullable|string',
           'jenis_kpjr'           => 'nullable|string',
           'nomor_mesin'          => 'nullable|string',
           'nomor_sarana'         => 'nullable|string',
@@ -537,6 +540,9 @@ class WorkingReportController extends Controller
           'has_trouble'       => 'nullable',
           'status'            => 'nullable|in:draft,checksheet_done,warming_up_done,photo_uploaded,work_done,verification,finished',
           'cuaca'                => 'nullable|string',
+          'lokasi_stabling_awal' => 'nullable|string',
+          'klasifikasi'          => 'nullable|string',
+          'type'                 => 'nullable|string',
           'jenis_kpjr'           => 'nullable|string',
           'nomor_mesin'          => 'nullable|string',
           'nomor_sarana'         => 'nullable|string',
@@ -663,6 +669,9 @@ class WorkingReportController extends Controller
       'has_trouble',
       'status',
       'cuaca',
+      'klasifikasi',
+      'type',
+      'lokasi_stabling_awal',
       'jenis_kpjr',
       'nomor_mesin',
       'nomor_sarana',

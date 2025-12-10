@@ -54,27 +54,36 @@
 
     <table style="width: 100%; border-collapse: collapse; margin-bottom: 5px; margin-top: 5px;">
         <tr>
-            <td style="width: 20%; font-weight: bold; padding: 1px 3px 1px 0;">Hari / Tanggal</td>
+            <td style="width: 20%; font-weight: bold; padding: 1px 3px 1px 0;">Klasifikasi</td>
             <td style="width: 1%; text-align: center; font-weight: bold;">:</td>
-            <td style="width: 33%; border-bottom: 1px solid black; padding: 1px 3px;">{{ \Carbon\Carbon::parse($report->date)->translatedFormat('l, d F Y') }}</td>
+            <td style="width: 33%; border-bottom: 1px solid black; padding: 1px 3px;">{{ $report->klasifikasi ?? '-' }}</td>
 
-            <td style="width: 20%; font-weight: bold; padding: 1px 3px 1px 0;">Nomor Mesin</td>
+            <td style="width: 20%; font-weight: bold; padding: 1px 3px 1px 0;">Type</td>
             <td style="width: 1%; text-align: center; font-weight: bold;">:</td>
-            <td style="width: 33%; border-bottom: 1px solid black; padding: 1px 3px;">{{ $report->nomor_mesin ?? '-' }}</td>
+            <td style="width: 33%; border-bottom: 1px solid black; padding: 1px 3px;">{{ $report->type ?? '-' }}</td>
         </tr>
         <tr>
-            <td style="font-weight: bold; padding: 1px 3px 1px 0;">Cuaca</td>
+            <td style="font-weight: bold; padding: 1px 3px 1px 0;">Merk</td>
             <td style="text-align: center; font-weight: bold;">:</td>
-            <td style="border-bottom: 1px solid black; padding: 1px 3px;">{{ $report->cuaca ?? '-' }}</td>
+            <td style="border-bottom: 1px solid black; padding: 1px 3px;">{{ $report->jenis_kpjr ?? '-' }}</td>
 
             <td style="font-weight: bold; padding: 1px 3px 1px 0;">Nomor Sarana</td>
             <td style="text-align: center; font-weight: bold;">:</td>
             <td style="border-bottom: 1px solid black; padding: 1px 3px;">{{ $report->nomor_sarana ?? '-' }}</td>
         </tr>
         <tr>
-            <td style="font-weight: bold; padding: 1px 3px 1px 0;">Jenis / Tipe KPJR</td>
+            <td style="font-weight: bold; padding: 1px 3px 1px 0;">Nomor Mesin</td>
             <td style="text-align: center; font-weight: bold;">:</td>
-            <td style="border-bottom: 1px solid black; padding: 1px 3px;">{{ $report->jenis_kpjr ?? '-' }}</td>
+            <td style="border-bottom: 1px solid black; padding: 1px 3px;">{{ $report->nomor_mesin ?? '-' }}</td>
+
+            <td style="font-weight: bold; padding: 1px 3px 1px 0;">Hari / Tanggal</td>
+            <td style="text-align: center; font-weight: bold;">:</td>
+            <td style="border-bottom: 1px solid black; padding: 1px 3px;">{{ \Carbon\Carbon::parse($report->date)->translatedFormat('l, d F Y') }}</td>
+        </tr>
+        <tr>
+            <td style="font-weight: bold; padding: 1px 3px 1px 0;">Cuaca</td>
+            <td style="text-align: center; font-weight: bold;">:</td>
+            <td style="border-bottom: 1px solid black; padding: 1px 3px;">{{ $report->cuaca ?? '-' }}</td>
 
             <td colspan="3"></td> 
         </tr>
@@ -444,12 +453,12 @@
               <td style="border-bottom: 1px solid black;">{{ optional($report->workresult)->jam_traveling_akhir ?? '-' }}</td>
           </tr>
           <tr>
-              <td style="font-weight: bold;">Jam Kerja Awal</td>
+              <td style="font-weight: bold;">Awal Jam Kerja Operator</td>
               <td style="text-align: center;">:</td>
               <td style="border-bottom: 1px solid black;">{{ substr($report->jam_kerja_awal ?? ' - : - : - ', 0, 5) }} WIB</td>
               <td></td>
               
-              <td style="font-weight: bold;">Jam Kerja Akhir</td>
+              <td style="font-weight: bold;">Akhir Jam Kerja Operator</td>
               <td style="text-align: center;">:</td>
               <td style="border-bottom: 1px solid black;">{{ optional($report->workresult)->jam_kerja_akhir ? date('H:i', strtotime(optional($report->workresult)->jam_kerja_akhir)): '-' }} WIB</td>
           </tr>
@@ -503,14 +512,14 @@
               <td style="text-align: center;">:</td>
               <td style="border-bottom: 1px solid black;">{{ optional($report->workresult)->hsd_akhir_kerja ?? '-' }} %</td>
           </tr>
-          <tr>
+          <!-- <tr>
               <td style="font-weight: bold;">Konsumsi H&D</td>
               <td style="text-align: center;">:</td>
               <td style="border-bottom: 1px solid black;">{{ optional($report->workresult)->konsumsi_hsd ?? '-' }} Liter</td>
               <td></td>
               
               <td colspan="3"></td>
-          </tr>
+          </tr> -->
       </table>
 
       <div style="font-weight: bold; padding: 3px 0; border-top: 1px solid black; border-bottom: 1px solid black; background-color: #f0f0f0; margin-top: 5px; margin-bottom: 5px; background-color: #ccc;">C. DATA PERSONEL</div>
@@ -744,7 +753,7 @@
               <td style="width: 1%; text-align: center;">:</td>
               <td style="width: 33%; border-bottom: 1px solid black;">{{ optional($report->warmingup)->waktu_stop_engine ? date('H:i', strtotime(optional($report->warmingup)->waktu_stop_engine)): '-' }} WIB</td>
           </tr>
-          <tr>
+          <!-- <tr>
               <td style="font-weight: bold;">Jam Travelling Awal</td>
               <td style="text-align: center;">:</td>
               <td style="border-bottom: 1px solid black;">{{ $report->jam_traveling_awal ?? '-' }}</td>
@@ -753,14 +762,14 @@
               <td style="font-weight: bold;">Jam Travelling Akhir</td>
               <td style="text-align: center;">:</td>
               <td style="border-bottom: 1px solid black;">{{ optional($report->warmingup)->jam_traveling_akhir ?? '-' }}</td>
-          </tr>
+          </tr> -->
           <tr>
-              <td style="font-weight: bold;">Jam Kerja Awal</td>
+              <td style="font-weight: bold;">Awal Jam Kerja Operator</td>
               <td style="text-align: center;">:</td>
               <td style="border-bottom: 1px solid black;">{{ substr($report->jam_kerja_awal ?? ' - : - : - ', 0, 5) }} WIB</td>
               <td></td>
               
-              <td style="font-weight: bold;">Jam Kerja Akhir</td>
+              <td style="font-weight: bold;">Akhir Jam Kerja Operator</td>
               <td style="text-align: center;">:</td>
               <td style="border-bottom: 1px solid black;">{{ optional($report->warmingup)->jam_kerja_akhir ? date('H:i', strtotime(optional($report->warmingup)->jam_kerja_akhir)): '-' }} WIB</td>
           </tr>
@@ -814,32 +823,32 @@
               <td style="text-align: center;">:</td>
               <td style="border-bottom: 1px solid black;">{{ optional($report->warmingup)->hsd_akhir_kerja ?? '-' }} %</td>
           </tr>
-          <tr>
+          <!-- <tr>
               <td style="font-weight: bold;">Konsumsi H&D</td>
               <td style="text-align: center;">:</td>
               <td style="border-bottom: 1px solid black;">{{ optional($report->warmingup)->konsumsi_hsd ?? '-' }} Liter</td>
               <td></td>
               
               <td colspan="3"></td>
-          </tr>
+          </tr> -->
       </table>
 
       <div style="font-weight: bold; padding: 3px 0; border-top: 1px solid black; border-bottom: 1px solid black; background-color: #f0f0f0; margin-top: 5px; margin-bottom: 5px; background-color: #ccc;">B. DATA PERSONEL</div>
 
       <table style="width: 100%; border-collapse: collapse; margin-bottom: 5px;">
         <tr>
-            <td style="width: 20%; font-weight: bold;">Operator 1</td>
+            <td style="width: 18%; font-weight: bold;">Operator 1</td>
             <td style="width: 1%; text-align: center;">:</td>
             <td style="width: 33%; border-bottom: 1px solid black;">
                 {{ ucwords(strtolower(optional($report->operator1)->name ?? '-')) }}
             </td>
             <td style="width: 5px;"></td>
 
-            <td style="width: 20%; font-weight: bold;">Pengawal 1</td>
+            <!-- <td style="width: 20%; font-weight: bold;">Pengawal 1</td>
             <td style="width: 1%; text-align: center;">:</td>
             <td style="width: 33%; border-bottom: 1px solid black;">
                 {{ ucwords(strtolower($report->nama_pengawal) ?? '-') }}
-            </td>
+            </td> -->
         </tr>
 
         <tr>
@@ -850,11 +859,11 @@
             </td>
             <td></td>
 
-            <td style="font-weight: bold;">Pengawal 2</td>
+            <!-- <td style="font-weight: bold;">Pengawal 2</td>
             <td style="text-align: center;">:</td>
             <td style="border-bottom: 1px solid black;">
                 {{ ucwords(strtolower($report->nama_pengawal1) ?? '-') }}
-            </td>
+            </td> -->
         </tr>
 
         <tr>
