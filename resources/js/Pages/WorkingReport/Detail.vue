@@ -652,6 +652,42 @@ const updatechecksheetday = async () => {
   }
 };
 
+//disabled dailycheck
+const isGroupCompleted = computed(() => {
+    const results = currentGroupResults.value; 
+    const isSignedByOperator = props.report.operator_at3 !== null && props.report.operator_at3 !== '';
+
+    // Jika sudah ditandatangani oleh operator
+    if (isSignedByOperator) {
+        return true;
+    }
+
+    if (!results || results.length === 0) {
+        return false;
+    }
+
+    const allItemsCompleted = results.every(item => {
+        const isCheckboxChecked = item.cek === 1 || item.tambahan === 1 || item.ganti === 1;
+        const isTextFieldFilled = item.kiri_depan?.trim() !== '' || item.kanan_depan?.trim() !== '' || item.keterangan?.trim() !== '';
+
+        return isCheckboxChecked || isTextFieldFilled;
+    });
+
+    return allItemsCompleted;
+});
+
+const isSignedByOperator = computed(() => {
+    return props.report.operator_at3 !== null && props.report.operator_at3 !== '';
+});
+
+const isCheckboxDisabled = computed(() => {
+    return isGroupCompleted.value || isSignedByOperator.value;
+});
+
+const isTextFieldDisabled = computed(() => {
+    return isSignedByOperator.value; 
+});
+
 const toggleResult = async (item, field) => {
   const previousValue = item[field];
   item[field] = item[field] == 1 ? 0 : 1;
@@ -704,10 +740,18 @@ const saveTextField = async (item) => {
     });
 
     Swal.fire({
+      toast: true,
+      position: "top-end",
       icon: "success",
-      title: "Berhasil disimpan",
-      timer: 1000,
+      title: "Berhasil Disimpan",
+      timer: 600,  
+      timerProgressBar: true,
       showConfirmButton: false,
+      showCloseButton: false,
+      backdrop: false,
+      didOpen: (toast) => {
+        toast.style.animation = "none"; 
+      }
     });
   } catch (error) {
     console.error("Autosave failed:", error);
@@ -2428,33 +2472,33 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                         <th colspan="11" class="border border-black px-1 py-1 text-center bg-gray-600 font-bold text-white">{{ groups[currentGroupIndex] }}</th>
                       </tr>
                       <tr>
-                        <th class="border border-black px-1 py-1 text-center bg-gray-200 font-bold">No</th>
-                        <th class="border border-black px-1 py-1 text-center bg-gray-200 font-bold">Komponen</th>
-                        <th class="border border-black px-1 py-1 text-center bg-gray-200 font-bold">Rujukan</th>
-                        <th class="border border-black px-1 py-1 text-center bg-gray-200 font-bold">Cek</th>
-                        <th class="border border-black px-1 py-1 text-center bg-gray-200 font-bold">Tambah</th>
-                        <th class="border border-black px-1 py-1 text-center bg-gray-200 font-bold">Ganti</th>
-                        <th class="border border-black px-1 py-1 text-center bg-gray-200 font-bold">Nilai Rujukan</th>
-                        <th class="border border-black px-1 py-1 text-center bg-gray-200 font-bold">Kr/Dpn</th>
-                        <th class="border border-black px-1 py-1 text-center bg-gray-200 font-bold">Kn/Dpn</th>
-                        <th class="border border-black px-1 py-1 text-center bg-gray-200 font-bold">Sat.</th>
-                        <th class="border border-black px-1 py-1 text-center bg-gray-200 font-bold">App.</th>
+                        <th class="border border-black px-1 py-1 text-center bg-gray-200 font-bold text-xs">No</th>
+                        <th class="border border-black px-1 py-1 text-center bg-gray-200 font-bold text-xs">Komponen</th>
+                        <th class="border border-black px-1 py-1 text-center bg-gray-200 font-bold text-xs">Rujukan</th>
+                        <th class="border border-black px-1 py-1 text-center bg-gray-200 font-bold text-xs">Cek</th>
+                        <th class="border border-black px-1 py-1 text-center bg-gray-200 font-bold text-xs">Tambah</th>
+                        <th class="border border-black px-1 py-1 text-center bg-gray-200 font-bold text-xs">Ganti</th>
+                        <th class="border border-black px-1 py-1 text-center bg-gray-200 font-bold text-xs">Nilai Rujukan</th>
+                        <th class="border border-black px-1 py-1 text-center bg-gray-200 font-bold text-xs">Kr/Dpn</th>
+                        <th class="border border-black px-1 py-1 text-center bg-gray-200 font-bold text-xs">Kn/Dpn</th>
+                        <th class="border border-black px-1 py-1 text-center bg-gray-200 font-bold text-xs">Sat.</th>
+                        <th class="border border-black px-1 py-1 text-center bg-gray-200 font-bold text-xs">App.</th>
                       </tr>
                     </thead>
 
                     <tbody>
                       <tr v-for="(item, index) in currentGroupResults" :key="index">
-                        <td class="border border-black px-2 py-1 text-center">{{ item.urutan }}</td>
-                        <td class="border border-black px-2 py-1 text-left">{{ item.komponen }}</td>
-                        <td class="border border-black px-2 py-1">{{ item.rujukan }}</td>
+                        <td class="border border-black px-2 py-1 text-center text-xs">{{ item.urutan }}</td>
+                        <td class="border border-black px-2 py-1 text-left text-xs">{{ item.komponen }}</td>
+                        <td class="border border-black px-2 py-1 text-xs">{{ item.rujukan }}</td>
                         <td class="border border-black px-2 py-1 text-center">
-                          <input type="checkbox" :checked="item.cek == 1" @change="toggleResult(item, 'cek')" />
+                          <input type="checkbox" :checked="item.cek == 1" @change="toggleResult(item, 'cek')" :disabled="isCheckboxDisabled"/>
                         </td>
                         <td class="border border-black px-2 py-1 text-center">
-                          <input type="checkbox" :checked="item.tambahan == 1" @change="toggleResult(item, 'tambahan')"/>
+                          <input type="checkbox" :checked="item.tambahan == 1" @change="toggleResult(item, 'tambahan')" :disabled="isCheckboxDisabled"/>
                         </td>
                         <td class="border border-black px-2 py-1 text-center">
-                          <input type="checkbox" :checked="item.ganti == 1" @change="toggleResult(item, 'ganti')"/>
+                          <input type="checkbox" :checked="item.ganti == 1" @change="toggleResult(item, 'ganti')" :disabled="isCheckboxDisabled"/>
                         </td>
                         <td class="border border-black px-2 py-1 text-center">{{ item.nilai_rujukan }}</td>
                         <td class="border border-black p-0 m-0 relative">
@@ -2463,7 +2507,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                             type="text"
                             placeholder="...."
                             class="absolute inset-0 w-full h-full border-none focus:ring-0 text-center text-[10px] p-0 m-0"
-                            @change="saveTextField(item)"/>
+                            @change="saveTextField(item)" :disabled="isTextFieldDisabled"/>
                         </td>
                         <td class="border border-black p-0 m-0 relative">
                           <input
@@ -2471,7 +2515,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                             type="text"
                             placeholder="...."
                             class="absolute inset-0 w-full h-full border-none focus:ring-0 text-center text-[10px] p-0 m-0"
-                            @change="saveTextField(item)" />
+                            @change="saveTextField(item)" :disabled="isTextFieldDisabled"/>
                         </td>
                         <td class="border border-black px-2 py-1 text-center text-[10px] p-0 m-0">{{ item.satuan }}</td>
                         <td class="border border-black p-0 m-0 relative">
@@ -2479,7 +2523,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                             v-model="item.keterangan"
                             type="text"
                             placeholder="...."
-                            @change="saveTextField(item)"
+                            @change="saveTextField(item)" :disabled="isTextFieldDisabled"
                             class="absolute inset-0 w-full h-full border-none focus:ring-0 text-center text-[10px] p-0 m-0"
                           />
                         </td>
@@ -2490,7 +2534,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <Button v-if="!isFirstGroup" class="bg-gray-600 text-white px-4 py-1 rounded disabled:opacity-50 text-xs" @click="prevGroup">   ← Kembali </Button>
                     <div v-else></div> 
                     <Button v-if="!isLastGroup" class="bg-blue-600 text-white px-4 py-1 rounded disabled:opacity-50 text-xs" @click="nextGroup"> Lanjut → </Button>
-                    <div v-if="canChangeMode && isLastGroup" class="flex space-x-3">
+                    <div v-if="canChangeMode && isLastGroup && !props.report?.operator_at3" class="flex space-x-3">
                         <Button 
                             class="bg-orange-600 hover:bg-orange-700 text-white px-5 py-1 rounded text-xs shadow-md"
                             @click.prevent="setMode('working')">
