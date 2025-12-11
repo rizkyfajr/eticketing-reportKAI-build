@@ -1370,11 +1370,24 @@ const canAccessWorking = computed(() => {
   return isWorkingOrderMode.value && isAllGroupValid.value;
 });
 
+// const isWorkResult = computed(() => {
+//   const result = props.report
+//   return ['working', 'warmingup'].includes(result?.mode)
+// })
+
 const isWorkResult = computed(() => {
-  const result = props.report
-  // return result?.mode === 'working'
-  return ['working', 'warmingup'].includes(result?.mode)
-})
+    // Diasumsikan 'report' adalah prop yang berisi data WorkingReport
+    const report = props.report;
+    
+    // Perbaikan: Cek apakah ID dari data Work Result atau Warming Up sudah terisi.
+    // Jika salah satu ID ada, Work Result harus muncul/tersedia.
+    const isWarmingUpDataExists = report.warmingup && report.warmingup.id;
+    const isWorkResultDataExists = report.workresult && report.workresult.id;
+    
+    // Kembalikan true jika data Warming Up (Langkah 3) SUDAH ADA 
+    // ATAU data Work Result (Langkah 5) SUDAH ADA.
+    return isWarmingUpDataExists || isWorkResultDataExists;
+});
 
 const hasWorkResultAccess = computed(() => {
   return !!props.checksheetworkresult && !!props.upload
@@ -1426,10 +1439,10 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
 <template>
 
   <DashboardLayout :title="__('Working Order')">
-    <div class="flex items-center w-full overflow-x-auto py-2  rounded">
+    <div class="flex justify-between items-start w-full px-1 sm:px-4">
 
       <!-- STEP 1 - WORKING ORDER -->
-      <div class="step-wrapper"
+      <div class="step-wrapper flex flex-col items-center text-center"
           @click.prevent="fetch('report', report)"
           :class="{ 'cursor-pointer': report.id }">
 
@@ -1444,10 +1457,10 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
         <p class="text-[11px] mt-1 font-bold">Working Order</p>
       </div>
 
-      <div class="step-line"></div>
+      <div class="step-line flex-grow h-1 bg-gray-300 mx-1 mt-4"></div>
 
       <!-- STEP 2 - DAILY CHECK -->
-      <div class="step-wrapper"
+      <div class="step-wrapper flex flex-col items-center text-center"
           @click.prevent="hasWorkingOrder && fetch('checksheetday', report)"
           :class="{ 'cursor-pointer': hasWorkingOrder }">
 
@@ -1462,10 +1475,10 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
         <p class="text-[11px] mt-1 font-bold">Daily Check</p>
       </div>
 
-      <div class="step-line"></div>
+      <div class="step-line flex-grow h-1 bg-gray-300 mx-1 mt-4"></div>
 
       <!-- STEP 3 - WARMING UP -->
-      <div class="step-wrapper"
+      <div class="step-wrapper flex flex-col items-center text-center"
           @click.prevent="canAccessWarmingUp && fetch('warmingup', report)"
           :class="{ 'cursor-pointer': canAccessWarmingUp }">
 
@@ -1481,10 +1494,10 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
         <p class="text-[11px] mt-1 font-bold">Warming Up</p>
       </div>
 
-      <div class="step-line"></div>
+      <div class="step-line flex-grow h-1 bg-gray-300 mx-1 mt-4"></div>
 
       <!-- STEP 4 - WORKING -->
-      <div class="step-wrapper"
+      <div class="step-wrapper flex flex-col items-center text-center"
           @click.prevent="canAccessWorking && fetch('workresult', report)"
           :class="{ 'cursor-pointer': canAccessWorking }">
 
@@ -1500,10 +1513,10 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
         <p class="text-[11px] mt-1 font-bold">Working</p>
       </div>
 
-      <div class="step-line"></div>
+      <div class="step-line flex-grow h-1 bg-gray-300 mx-1 mt-4"></div>
 
       <!-- STEP 5 - WORK RESULT -->
-      <div class="step-wrapper"
+      <div class="step-wrapper flex flex-col items-center text-center"
           v-if="isWorkResult"
           @click.prevent="(report.workresult?.id || warmingup?.id) && fetch('workresultok', report)"
           :class="{ 'cursor-pointer': report.workresult?.id || warmingup?.id }">
