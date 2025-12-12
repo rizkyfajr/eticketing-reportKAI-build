@@ -4,9 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Models\CheckSheetWorkResult;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class CheckSheetWorkResultController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        return Inertia::render('CheckSheetWorkResult/Index', [
+            'results' => CheckSheetWorkResult::with(['workingreport', 'checksheetday'])
+                ->latest()
+                ->paginate(20)
+        ]);
+    }
+
     /**
      * Autosave data CheckSheetWorkResult
      */

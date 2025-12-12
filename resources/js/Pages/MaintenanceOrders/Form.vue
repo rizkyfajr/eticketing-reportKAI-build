@@ -383,15 +383,40 @@ function initializeChecklistResults() {
     return {}
   }
 
+  // Buat map dari results yang sudah disimpan (jika ada)
+  const savedResults = {}
+  if (order.results && Array.isArray(order.results)) {
+    order.results.forEach(result => {
+      savedResults[result.master_pedoman_item_id] = result
+    })
+  }
+
   order.master_pedoman.categories.forEach(cat => {
     cat.items.forEach(item => {
       let realisasiVal = ''
       let statusVal = 'OK'
       let catatanVal = ''
 
-      // KHUSUS TIPE TABLE: buat object kosong
-      if (item.tipe_input === 'table') {
-        realisasiVal = {}
+      // Cek apakah ada saved result untuk item ini
+      const savedResult = savedResults[item.id]
+      if (savedResult) {
+        realisasiVal = savedResult.realisasi || ''
+        statusVal = savedResult.status || 'OK'
+        catatanVal = savedResult.catatan || ''
+
+        // Parse JSON untuk tipe table
+        if (item.tipe_input === 'table' && realisasiVal) {
+          try {
+            realisasiVal = JSON.parse(realisasiVal)
+          } catch (e) {
+            realisasiVal = {}
+          }
+        }
+      } else {
+        // KHUSUS TIPE TABLE: buat object kosong
+        if (item.tipe_input === 'table') {
+          realisasiVal = {}
+        }
       }
 
       resultsData[item.id] = {
@@ -413,6 +438,21 @@ const formChecklist = useForm({
 // Auto-save state
 const checklistSaveStatus = ref('') // '', 'saving', 'saved'
 let checklistSaveTimeout = null
+
+// Watcher untuk update savedOrderData ketika props.order berubah
+watch(() => props.order, (newOrder) => {
+  if (newOrder) {
+    savedOrderData.value = newOrder
+    savedOrderId.value = newOrder.id
+    console.log('Props order updated, reloading savedOrderData:', newOrder)
+
+    // Re-initialize checklist jika ada pedoman
+    if (newOrder.master_pedoman) {
+      formChecklist.results = initializeChecklistResults()
+      console.log('Checklist re-initialized with saved data')
+    }
+  }
+}, { deep: true })
 
 function submitChecklist() {
   if (!savedOrderId.value) {
@@ -764,8 +804,8 @@ function finishLater() {
                 <label class="block text-sm font-semibold mb-1">Pedoman Perawatan (Checklist)</label>
                 <select v-model="form.master_pedoman_id" class="w-full border rounded p-2">
                     <option :value="null" disabled>Pilih Pedoman Checklist</option>
-                    <option v-for="p in filteredPedoman" :key="p.id" :value="p.id">
-                      {{ p.kode_pedoman }}
+                    <option v-for="p in filteredPedoman" :key="p.id" :value="p.id" :title="p.deskripsi">
+                      {{ p.kode_pedoman }} - {{ p.nama_pedoman }}
                     </option>
                 </select>
                 <InputError :message="form.errors.master_pedoman_id" class="mt-1" />

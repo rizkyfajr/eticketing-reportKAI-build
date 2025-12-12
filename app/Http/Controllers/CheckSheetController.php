@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\CheckSheet;
+use Inertia\Inertia;
 
 class CheckSheetController extends Controller
 {
@@ -15,9 +16,13 @@ class CheckSheetController extends Controller
   */
   public function index()
   {
-    //
+    return Inertia::render('CheckSheet/Index', [
+      'checksheets' => CheckSheet::with(['workingReport', 'region'])
+        ->latest()
+        ->paginate(20)
+    ]);
   }
-  
+
   /**
   * Show the form for creating a new resource.
   *
@@ -27,7 +32,7 @@ class CheckSheetController extends Controller
   {
     //
   }
-  
+
   /**
   * Store a newly created resource in storage.
   *
@@ -85,7 +90,7 @@ class CheckSheetController extends Controller
 
     return redirect()->back()->with('error', __('Gagal menambahkan Data.'));
   }
-  
+
   /**
   * Display the specified resource.
   *
@@ -96,7 +101,7 @@ class CheckSheetController extends Controller
   {
     //
   }
-  
+
   /**
   * Show the form for editing the specified resource.
   *
@@ -107,7 +112,7 @@ class CheckSheetController extends Controller
   {
     //
   }
-  
+
   /**
   * Update the specified resource in storage.
   *
@@ -164,7 +169,7 @@ class CheckSheetController extends Controller
 
     return redirect()->back()->with('success', __('Data berhasil diperbarui.'));
   }
-  
+
   /**
   * Remove the specified resource from storage.
   *

@@ -44,7 +44,7 @@ class MaintenanceOrderController extends Controller
     {
         $machines = MasterMachine::with('region:id,name')->select('id','name','type','nomor','hierarchy_code','no_sarana','region_id')->get();
         $reports = WorkingReport::select('id')->get();
-        $pedoman = MasterPedoman::select('id', 'kode_pedoman')->orderBy('kode_pedoman')->get();
+        $pedoman = MasterPedoman::select('id', 'kode_pedoman', 'nama_pedoman', 'deskripsi')->orderBy('kode_pedoman')->get();
         $users = User::select('id', 'name', 'username')->orderBy('name')->get()->map(function($user) {
             $user->formatted_name = '[' . $user->username . '] - ' . strtoupper($user->name);
             return $user;
@@ -97,13 +97,20 @@ class MaintenanceOrderController extends Controller
 
     public function edit(MaintenanceOrder $maintenanceOrder)
     {
-        $maintenanceOrder->load(['machine:id,name,type,nomor,no_sarana','workingReport:id']);
+        $maintenanceOrder->load([
+            'machine:id,name,type,nomor,no_sarana',
+            'workingReport:id',
+            'masterPedoman.categories.items' => function ($query) {
+                $query->orderBy('nomor_poin');
+            },
+            'results' // Load checklist results yang sudah disimpan
+        ]);
 
         return Inertia::render('MaintenanceOrders/Form', [
             'order'    => $maintenanceOrder,
             'machines' => MasterMachine::with('region:id,name')->select('id','name','type','nomor','hierarchy_code','no_sarana','region_id')->get(),
             'reports'  => WorkingReport::select('id')->latest()->take(100)->get(),
-            'pedoman' => MasterPedoman::select('id', 'kode_pedoman')->orderBy('kode_pedoman')->get(),
+            'pedoman' => MasterPedoman::select('id', 'kode_pedoman', 'nama_pedoman', 'deskripsi')->orderBy('kode_pedoman')->get(),
             'users' => User::select('id', 'name', 'username')->orderBy('name')->get()->map(function($user) {
                 $user->formatted_name = '[' . $user->username . '] - ' . strtoupper($user->name);
                 return $user;
