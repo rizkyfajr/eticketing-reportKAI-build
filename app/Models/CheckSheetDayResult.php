@@ -12,7 +12,7 @@ class CheckSheetDayResult extends Model
     protected $table = 'check_sheet_day_results';
 
     protected $fillable = [
-        'check_sheet_day_id',
+        'working_report_id',
         'check_sheet_master_day_id',
         'cek',
         'tambahan',
@@ -30,7 +30,7 @@ class CheckSheetDayResult extends Model
 
     public function checksheetday()
     {
-        return $this->belongsTo(CheckSheetDay::class, 'check_sheet_day_id');
+        return $this->belongsTo(WorkingReport::class, 'working_report_id');
     }
 
     public function checksheetdaymaster()

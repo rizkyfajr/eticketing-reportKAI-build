@@ -38,6 +38,9 @@ const form = useForm({
   has_trouble: props.report?.has_trouble || '',
   status: props.report?.status || '',
   cuaca: props.report?.cuaca || '',
+  klasifikasi: props.report?.klasifikasi || '',
+  type: props.report?.type || '',
+  lokasi_stabling_awal: props.report?.lokasi_stabling_awal || '',
   jenis_kpjr: props.report?.jenis_kpjr || '',
   nomor_mesin: props.report?.nomor_mesin || '',
   nomor_sarana: props.report?.nomor_sarana || '',
@@ -112,16 +115,21 @@ watch(
       form.nomor_mesin = ''
       form.nomor_sarana = ''
       form.region_id = ''
+      form.klasifikasi = ''
+      form.type = ''
       return
     }
 
     const selected = props.machines.find(m => m.id === newVal)
 
     if (selected) {
-      form.jenis_kpjr = `${selected.name} ${selected.type}`
+      // form.jenis_kpjr = `${selected.name} ${selected.type}`
+      form.jenis_kpjr = selected.type || ''
       form.nomor_mesin = selected.nomor || ''
       form.nomor_sarana = selected.no_sarana || ''
       form.region_id = selected.region_id || ''
+      form.klasifikasi = selected.classification?.name || ''
+      form.type = selected.name || ''
     }
   }
 )
@@ -238,7 +246,7 @@ const validateForms = () => {
         (props.mgweselawal_attachments?.length > 0);
 
     if (!isOneOfMgUploaded) {
-        failedValidations.push("Data Opname Rel Jalan Awal (MG 1, MG 2, atau MG 3) (Wajib pilih salah satu)");
+        failedValidations.push("Data Opname Rel Jalan Awal (IP 2, IG 2, atau IG 3) (Wajib pilih salah satu)");
     }
     
     if (!(props.pemeriksaansilangkpjr_attachments?.length > 0)) {
@@ -337,6 +345,21 @@ const submitForms = () => {
 
 };
 
+const formatDateTime = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
+onMounted(() => {
+    const now = new Date();
+    form.date = formatDateTime(now);
+});
+
 const esc = e => e.key === 'Escape' && close()
 onMounted(() => window.addEventListener('keydown', esc))
 onUnmounted(() => window.removeEventListener('keydown', esc))
@@ -354,7 +377,97 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
             <form @submit.prevent="submit" class="gap-6 p-4">
               <div v-if="!showForm1" class="space-y-4">
                 
-                <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">     
+
+                <!-- QR Code Scanner Section -->
+                <div class="mb-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                  <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-bold text-purple-800">
+                      Scan QR Code Mesin
+                    </h3>
+                    <p class="text-xs text-gray-600">
+                      Scan QR code untuk input otomatis data mesin
+                    </p>
+                  </div>
+                  <QrScanner
+                    @scanned="handleQrScanned"
+                    @error="handleQrError"
+                  />
+                </div>
+
+                <div class="grid grid-cols-1 gap-4 mb-4">
+                  <div class="flex flex-col">
+                    <label class="block text-xs font-semibold">Nama Mesin</label>
+                    <Select
+                      v-model="form.machine_id"
+                      :options="machines.map(machine => ({
+                        label: `[${machine.nomor}] ${machine.name} - ${machine.type} - ${machine.no_sarana} (${machine.region.name})`,
+                        value: machine.id,
+                      }))"
+                      :searchable="true"
+                      placeholder="Pilih Mesin"
+                      style="font-size: 0.7rem;"
+                    >
+                      <template #option="{ option }">
+                        <span class="text-xs antialiased">
+                            {{ option.label }}
+                        </span>
+                      </template>
+                    </Select>
+                    <InputError :error="form.errors.machine_id" />
+                  </div>
+                </div>
+                
+                <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">    
+
+                  <div class="flex flex-col">
+                    <label class="block text-xs font-semibold">Klasifikasi</label>
+                    <Input
+                      v-model="form.klasifikasi"
+                      type="text"
+                      class="w-full border rounded-md px-2 py-2 text-xs"
+                      placeholder="Isi Klasifikasi"
+                    />
+                  </div>
+
+                  <div class="flex flex-col">
+                    <label class="block text-xs font-semibold">Type</label>
+                    <Input
+                      v-model="form.type"
+                      type="text"
+                      class="w-full border rounded-md px-2 py-2 text-xs"
+                      placeholder="Isi Type"
+                    />
+                  </div>
+
+                  <div class="flex flex-col">
+                    <label class="block text-xs font-semibold">Merk</label>
+                    <Input
+                      v-model="form.jenis_kpjr"
+                      type="text"
+                      class="w-full border rounded-md px-2 py-2 text-xs"
+                      placeholder="Isi Merk"
+                    />
+                  </div>
+
+                  <div class="flex flex-col">
+                    <label class="block text-xs font-semibold">Nomor Sarana</label>
+                    <Input
+                      v-model="form.nomor_sarana"
+                      type="text"
+                      class="w-full border rounded-md px-2 py-2 text-xs"
+                      placeholder="Isi Nomor Sarana"
+                    />
+                  </div>
+
+                  <div class="flex flex-col">
+                    <label class="block text-xs font-semibold">Nomor Mesin</label>
+                    <Input
+                      v-model="form.nomor_mesin"
+                      type="text"
+                      class="w-full border rounded-md px-2 py-2 text-xs"
+                      placeholder="Isi Nomor Mesin"
+                    />
+                  </div> 
 
                   <div class="flex flex-col">
                     <label class="block text-xs font-semibold">Tanggal</label>
@@ -367,22 +480,44 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   </div>             
 
                   <div class="flex flex-col">
-                    <label for="approved_by1" class="block text-xs font-semibold">
+                    <label for="cuaca" class="block text-xs font-semibold">
+                      {{ __('Cuaca') }}
+                    </label>
+                    
+                    <select 
+                      v-model="form.cuaca"
+                      class="border border-gray-300 rounded-md px-2 py-1 h-9 text-xs bg-white focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                      required
+                    >
+                      <option value="" disabled>Pilih</option>
+                      <option value="Cerah">Cerah</option>
+                      <option value="Berawan">Berawan</option>
+                      <option value="Hujan">Hujan</option>
+                      <option value="Panas">Panas</option>
+                      <option value="Dingin">Dingin</option>
+                      <option value="Berangin">Berangin</option>
+                    </select>
+                    <InputError :error="form.errors.cuaca" />
+                  </div>
+
+                  <div class="flex flex-col">
+                    <label for="mode" class="block text-xs font-semibold">
                       {{ __('Mode') }}
                     </label>
 
                     <select
                       v-model="form.mode"
                       class="border border-gray-300 rounded-md px-2 py-1 h-9 text-xs bg-white focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                      required
                     >
                       <option value="" disabled>Pilih</option>
                       <option value="warmingup">Warming Up</option>
                       <option value="working">Working</option>
                     </select>
-                    <InputError :error="form.errors.approved_by1" />
+                    <InputError :error="form.errors.mode" />
                   </div>
 
-                  <div class="flex flex-col">
+                  <!-- <div class="flex flex-col">
                     <label class="block text-xs font-semibold">Nama Mesin</label>
                     <Select
                       v-model="form.machine_id"
@@ -402,33 +537,19 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       </template>
                     </Select>
                     <InputError :error="form.errors.machine_id" />
-                  </div>
+                  </div> -->
 
-                </div>
-
-                <!-- QR Code Scanner Section -->
-                <div class="mb-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
-                  <div class="flex items-center justify-between mb-3">
-                    <h3 class="text-sm font-bold text-purple-800">
-                      Scan QR Code Mesin
-                    </h3>
-                    <p class="text-xs text-gray-600">
-                      Scan QR code untuk input otomatis data mesin
-                    </p>
-                  </div>
-                  <QrScanner
-                    @scanned="handleQrScanned"
-                    @error="handleQrError"
-                  />
                 </div>
 
                 <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">
 
                   <div class="flex flex-col">
-                    <label class="block text-xs font-semibold">Wilayah</label>
+                    <label for="region_id" class="block text-xs font-semibold">
+                      {{ __('Wilayah') }}
+                    </label>
+
                     <Select
                       v-model="form.region_id"
-                      class="w-full border rounded-md px-2 py-2 bg-white text-xs"
                       :options="regions.map(region => ({
                         label: `${region.name}`,
                         value: region.id,
@@ -448,56 +569,6 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   </div>
 
                   <div class="flex flex-col">
-                    <label for="cuaca" class="block text-xs font-semibold">
-                      {{ __('Cuaca') }}
-                    </label>
-                    
-                    <select 
-                      v-model="form.cuaca"
-                      class="border border-gray-300 rounded-md px-2 py-1 h-9 text-xs bg-white focus:ring-blue-500 focus:border-blue-500 shadow-sm"
-                    >
-                      <option value="" disabled>Pilih</option>
-                      <option value="Cerah">Cerah</option>
-                      <option value="Berawan">Berawan</option>
-                      <option value="Hujan">Hujan</option>
-                      <option value="Panas">Panas</option>
-                      <option value="Dingin">Dingin</option>
-                      <option value="Berangin">Berangin</option>
-                    </select>
-                    <InputError :error="form.errors.cuaca" />
-                  </div>
-
-                  <div class="flex flex-col">
-                    <label class="block text-xs font-semibold">Jenis KPJR</label>
-                    <Input
-                      v-model="form.jenis_kpjr"
-                      type="text"
-                      class="w-full border rounded-md px-2 py-2 text-xs"
-                      placeholder="Isi Jenis KPJR"
-                    />
-                  </div>
-
-                  <div class="flex flex-col">
-                    <label class="block text-xs font-semibold">Nomor Mesin</label>
-                    <Input
-                      v-model="form.nomor_mesin"
-                      type="text"
-                      class="w-full border rounded-md px-2 py-2 text-xs"
-                      placeholder="Isi Nomor Mesin"
-                    />
-                  </div>
-
-                  <div class="flex flex-col">
-                    <label class="block text-xs font-semibold">Nomor Sarana</label>
-                    <Input
-                      v-model="form.nomor_sarana"
-                      type="text"
-                      class="w-full border rounded-md px-2 py-2 text-xs"
-                      placeholder="Isi Nomor Sarana"
-                    />
-                  </div>
-
-                  <div class="flex flex-col">
                     <label class="block text-xs font-semibold">Waktu Start Engine</label>
                     <Input
                       v-model="form.waktu_start_engine"
@@ -507,7 +578,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     />
                   </div>
 
-                  <div class="flex flex-col">
+                  <div class="flex flex-col" v-if="form.mode === 'working'">
                     <label class="block text-xs font-semibold">Jam Traveling Awal</label>
                     <Input
                       v-model="form.jam_traveling_awal"
@@ -518,12 +589,12 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   </div>
 
                   <div class="flex flex-col">
-                    <label class="block text-xs font-semibold">Jam Kerja Awal</label>
+                    <label class="block text-xs font-semibold">Awal Jam Kerja Operator</label>
                     <Input
                       v-model="form.jam_kerja_awal"
                       type="time"
                       class="w-full border rounded-md px-2 py-2 text-xs"
-                      placeholder="Isi Jam Kerja Awal"
+                      placeholder="Isi Awal Jam Kerja Operator"
                     />
                   </div>
 
@@ -649,7 +720,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <InputError :error="form.errors.operator_by3" />
                   </div>    
 
-                  <div class="flex flex-col">
+                  <div class="flex flex-col" v-if="form.mode === 'working'">
                     <label class="block text-xs font-semibold">NIPP Pengawal 1</label>
                     <Input
                       v-model="form.nipp"
@@ -659,7 +730,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     />
                   </div>
 
-                  <div class="flex flex-col">
+                  <div class="flex flex-col" v-if="form.mode === 'working'">
                     <label class="block text-xs font-semibold">Nama Pengawal 1</label>
                     <Input
                       v-model="form.nama_pengawal"
@@ -669,7 +740,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     />
                   </div>
 
-                  <div class="flex flex-col">
+                  <div class="flex flex-col" v-if="form.mode === 'working'">
                     <label class="block text-xs font-semibold">NIPP Pengawal 2</label>
                     <Input
                       v-model="form.nipp1"
@@ -679,7 +750,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     />
                   </div>
 
-                  <div class="flex flex-col">
+                  <div class="flex flex-col" v-if="form.mode === 'working'">
                     <label class="block text-xs font-semibold">Nama Pengawal 2</label>
                     <Input
                       v-model="form.nama_pengawal1"
@@ -721,7 +792,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                           <div class="flex flex-row items-start justify-between text-sm">
 
                               <label for="mg1_awal" class="flex-1 text-xs text-black font-semi-bold pr-2">
-                                  a. MG 1 (Lurusan)
+                                  a. IP 2 (Lurusan)
                               </label>
 
                               <div class="flex space-x-4 flex-shrink-0 text-xs">
@@ -760,7 +831,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                             <AttachmentInline
                               :model="mglurusanawal ?? {}"
                               type="MgLurusanAwal"
-                              :redaction="`Lampiran (MG 1 Lurusan)`"
+                              :redaction="`Lampiran (IP 2 Lurusan)`"
                               :attachments="mglurusanawal_attachments"
                             />
                           </div>
@@ -770,7 +841,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                           <div class="flex flex-row items-start justify-between text-sm">
 
                               <label for="mg2_awal" class="flex-1 text-xs text-black font-semi-bold pr-2">
-                                  b. MG 2 (Lengkungan)
+                                  b. IG 2 (Lengkungan)
                               </label>
 
                               <div class="flex space-x-4 flex-shrink-0 text-xs">
@@ -809,7 +880,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                             <AttachmentInline
                               :model="mglengkunganawal ?? {}"
                               type="MgLengkunganAwal"
-                              :redaction="`Lampiran (MG 2 Lengkungan)`"
+                              :redaction="`Lampiran (IG 2 Lengkungan)`"
                               :attachments="mglengkunganawal_attachments"
                             />
                           </div>
@@ -819,7 +890,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                           <div class="flex flex-row items-start justify-between text-sm">
 
                               <label for="mg3_awal" class="flex-1 text-xs text-black font-semi-bold pr-2">
-                                  c. MG 3 (Wesel)
+                                  c. IG 3 (Wesel)
                               </label>
 
                               <div class="flex space-x-4 flex-shrink-0 text-xs">
@@ -858,7 +929,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                             <AttachmentInline
                               :model="mgweselawal ?? {}"
                               type="MgWeselAwal"
-                              :redaction="`Lampiran (MG 3 Wesel)`"
+                              :redaction="`Lampiran (IG 3 Wesel)`"
                               :attachments="mgweselawal_attachments"
                             />
                           </div>

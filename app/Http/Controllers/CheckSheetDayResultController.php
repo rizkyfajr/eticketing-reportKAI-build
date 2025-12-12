@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\CheckSheetDayResult;
+use App\Models\WorkingReport;
 
 class CheckSheetDayResultController extends Controller
 {
@@ -12,7 +13,7 @@ class CheckSheetDayResultController extends Controller
   public function autosave(Request $request)
   {
       $validated = $request->validate([
-          'check_sheet_day_id' => 'required|integer|exists:check_sheet_days,id',
+          'working_report_id' => 'required|integer|exists:working_reports,id',
           'check_sheet_master_day_id' => 'required|integer|exists:check_sheet_master_days,id',
           'cek' => 'nullable|integer|in:0,1',
           'tambahan' => 'nullable|integer|in:0,1',
@@ -22,7 +23,7 @@ class CheckSheetDayResultController extends Controller
           'keterangan' => 'nullable|string',
       ]);
 
-      $result = CheckSheetDayResult::where('check_sheet_day_id', $validated['check_sheet_day_id'])
+      $result = CheckSheetDayResult::where('working_report_id', $validated['working_report_id'])
           ->where('check_sheet_master_day_id', $validated['check_sheet_master_day_id'])
           ->first();
 
@@ -37,7 +38,7 @@ class CheckSheetDayResultController extends Controller
           ]);
       } else {
           $result = CheckSheetDayResult::create([
-              'check_sheet_day_id' => $validated['check_sheet_day_id'],
+              'working_report_id' => $validated['working_report_id'],
               'check_sheet_master_day_id' => $validated['check_sheet_master_day_id'],
               'cek' => $validated['cek'] ?? 0,
               'tambahan' => $validated['tambahan'] ?? 0,
@@ -47,6 +48,9 @@ class CheckSheetDayResultController extends Controller
               'keterangan' => $validated['keterangan'] ?? '',
           ]);
       }
+
+      WorkingReport::where('id', $validated['working_report_id'])
+        ->update(['status' => 'checksheet_done']);
 
       return response()->json([
           'success' => true,

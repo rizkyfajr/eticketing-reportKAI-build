@@ -32,10 +32,10 @@ class CheckSheetDay extends Model
         return $this->hasOne(CheckSheetWorkResult::class, 'check_sheet_day_id');
     }
 
-    public function dayresults()
-    {
-        return $this->hasMany(CheckSheetDayResult::class, 'check_sheet_day_id');
-    }
+    // public function dayresults()
+    // {
+    //     return $this->hasMany(CheckSheetDayResult::class, 'check_sheet_day_id');
+    // }
 
     public function workingReport()
     {

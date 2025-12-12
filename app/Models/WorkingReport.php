@@ -49,6 +49,9 @@ class WorkingReport extends Model
         'nipp',
         'nama_pengawal1',
         'nipp1',
+        'klasifikasi',
+        'type',
+        'lokasi_stabling_awal',
     ];
 
     protected $with = [
@@ -211,6 +214,11 @@ class WorkingReport extends Model
     public function kuptBy1()
     {
         return $this->belongsTo(User::class, 'kupt_by1');
+    }
+    
+    public function dayresults()
+    {
+        return $this->hasMany(CheckSheetDayResult::class, 'working_report_id');
     }
 
 }

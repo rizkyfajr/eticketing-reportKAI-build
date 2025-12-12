@@ -71,7 +71,7 @@ class WorkingReportController extends Controller
   public function detail(DataTableRequest $request, WorkingReport $report, WorkResult $workresult)
   {
         $report->load(
-            'checksheetday.dayresults',
+            'dayresults',
             'checksheetday.checksheetworkresult',
             'machine',
             'mglurusanawal.attachments',
@@ -84,18 +84,19 @@ class WorkingReportController extends Controller
             'mglengkunganakhir.attachments',
             'mgweselakhir.attachments',
             'perekamanakhir.attachments',
-            'maintenanceOrders.machine', // Load maintenance orders terkait
+            'maintenanceOrders.machine', 
         );
 
         $machineType = $report->machine?->name;
 
-        $machineType = $report->machine?->name;
-        $filterType = $machineType;
+        // DAILY CHECK SHEET BERDASARKAN TIPE MESIN
+        $machineClassification = $report->machine?->classification?->name; 
+        $filterType = null;
 
-        if ($machineType === 'Tamping Machine') {
-            $filterType = 'MTT';
-        } elseif ($machineType === 'Ballast Regulator Machine') {
-            $filterType = 'PBR';
+        if ($machineClassification === 'Tamping Machine' || $machineClassification === 'Material and Logistic Machine' || $machineClassification === 'Stabilization and Consolidation Machine') {
+            $filterType = 'MTT'; 
+        } elseif ($machineClassification === 'Ballast Regulator Machine' || $machineClassification === 'Distributing and Profiling') {
+            $filterType = 'PBR'; 
         }
 
         $masters = CheckSheetMasterDay::when($filterType, function ($query, $filterType) {
@@ -117,8 +118,8 @@ class WorkingReportController extends Controller
             END
         ")->get();
 
-      $existingResults = $report->checksheetday
-        ? $report->checksheetday->dayresults->keyBy('check_sheet_master_day_id')
+      $existingResults = $report->dayresults
+        ? $report->dayresults->keyBy('check_sheet_master_day_id')
         : collect();
 
        $mergedResults = $masters->map(function ($master) use ($existingResults) {
@@ -154,8 +155,8 @@ class WorkingReportController extends Controller
           'report'      => $report,
           'masters'     => $masters,
           'results'     => $mergedResults,
-          'checksheet'  => $report->checksheet ?? null,
-          'checksheetday'  => $report->checksheetday ?? null,
+        //   'checksheet'  => $report->checksheet ?? null,
+        //   'checksheetday'  => $report->checksheetday ?? null,
           'upload'      => $report->upload ?? null,
           'checksheetworkresult' => $checksheetworkresult,
           'warmingup'   => $report->warmingup ?? null,
@@ -207,7 +208,7 @@ class WorkingReportController extends Controller
       // Menampilkan data mesin sesuai daop user
       $user = auth()->user();
 
-      $machineQuery = MasterMachine::with('region')->select('id', 'name', 'type', 'nomor', 'no_sarana', 'region_id');
+      $machineQuery = MasterMachine::with('region', 'classification')->select('id', 'name', 'type', 'nomor', 'no_sarana', 'region_id', 'classification_id');
 
       if ($user->division_id == 4) {
         $machineQuery->where('region_id', 2);
@@ -272,6 +273,9 @@ class WorkingReportController extends Controller
           'has_trouble' => 'nullable',
           'status'      => 'nullable|in:draft,checksheet_done,warming_up_done,photo_uploaded,work_done,verification,finished',
           'cuaca'                => 'nullable|string',
+          'lokasi_stabling_awal' => 'nullable|string',
+          'klasifikasi'          => 'nullable|string',
+          'type'                 => 'nullable|string',
           'jenis_kpjr'           => 'nullable|string',
           'nomor_mesin'          => 'nullable|string',
           'nomor_sarana'         => 'nullable|string',
@@ -536,6 +540,9 @@ class WorkingReportController extends Controller
           'has_trouble'       => 'nullable',
           'status'            => 'nullable|in:draft,checksheet_done,warming_up_done,photo_uploaded,work_done,verification,finished',
           'cuaca'                => 'nullable|string',
+          'lokasi_stabling_awal' => 'nullable|string',
+          'klasifikasi'          => 'nullable|string',
+          'type'                 => 'nullable|string',
           'jenis_kpjr'           => 'nullable|string',
           'nomor_mesin'          => 'nullable|string',
           'nomor_sarana'         => 'nullable|string',
@@ -662,6 +669,9 @@ class WorkingReportController extends Controller
       'has_trouble',
       'status',
       'cuaca',
+      'klasifikasi',
+      'type',
+      'lokasi_stabling_awal',
       'jenis_kpjr',
       'nomor_mesin',
       'nomor_sarana',
@@ -775,6 +785,7 @@ class WorkingReportController extends Controller
                 'machine',
                 'workresult',
                 'checksheetday',
+                'dayresults',
                 'mglurusanawal.attachments',
                 'mglengkunganawal.attachments',
                 'mgweselawal.attachments',
@@ -791,12 +802,72 @@ class WorkingReportController extends Controller
             ]);
             // dd($report->mglurusanawal);
 
+            // $getAttachmentUrl = function ($attachment) {
+            //     $fullPath = $attachment->path . $attachment->filename;
+            //     return storage_path('app/public/' . $fullPath);
+            // };
+
+            // $pdf = PDF::loadView('working_report_1',  compact('report', 'getAttachmentUrl'))->setPaper('A4', 'portrait');
+
+            // return $pdf->download('working-report-'.$report->id.'.pdf');
+
+            $machineType = $report->machine?->name;
+            $machineClassification = $report->machine?->classification?->name; 
+            $filterType = null;
+
+            if ($machineClassification === 'Tamping Machine' || $machineClassification === 'Material and Logistic Machine' || $machineClassification === 'Stabilization and Consolidation Machine') {
+                $filterType = 'MTT'; 
+            } elseif ($machineClassification === 'Ballast Regulator Machine' || $machineClassification === 'Distributing and Profiling') {
+                $filterType = 'PBR'; 
+            }
+
+            $masters = CheckSheetMasterDay::when($filterType, function ($query, $filterType) {
+                $query->where('jenis_mesin', $filterType);
+            })
+            ->orderByRaw("
+                CASE
+                    WHEN LOWER(group_name) LIKE 'engine%' THEN 1
+                    WHEN LOWER(group_name) LIKE 'mekanik%' THEN 2
+                    WHEN LOWER(group_name) LIKE 'pneumatic%' THEN 3
+                    WHEN LOWER(group_name) LIKE 'hydraulic%' OR LOWER(group_name) LIKE 'hidrolik%' THEN 4
+                    WHEN LOWER(group_name) LIKE 'elektrik%' OR LOWER(group_name) LIKE 'electrical%' THEN 5
+                    WHEN LOWER(group_name) LIKE 'peralatan keselamatan%' THEN 6
+                    ELSE 7
+                END
+            ")->get();
+
+            $existingResults = $report->dayresults
+                ? $report->dayresults->keyBy('check_sheet_master_day_id')
+                : collect();
+
+            $mergedResults = $masters->map(function ($master) use ($existingResults) {
+                $result = $existingResults->get($master->id);
+
+                return [
+                    'check_sheet_master_day_id' => $master->id,
+                    'group_name' => $master->group_name,
+                    'komponen' => $master->komponen,
+                    'rujukan' => $master->rujukan,
+                    'nilai_rujukan' => $master->nilai_rujukan,
+                    'satuan' => $master->satuan,
+                    'urutan' => $master->urutan,
+                    'cek' => $result ? (int) $result->cek : 0,
+                    'tambahan' => $result ? (int) $result->tambahan : 0,
+                    'ganti' => $result ? (int) $result->ganti : 0,
+                    'kiri_depan' => $result ? $result->kiri_depan : '',
+                    'kanan_depan' => $result ? $result->kanan_depan : '',
+                    'keterangan' => $result ? $result->keterangan : '',
+                ];
+            });
+            
             $getAttachmentUrl = function ($attachment) {
                 $fullPath = $attachment->path . $attachment->filename;
                 return storage_path('app/public/' . $fullPath);
             };
 
-            $pdf = PDF::loadView('working_report_1',  compact('report', 'getAttachmentUrl'))->setPaper('A4', 'portrait');
+            $pdf = PDF::loadView('working_report_1', 
+                compact('report', 'getAttachmentUrl', 'mergedResults', 'masters') 
+            )->setPaper('A4', 'portrait');
 
             return $pdf->download('working-report-'.$report->id.'.pdf');
 
@@ -810,5 +881,18 @@ class WorkingReportController extends Controller
         }
     }
 
+    public function setMode(Request $request)
+    {
+        $request->validate([
+        'working_report_id' => 'required|exists:working_reports,id',
+        'mode'              => 'required|string',
+        ]);
+
+        WorkingReport::where('id', $request->working_report_id)
+            ->update(['mode' => $request->mode]);
+
+        return response()->json(['message' => 'Mode updated']);
+    
+    }
 
 }

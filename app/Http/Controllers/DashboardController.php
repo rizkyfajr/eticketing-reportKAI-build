@@ -61,11 +61,29 @@ class DashboardController extends Controller
     }
     // Cek apakah user sudah mengisi assessment hari ini (Raidnes Assessments)
 
+    // --- FILTER STATUS WORKING ORDER BERDASARKAN USER DI KEDUDUKANNYA ---
+    $userDivisionId = $user->division_id;
+    $allowedRegionId = null; 
+
+    if (in_array($userDivisionId, [1, 3])) {
+        $allowedRegionId = 1;
+    } elseif ($userDivisionId === 4) {
+        $allowedRegionId = 2;
+    } elseif ($userDivisionId === 5) {
+        $allowedRegionId = 3;
+    }
+
     $reports = WorkingReport::with([
         'machine:id,name,nomor,type',
         'warmingup',
         'workresult',
     ])->get();
+
+    if ($allowedRegionId !== null) {
+        $reports = $reports->filter(function ($report) use ($allowedRegionId) {
+            return $report->region_id === $allowedRegionId;
+        })->values(); 
+    }
 
     $statusCounts = $reports->countBy('status');
 
@@ -77,7 +95,28 @@ class DashboardController extends Controller
         'finished' => $statusCounts['finished'] ?? 0,
     ];
 
-    $allMachines = MasterMachine::select('id', 'name', 'nomor', 'type')->get();
+    // $allMachines = MasterMachine::select('id', 'name', 'nomor', 'type')->get();
+
+    // $machineNames = $allMachines->map(function ($machine) {
+    //     return ' [' . $machine->nomor .'] ' . $machine->name . ' - ' . $machine->type . '';
+    // })->unique()->toArray();
+
+    // --- FILTER DATA MESIN BERDASARKAN KEDUDUKAN USER YANG LOGIN ---
+    $userDivisionId = $user->division_id;
+
+    $machineQuery = MasterMachine::select('id', 'name', 'nomor', 'type', 'region_id');
+
+    if (in_array($userDivisionId, [1, 3])) {
+        $machineQuery->where('region_id', 1); 
+    } 
+    elseif ($userDivisionId === 4) {
+        $machineQuery->where('region_id', 2);
+    } 
+    elseif ($userDivisionId === 5) {
+        $machineQuery->where('region_id', 3);
+    }
+
+    $allMachines = $machineQuery->get();
 
     $machineNames = $allMachines->map(function ($machine) {
         return ' [' . $machine->nomor .'] ' . $machine->name . ' - ' . $machine->type . '';
@@ -99,12 +138,13 @@ class DashboardController extends Controller
             $machineName = ' [' . $machine->nomor .'] ' . $machine->name . ' - ' . $machine->type . '';
 
             if (!isset($totalPerMesin[$machineName])) {
-                $totalPerMesin[$machineName] = 0;
-                $totalJamGenerator[$machineName] = 0;
-                $totalCounterTamping[$machineName] = 0;
-                $totalOdometer[$machineName] = 0;
-                $totalHSD[$machineName] = 0;
-                $machineNames[] = $machineName; 
+                continue; 
+                // $totalPerMesin[$machineName] = 0;
+                // $totalJamGenerator[$machineName] = 0;
+                // $totalCounterTamping[$machineName] = 0;
+                // $totalOdometer[$machineName] = 0;
+                // $totalHSD[$machineName] = 0;
+                // $machineNames[] = $machineName; 
             }
 
             $start = $wr->waktu_start_engine;
