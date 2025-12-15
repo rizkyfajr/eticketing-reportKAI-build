@@ -84,19 +84,19 @@ class WorkingReportController extends Controller
             'mglengkunganakhir.attachments',
             'mgweselakhir.attachments',
             'perekamanakhir.attachments',
-            'maintenanceOrders.machine', 
+            'maintenanceOrders.machine',
         );
 
         $machineType = $report->machine?->name;
 
         // DAILY CHECK SHEET BERDASARKAN TIPE MESIN
-        $machineClassification = $report->machine?->classification?->name; 
+        $machineClassification = $report->machine?->classification?->name;
         $filterType = null;
 
         if ($machineClassification === 'Tamping Machine' || $machineClassification === 'Material and Logistic Machine' || $machineClassification === 'Stabilization and Consolidation Machine') {
-            $filterType = 'MTT'; 
+            $filterType = 'MTT';
         } elseif ($machineClassification === 'Ballast Regulator Machine' || $machineClassification === 'Distributing and Profiling') {
-            $filterType = 'PBR'; 
+            $filterType = 'PBR';
         }
 
         $masters = CheckSheetMasterDay::when($filterType, function ($query, $filterType) {
@@ -305,6 +305,16 @@ class WorkingReportController extends Controller
           'nipp1'                => 'nullable|integer',
       ]);
 
+      // Auto-set region_id untuk Admin Wilayah
+      $regionId = WorkingReport::getRegionIdForCreate() ?? $validated['region_id'] ?? null;
+
+      // Validasi Admin Wilayah hanya bisa create di region sendiri
+      $user = auth()->user();
+      if ($user->isAdminWilayah() && $validated['region_id'] && $validated['region_id'] != $user->region_id) {
+          return back()->withErrors(['region_id' => 'Anda hanya dapat membuat laporan untuk wilayah Anda sendiri.']);
+      }
+
+      $validated['region_id'] = $regionId;
       $validated['created_by_id'] = auth()->id();
       $validated['status'] = $validated['status'] ?? 'draft';
 
@@ -603,7 +613,7 @@ class WorkingReportController extends Controller
     $request->validated();
     $user = $request->user();
 
-    $query = WorkingReport::where(function (Builder $query) use ($request) {
+    $query = WorkingReport::forCurrentUserRegion()->where(function (Builder $query) use ($request) {
         $search = '%' . $request->search . '%';
         $model = $query->getModel();
 
@@ -812,13 +822,13 @@ class WorkingReportController extends Controller
             // return $pdf->download('working-report-'.$report->id.'.pdf');
 
             $machineType = $report->machine?->name;
-            $machineClassification = $report->machine?->classification?->name; 
+            $machineClassification = $report->machine?->classification?->name;
             $filterType = null;
 
             if ($machineClassification === 'Tamping Machine' || $machineClassification === 'Material and Logistic Machine' || $machineClassification === 'Stabilization and Consolidation Machine') {
-                $filterType = 'MTT'; 
+                $filterType = 'MTT';
             } elseif ($machineClassification === 'Ballast Regulator Machine' || $machineClassification === 'Distributing and Profiling') {
-                $filterType = 'PBR'; 
+                $filterType = 'PBR';
             }
 
             $masters = CheckSheetMasterDay::when($filterType, function ($query, $filterType) {
@@ -859,14 +869,14 @@ class WorkingReportController extends Controller
                     'keterangan' => $result ? $result->keterangan : '',
                 ];
             });
-            
+
             $getAttachmentUrl = function ($attachment) {
                 $fullPath = $attachment->path . $attachment->filename;
                 return storage_path('app/public/' . $fullPath);
             };
 
-            $pdf = PDF::loadView('working_report_1', 
-                compact('report', 'getAttachmentUrl', 'mergedResults', 'masters') 
+            $pdf = PDF::loadView('working_report_1',
+                compact('report', 'getAttachmentUrl', 'mergedResults', 'masters')
             )->setPaper('A4', 'portrait');
 
             return $pdf->download('working-report-'.$report->id.'.pdf');
@@ -892,7 +902,7 @@ class WorkingReportController extends Controller
             ->update(['mode' => $request->mode]);
 
         return response()->json(['message' => 'Mode updated']);
-    
+
     }
 
 }

@@ -128,7 +128,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         ->name('readiness.admin.userdetail');
 
     // Route::get('/working-reports/{report}/create', [App\Http\Controllers\WorkingReportController::class, 'create'])->name('working-reports.create.withid');
-    Route::get('working-reports/{report}/download', [App\Http\Controllers\WorkingReportController::class, 'downloadReport'])->name('working-reports.download');    
+    Route::get('working-reports/{report}/download', [App\Http\Controllers\WorkingReportController::class, 'downloadReport'])->name('working-reports.download');
     Route::post('/working-reports/setmode', [App\Http\Controllers\WorkingReportController::class, 'setMode'])->name('working-reports.setMode');
     Route::post('/working-reports/approveKUPT', [App\Http\Controllers\WorkingReportController::class, 'approveKUPT'])->name('working-reports.approveKUPT');
     Route::post('/working-reports/{report}/approvePengawal/{level}', [App\Http\Controllers\WorkingReportController::class, 'approvePengawal'])->name('working-reports.approvePengawal');
@@ -138,6 +138,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('/working-reports/{report}/fetch', [App\Http\Controllers\WorkingReportController::class, 'fetch'])->name('working-reports.fetch');
     Route::get('/working-reports/{report}/detail/', [App\Http\Controllers\WorkingReportController::class, 'detail'])->name('working-reports.detail');
     Route::resource('working-reports', App\Http\Controllers\WorkingReportController::class);
+    Route::put('/working-reports/{working_report}', [App\Http\Controllers\WorkingReportController::class, 'update'])
+        ->middleware('regional.access:working_report');
+    Route::delete('/working-reports/{working_report}', [App\Http\Controllers\WorkingReportController::class, 'destroy'])
+        ->middleware('regional.access:working_report');
     Route::post('/working-reports/paginate', [App\Http\Controllers\WorkingReportController::class, 'paginate'])
         ->name('working-reports.paginate');
 
@@ -150,10 +154,18 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     // Route::post('/checksheet-results/autosave', [App\Http\Controllers\CheckSheetResultController::class, 'autosave'])->name('checksheet-results.autosave');
     Route::resource('check-sheet', App\Http\Controllers\CheckSheetController::class);
+    Route::put('/check-sheet/{check_sheet}', [App\Http\Controllers\CheckSheetController::class, 'update'])
+        ->middleware('regional.access:check_sheet');
+    Route::delete('/check-sheet/{check_sheet}', [App\Http\Controllers\CheckSheetController::class, 'destroy'])
+        ->middleware('regional.access:check_sheet');
     Route::post('/check-sheet/paginate', [App\Http\Controllers\CheckSheetController::class, 'paginate'])
         ->name('check-sheet.paginate');
 
     Route::resource('check-sheet-day', App\Http\Controllers\CheckSheetDayController::class);
+    Route::put('/check-sheet-day/{check_sheet_day}', [App\Http\Controllers\CheckSheetDayController::class, 'update'])
+        ->middleware('regional.access:check_sheet_day');
+    Route::delete('/check-sheet-day/{check_sheet_day}', [App\Http\Controllers\CheckSheetDayController::class, 'destroy'])
+        ->middleware('regional.access:check_sheet_day');
     Route::post('/check-sheet-day/paginate', [App\Http\Controllers\CheckSheetDayController::class, 'paginate'])
         ->name('check-sheet-day.paginate');
 
@@ -168,6 +180,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('/working-results/submit-form', [App\Http\Controllers\WorkResultController::class, 'submitForm'])->name('working-results.submit-form');
     Route::post('/workresult/approve', [App\Http\Controllers\WorkResultController::class, 'approve'])->name('workresult.approve');
     Route::resource('work-results', App\Http\Controllers\WorkResultController::class);
+    Route::put('/work-results/{work_result}', [App\Http\Controllers\WorkResultController::class, 'update'])
+        ->middleware('regional.access:work_result');
+    Route::delete('/work-results/{work_result}', [App\Http\Controllers\WorkResultController::class, 'destroy'])
+        ->middleware('regional.access:work_result');
     Route::post('/work-results/paginate', [App\Http\Controllers\WorkResultController::class, 'paginate'])
         ->name('work-results.paginate');
 

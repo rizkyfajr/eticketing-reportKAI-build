@@ -20,9 +20,10 @@ import Button from '@/Components/Button.vue'
 
 const self = getCurrentInstance()
 const render = ref(true)
-const { permissions, roles, positions, divisions } = defineProps({
+const { permissions, roles, positions, divisions, regions } = defineProps({
   positions: Array,
   divisions: Array,
+  regions: Array,
   permissions: Array,
   roles: Array,
 })
@@ -33,6 +34,7 @@ const form = useForm({
   username: '',
   position_id: '',
   division_id: '',
+  region_id: '',
   positions: [],
   divisions: [],
   email: '',
@@ -67,6 +69,7 @@ const edit = user => {
   form.username = user.username
   form.position_id = user.position_id
   form.division_id = user.division_id
+  form.region_id = user.region_id
   form.email = user.email
   form.permissions = user.permissions.map(permission => permission.id)
   form.roles = user.roles.map(role => role.id)
@@ -146,9 +149,9 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
   >
     <!-- <main class="p-0 py-0 mb-[1.25rem] ml-[1.25rem] mt-[1.25rem]">
             <h2 class="font-bold text-2xl">Master Data User</h2>
-           <a type="button" href="/" class="text-sm text-gray-500 font-semibold hover:text-sky-600 focus:text-sky-600">Home</a> 
+           <a type="button" href="/" class="text-sm text-gray-500 font-semibold hover:text-sky-600 focus:text-sky-600">Home</a>
            <span class="font-semibold text-sm pl-2 pr-2">-</span>
-           <span class="text-sm text-gray-500 font-semibold hover:text-sky-600 focus:text-sky-700">Builtin</span> 
+           <span class="text-sm text-gray-500 font-semibold hover:text-sky-600 focus:text-sky-700">Builtin</span>
             <slot />
         </main> -->
     <Card class="bg-white pt-[1.100rem] pb-[2.5rem] shadow-lg border border-solid border-slate-200" style="border-radius: 0.625rem;">
@@ -218,6 +221,15 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   class="uppercase font-semibold border border-gray-300 px-3 py-1 text-left font-extrabold text-xs"
                 >
                   {{ __('Posisi').toUpperCase() }}
+                </Th>
+
+                <Th
+                  :table="table"
+                  :sort="false"
+                  name="region_id"
+                  class="uppercase font-semibold border border-gray-300 px-3 py-1 text-left font-extrabold text-xs"
+                >
+                  WILAYAH
                 </Th>
 
                 <!-- <Th
@@ -325,6 +337,13 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
 
                     <td class="uppercase font-semibold border-b border-gray-300 px-4 py-3 text-left text-xs">
                       {{ user.divisions ? user.divisions.division_name : '' }}
+                    </td>
+
+                    <td class="uppercase font-semibold border-b border-gray-300 px-4 py-3 text-left text-xs">
+                      <span v-if="user.region" class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
+                        {{ user.region.name }}
+                      </span>
+                      <span v-else class="text-gray-400 italic text-xs">-</span>
                     </td>
 
                     <!-- <td class="uppercase font-semibold border-b border-gray-300 px-4 py-3 text-left text-xs">
@@ -460,7 +479,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   <label for="username" class="w-1/3 lowercase first-letter:capitalize text-sm">
                     {{ __('nipp') }}
                   </label>
-                  
+
                   <Input
                     v-model="form.username"
                     :placeholder="__('nipp')"
@@ -479,7 +498,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   <label for="position_id" class="w-1/3 lowercase first-letter:capitalize text-sm">
                     {{ __('jabatan') }}
                   </label>
-                  
+
                   <Select
                     v-model="form.position_id"
                     :options="positions.map(position => ({
@@ -500,7 +519,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                   <label for="division_id" class="w-1/3 lowercase first-letter:capitalize text-sm">
                     {{ __('bagaian') }}
                   </label>
-                  
+
                   <Select
                     v-model="form.division_id"
                     :options="divisions.map(division => ({
@@ -514,6 +533,28 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                 </div>
 
                 <InputError :error="form.errors.division_id" />
+              </div>
+
+              <div class="flex flex-col space-y-2">
+                <div class="flex items-center space-x-2">
+                  <label for="region_id" class="w-1/3 lowercase first-letter:capitalize text-sm">
+                    Wilayah
+                  </label>
+
+                  <Select
+                    v-model="form.region_id"
+                    :options="regions.map(region => ({
+                      label: region.name,
+                      value: region.id,
+                    }))"
+                    :searchable="true"
+                    placeholder="Pilih wilayah (untuk Admin Wilayah)"
+                    class="w-full text-sm"
+                  />
+                </div>
+
+                <InputError :error="form.errors.region_id" />
+                <p class="text-xs text-gray-500 italic">* Kosongkan jika user bukan Admin Wilayah</p>
               </div>
 
               <div class="flex flex-col space-y-2">

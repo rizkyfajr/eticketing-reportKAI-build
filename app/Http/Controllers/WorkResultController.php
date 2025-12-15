@@ -36,7 +36,7 @@ class WorkResultController extends Controller
           'users' => User::select('id', 'name')->get(),
       ]);
   }
-  
+
   /**
   * Show the form for creating a new resource.
   *
@@ -51,7 +51,7 @@ class WorkResultController extends Controller
           'users' => User::select('id', 'name')->get(),
       ]);
   }
-  
+
   /**
   * Store a newly created resource in storage.
   *
@@ -269,7 +269,7 @@ class WorkResultController extends Controller
   {
     //
   }
-  
+
   /**
   * Show the form for editing the specified resource.
   *
@@ -287,7 +287,7 @@ class WorkResultController extends Controller
           'users' => User::select('id', 'name')->get(),
       ]);
   }
-  
+
   /**
   * Update the specified resource in storage.
   *
@@ -514,7 +514,7 @@ class WorkResultController extends Controller
 
         return redirect()->back()->with('success', 'Data berhasil disimpan.');
     }
-  
+
   /**
   * Remove the specified resource from storage.
   *
@@ -541,7 +541,7 @@ class WorkResultController extends Controller
     $request->validated();
     $user = $request->user();
 
-    $query = WorkResult::query();
+    $query = WorkResult::forCurrentUserRegion();
 
     if ($request->search) {
         $search = '%' . $request->search . '%';

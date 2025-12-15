@@ -25,8 +25,8 @@ class MasterReadinessAssessment extends Controller
   {
     $user = Auth::user();
 
-    // Cek apakah user punya role admin, superuser, atau Kepala UPT Mekanik
-    $isAdminOrSupervisor = $user->hasAnyRole(['admin', 'superuser', 'Kepala UPT Mekanik']);
+    // Cek apakah user punya role admin, superuser, Kepala UPT Mekanik, atau admin-wilayah
+    $isAdminOrSupervisor = $user->hasAnyRole(['admin', 'superuser', 'Kepala UPT Mekanik', 'admin-wilayah']);
 
     return Inertia::render('ReadinessAssessment/Index', [
       'readines' => $readines,

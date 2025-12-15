@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\HasAttachment;
+use App\Traits\RegionalScope;
 
 class WorkingReport extends Model
 {
-    use HasFactory, HasAttachment;
+    use HasFactory, HasAttachment, RegionalScope;
 
     protected $table = 'working_reports';
 
@@ -200,22 +201,22 @@ class WorkingReport extends Model
     {
         return $this->belongsTo(User::class, 'operator_by3');
     }
-    
+
     public function pengawal()
     {
         return $this->belongsTo(User::class, 'approved_by');
     }
-    
+
     public function pengawal1()
     {
         return $this->belongsTo(User::class, 'approved_by1');
     }
-    
+
     public function kuptBy1()
     {
         return $this->belongsTo(User::class, 'kupt_by1');
     }
-    
+
     public function dayresults()
     {
         return $this->hasMany(CheckSheetDayResult::class, 'working_report_id');

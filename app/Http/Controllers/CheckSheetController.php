@@ -17,7 +17,8 @@ class CheckSheetController extends Controller
   public function index()
   {
     return Inertia::render('CheckSheet/Index', [
-      'checksheets' => CheckSheet::with(['workingReport', 'region'])
+      'checksheets' => CheckSheet::forCurrentUserRegion()
+        ->with(['workingReport', 'region'])
         ->latest()
         ->paginate(20)
     ]);
@@ -62,12 +63,21 @@ class CheckSheetController extends Controller
       'approved_at2'      => 'nullable|date',
     ]);
 
+    // Auto-set region_id untuk Admin Wilayah
+    $regionId = CheckSheet::getRegionIdForCreate() ?? $request->region_id;
+
+    // Validasi Admin Wilayah hanya bisa create di region sendiri
+    $user = auth()->user();
+    if ($user->isAdminWilayah() && $request->region_id && $request->region_id != $user->region_id) {
+        return back()->withErrors(['region_id' => 'Anda hanya dapat membuat checksheet untuk wilayah Anda sendiri.']);
+    }
+
     $checksheet = CheckSheet::create([
       'working_report_id' => $request->working_report_id,
       'upt_resor'         => $request->upt_resor,
       'tanggal'           => $request->tanggal,
       'waktu'             => $request->waktu,
-      'region_id'         => $request->region_id,
+      'region_id'         => $regionId,
       'cuaca'             => $request->cuaca,
       'tipe_kpjr'         => $request->tipe_kpjr,
       'nomor_seri'        => $request->nomor_seri,

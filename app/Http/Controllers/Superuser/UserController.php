@@ -9,6 +9,7 @@ use App\Models\DivisionModels;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\MasterRegion;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -26,11 +27,13 @@ class UserController extends Controller
     {
         $positions = Position::all();
         $divisions = DivisionModels::all();
+        $regions = MasterRegion::all();
 
         return Inertia::render('Superuser/User/Index')->with([
             'roles' => Role::get(),
             'positions' => $positions,
             'divisions' => $divisions,
+            'regions' => $regions,
             'permissions' => Permission::get(),
         ]);
     }
@@ -61,7 +64,7 @@ class UserController extends Controller
                         });
                     })
                     ->orderBy($request->input('order.key') ?: 'name', $request->input('order.dir') ?: 'asc')
-                    ->with(['permissions', 'roles', 'positions', 'divisions'])
+                    ->with(['permissions', 'roles', 'positions', 'divisions', 'region'])
                     ->paginate($request->per_page ?: 10);
     }
 
@@ -78,6 +81,7 @@ class UserController extends Controller
             'username' => 'required|string|unique:users',
             'position_id.*' => 'nullable|integer',
             'division_id.*' => 'nullable|integer',
+            'region_id' => 'nullable|integer|exists:master_regions,id',
             'email' => 'nullable|email|unique:users',
             'password' => 'required|string|min:8',
             'password_confirmation' => 'required|same:password',
@@ -92,6 +96,7 @@ class UserController extends Controller
             $user->roles()->sync($request->input('roles', []));
             $user->position_id = $request->input('position_id', null);
             $user->division_id = $request->input('division_id', null);
+            $user->region_id = $request->input('region_id', null);
             $user->email_verified_at = now();
             $user->save();
 
@@ -121,6 +126,7 @@ class UserController extends Controller
             'username' => ['required', 'string', Rule::unique('users')->ignore($user->id)],
             'position_id' => 'nullable|int',
             'division_id' => 'nullable|int',
+            'region_id' => 'nullable|integer|exists:master_regions,id',
             'email' => ['nullable', 'email', Rule::unique('users')->ignore($user->id)],
             'password' => ['nullable', 'string', 'min:8'],
             'password_confirmation' => ['nullable', 'same:password'],
@@ -128,7 +134,7 @@ class UserController extends Controller
             'permissions.*' => ['nullable', 'integer', 'exists:permissions,id'],
         ]);
 
-        if ($user->update($request->only(['name', 'username', 'position_id', 'division_id', 'email']))) {
+        if ($user->update($request->only(['name', 'username', 'position_id', 'division_id', 'region_id', 'email']))) {
             $user->permissions()->sync($request->input('permissions', []));
             $user->roles()->sync($request->input('roles', []));
 

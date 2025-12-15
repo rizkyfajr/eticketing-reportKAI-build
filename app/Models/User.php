@@ -33,6 +33,7 @@ class User extends Authenticatable
         'username',
         'position_id',
         'division_id',
+        'region_id', // Untuk Admin Wilayah
         'email',
         'password',
     ];
@@ -113,5 +114,29 @@ class User extends Authenticatable
     {
     return $this->hasOne(DivisionModels::class, 'id', 'division_id');
     }
-    
+
+    /**
+     * Relasi ke Master Region (untuk Admin Wilayah)
+     */
+    public function region()
+    {
+        return $this->belongsTo(MasterRegion::class, 'region_id');
+    }
+
+    /**
+     * Helper untuk cek apakah user adalah Admin Wilayah
+     */
+    public function isAdminWilayah()
+    {
+        return $this->hasRole('admin-wilayah') && $this->region_id !== null;
+    }
+
+    /**
+     * Helper untuk cek apakah user adalah Super Admin
+     */
+    public function isSuperAdmin()
+    {
+        return $this->hasRole('super-admin') || $this->region_id === null;
+    }
+
 }

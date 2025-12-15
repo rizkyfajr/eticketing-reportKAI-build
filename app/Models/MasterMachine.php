@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\RegionalScope;
 
 class MasterMachine extends Model
 {
-    use HasFactory;
+    use HasFactory, RegionalScope;
 
     protected $table = 'master_machines';
 

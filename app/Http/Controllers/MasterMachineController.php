@@ -64,8 +64,18 @@ class MasterMachineController extends Controller
 
     ]);
 
+    // Auto-set region_id untuk Admin Wilayah
+    $regionId = MasterMachine::getRegionIdForCreate() ?? $request['region_id'];
+
+    // Validasi: Admin Wilayah hanya bisa create di regionnya
+    if (auth()->user()->hasRole('admin-wilayah') && auth()->user()->region_id) {
+        if ($regionId != auth()->user()->region_id) {
+            return back()->withErrors(['region_id' => 'Anda hanya dapat menambahkan mesin di wilayah Anda.']);
+        }
+    }
+
     $machine = MasterMachine::create([
-        'region_id' => $request['region_id'],
+        'region_id' => $regionId,
         'classification_id' => $request->classification_id,
         'name'      => $request->name,
         'type'      => $request->type,
@@ -174,7 +184,8 @@ class MasterMachineController extends Controller
     $request->validated();
     $user = $request->user();
 
-    $machines = MasterMachine::where(function (Builder $query) use ($request) {
+    $machines = MasterMachine::forCurrentUserRegion() // Filter berdasarkan region user
+    ->where(function (Builder $query) use ($request) {
         $search = '%' . $request->search . '%';
         $model = $query->getModel();
 
@@ -183,9 +194,7 @@ class MasterMachineController extends Controller
         }
     })
     ->orderBy($request->input('order.key') ?: 'created_at', $request->input('order.by') ?: 'desc')
-    ->when(!$user->hasRole(['superuser', 'it', 'admin']), fn (Builder $query) =>
-        $query->where('created_by_id', $user->id)
-    )
+    // Admin Wilayah sudah ter-filter oleh forCurrentUserRegion(), tidak perlu filter created_by_id
     ->select(['id', 'region_id', 'classification_id', 'name', 'type', 'nomor', 'tahun_md', 'umur', 'umur', 'no_sarana', 'keterangan'])
     ->paginate($request->per_page ?: 10);
 

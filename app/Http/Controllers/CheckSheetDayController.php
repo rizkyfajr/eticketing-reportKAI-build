@@ -26,8 +26,18 @@ class CheckSheetDayController extends Controller
             'note' => 'nullable|string',
         ]);
 
+        // Auto-set region_id untuk Admin Wilayah
+        $regionId = CheckSheetDay::getRegionIdForCreate() ?? $validated['region_id'];
+
+        // Validasi Admin Wilayah hanya bisa create di region sendiri
+        $user = auth()->user();
+        if ($user->isAdminWilayah() && $validated['region_id'] && $validated['region_id'] != $user->region_id) {
+            return back()->withErrors(['region_id' => 'Anda hanya dapat membuat checksheet day untuk wilayah Anda sendiri.']);
+        }
+
         DB::beginTransaction();
         try {
+            $validated['region_id'] = $regionId;
             $validated['created_by_id'] = Auth::id();
             $validated['updated_by_id'] = Auth::id();
 
@@ -36,7 +46,7 @@ class CheckSheetDayController extends Controller
             $workingReport->update(['status' => 'checksheet_done']);
 
             DB::commit();
-            
+
             return redirect()->back()->with('success', __('Data berhasil ditambahkan.'));
         } catch (\Exception $e) {
             DB::rollBack();
@@ -44,7 +54,7 @@ class CheckSheetDayController extends Controller
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
-    
+
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
@@ -69,11 +79,11 @@ class CheckSheetDayController extends Controller
             $checkSheetDay->update($validated);
 
             DB::commit();
-            
+
             return redirect()->back()->with('success', __('Data berhasil diperbarui.'));
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             return redirect()->back()->with('success', __('Data gagal diperbarui.'));
         }
     }

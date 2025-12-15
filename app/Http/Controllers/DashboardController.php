@@ -63,7 +63,7 @@ class DashboardController extends Controller
 
     // --- FILTER STATUS WORKING ORDER BERDASARKAN USER DI KEDUDUKANNYA ---
     $userDivisionId = $user->division_id;
-    $allowedRegionId = null; 
+    $allowedRegionId = null;
 
     if (in_array($userDivisionId, [1, 3])) {
         $allowedRegionId = 1;
@@ -82,7 +82,7 @@ class DashboardController extends Controller
     if ($allowedRegionId !== null) {
         $reports = $reports->filter(function ($report) use ($allowedRegionId) {
             return $report->region_id === $allowedRegionId;
-        })->values(); 
+        })->values();
     }
 
     $statusCounts = $reports->countBy('status');
@@ -107,11 +107,11 @@ class DashboardController extends Controller
     $machineQuery = MasterMachine::select('id', 'name', 'nomor', 'type', 'region_id');
 
     if (in_array($userDivisionId, [1, 3])) {
-        $machineQuery->where('region_id', 1); 
-    } 
+        $machineQuery->where('region_id', 1);
+    }
     elseif ($userDivisionId === 4) {
         $machineQuery->where('region_id', 2);
-    } 
+    }
     elseif ($userDivisionId === 5) {
         $machineQuery->where('region_id', 3);
     }
@@ -127,24 +127,24 @@ class DashboardController extends Controller
     $totalCounterTamping = array_fill_keys($machineNames, 0);
     $totalOdometer = array_fill_keys($machineNames, 0);
     $totalHSD = array_fill_keys($machineNames, 0);
-        
+
         foreach ($reports as $wr) {
 
             $machine = $wr->machine;
 
             if (!$machine) {
-                continue; 
+                continue;
             }
             $machineName = ' [' . $machine->nomor .'] ' . $machine->name . ' - ' . $machine->type . '';
 
             if (!isset($totalPerMesin[$machineName])) {
-                continue; 
+                continue;
                 // $totalPerMesin[$machineName] = 0;
                 // $totalJamGenerator[$machineName] = 0;
                 // $totalCounterTamping[$machineName] = 0;
                 // $totalOdometer[$machineName] = 0;
                 // $totalHSD[$machineName] = 0;
-                // $machineNames[] = $machineName; 
+                // $machineNames[] = $machineName;
             }
 
             $start = $wr->waktu_start_engine;
@@ -261,7 +261,7 @@ class DashboardController extends Controller
                 $totalHSD[$machineName] += $hsdStop;
             }
         }
-        
+
         $formatted = [];
         $formattedGenerator = [];
         $formattedTamping = [];
@@ -269,12 +269,12 @@ class DashboardController extends Controller
         $formattedHSD = [];
 
         foreach ($machineNames as $mesin) {
-            
+
             $menit = $totalPerMesin[$mesin] ?? 0;
             if ($menit > 0) {
                 $formatted[$mesin] = floor($menit / 60) . " Jam " . ($menit % 60) . " Menit";
             } else {
-                $formatted[$mesin] = null; 
+                $formatted[$mesin] = null;
             }
 
             $jamGen = $totalJamGenerator[$mesin] ?? 0;
@@ -408,7 +408,7 @@ class DashboardController extends Controller
       ]),
       'maintenanceStats' => $maintenanceStats,
       'recentMaintenanceOrders' => $recentMaintenanceOrders,
-      'isAdminOrSupervisor' => $user->hasAnyRole(['admin', 'superuser', 'Kepala UPT Mekanik']),
+      'isAdminOrSupervisor' => $user->hasAnyRole(['admin', 'superuser', 'Kepala UPT Mekanik', 'admin-wilayah']),
     ]);
   }
 
