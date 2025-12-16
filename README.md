@@ -107,9 +107,25 @@ Password : password
 
 ## 📚 Dokumentasi
 
+### Installation & Setup
 - **[SETUP_INSTALLATION_GUIDE.md](SETUP_INSTALLATION_GUIDE.md)** - Panduan instalasi lengkap
+- **[INSTALLATION_CHECKLIST.md](INSTALLATION_CHECKLIST.md)** - Checklist instalasi
+
+### Admin & User Guide
 - **[ADMIN_WILAYAH_GUIDE.md](ADMIN_WILAYAH_GUIDE.md)** - Dokumentasi Admin Wilayah
 - **[ADMIN_WILAYAH_QUICKSTART.md](ADMIN_WILAYAH_QUICKSTART.md)** - Quick reference Admin Wilayah
+
+### Master Data
+- **[MACHINE_HIERARCHY_SEEDER.md](MACHINE_HIERARCHY_SEEDER.md)** - Dokumentasi hierarki mesin
+- **[PANDUAN_MACHINE_HIERARCHY.md](PANDUAN_MACHINE_HIERARCHY.md)** - Panduan lengkap hierarki mesin
+- **[QUICK_REFERENCE_HIERARCHY.md](QUICK_REFERENCE_HIERARCHY.md)** - Quick reference hierarki
+- **[SUMMARY_MACHINE_HIERARCHY.md](SUMMARY_MACHINE_HIERARCHY.md)** - Summary hierarki mesin
+
+### Features
+- **[NOTIFICATION_SYSTEM.md](NOTIFICATION_SYSTEM.md)** - Sistem notifikasi
+- **[QR_CODE_DOCUMENTATION.md](QR_CODE_DOCUMENTATION.md)** - Dokumentasi QR Code
+- **[DASHBOARD_MAINTENANCE_ORDER.md](DASHBOARD_MAINTENANCE_ORDER.md)** - Dashboard maintenance
+- **[WIZARD_FLOW_README.md](WIZARD_FLOW_README.md)** - Wizard flow
 
 ---
 
