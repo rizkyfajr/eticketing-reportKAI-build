@@ -30,6 +30,7 @@ use App\Models\PerekamanAkhir;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Barryvdh\Snappy\Facades\SnappyPdf;
 use Illuminate\Support\Facades\Storage;
+use App\Models\ReadinessAssessment;
 
 class WorkingReportController extends Controller
 {
@@ -90,13 +91,13 @@ class WorkingReportController extends Controller
         $machineType = $report->machine?->name;
 
         // DAILY CHECK SHEET BERDASARKAN TIPE MESIN
-        $machineClassification = $report->machine?->classification?->name;
+        $machineClassification = $report->machine?->classification?->name; 
         $filterType = null;
 
         if ($machineClassification === 'Tamping Machine' || $machineClassification === 'Material and Logistic Machine' || $machineClassification === 'Stabilization and Consolidation Machine') {
-            $filterType = 'MTT';
+            $filterType = 'MTT'; 
         } elseif ($machineClassification === 'Ballast Regulator Machine' || $machineClassification === 'Distributing and Profiling') {
-            $filterType = 'PBR';
+            $filterType = 'PBR'; 
         }
 
         $masters = CheckSheetMasterDay::when($filterType, function ($query, $filterType) {
@@ -225,13 +226,7 @@ class WorkingReportController extends Controller
       // Menampilkan data user yang login sesuai daop division
 
       return Inertia::render('WorkingReport/Create', [
-          'report' => $report,
-        //   'report' => $report->load('mglurusanawal'),
-        //   'report' => $report->load('mglengkunganawal'),
-        //   'report' => $report->load('mgweselawal'),
-        //   'report' => $report->load('pemeriksaansilangkpjr'),
-        //   'report' => $report->load('pemeriksaansilanglahan'),
-        //   'report' => $report->load('perekamanawal'),
+        'report' => $report,
         'mglurusanawal' => $report->mglurusanawal,
         'mglengkunganawal' => $report->mglengkunganawal,
         'mgweselawal' => $report->mgweselawal,
@@ -244,17 +239,9 @@ class WorkingReportController extends Controller
         'pemeriksaansilangkpjr_attachments' => $report->pemeriksaansilangkpjr?->attachments ?? collect(),
         'pemeriksaansilanglahan_attachments' => $report->pemeriksaansilanglahan?->attachments ?? collect(),
         'perekamanawal_attachments' => $report->perekamanawal?->attachments ?? collect(),
-        // 'machines'    => MasterMachine::with('region')->select('id', 'name', 'type', 'nomor', 'no_sarana', 'region_id')->get(),
         'machines' => $machineQuery->get(),
         'regions' => MasterRegion::select('id', 'name')->get(),
         'users' => $userQuery->get(),
-        // 'users' => User::select('id', 'name', 'username')->get(),
-        //   'mglurusanawal' => $report->mglurusanawal,
-        //   'mglengkunganawal' => $report->mglengkunganawal,
-        //   'mgweselawal' => $report->mgweselawal,
-        //   'pemeriksaansilangkpjr' => $report->pemeriksaansilangkpjr,
-        //   'pemeriksaansilanglahan' => $report->pemeriksaansilanglahan,
-        //   'perekamanawal' => $report->perekamanawal,
       ]);
   }
 
@@ -613,6 +600,7 @@ class WorkingReportController extends Controller
     $request->validated();
     $user = $request->user();
 
+    // $query = WorkingReport::where(function (Builder $query) use ($request) {
     $query = WorkingReport::forCurrentUserRegion()->where(function (Builder $query) use ($request) {
         $search = '%' . $request->search . '%';
         $model = $query->getModel();
@@ -810,25 +798,31 @@ class WorkingReportController extends Controller
                 'operator2',
                 'operator3',
             ]);
-            // dd($report->mglurusanawal);
 
-            // $getAttachmentUrl = function ($attachment) {
-            //     $fullPath = $attachment->path . $attachment->filename;
-            //     return storage_path('app/public/' . $fullPath);
-            // };
+            // --- 1. TENTUKAN KRITERIA PENCARIAN ---
 
-            // $pdf = PDF::loadView('working_report_1',  compact('report', 'getAttachmentUrl'))->setPaper('A4', 'portrait');
+            // Ambil ID user yang membuat laporan (asumsi user ini yang melakukan assessment)
+            $assessorId = $report->created_by_id; 
 
-            // return $pdf->download('working-report-'.$report->id.'.pdf');
+            // Ambil tanggal laporan (Asumsi: Kolom yang menyimpan tanggal laporan adalah 'report_date')
+            $cleanDate = \Carbon\Carbon::parse($report->date)->format('Y-m-d');
+
+            // --- 2. AMBIL DATA READINESS ASSESSMENT ---
+
+            $readinessAssessments = ReadinessAssessment::with('masterQuestion')
+                                ->where('user_id', $assessorId) 
+                                ->whereDate('assessment_date', $cleanDate) // Gunakan tanggal yang sudah bersih
+                                ->get();
+            // --- END AMBIL DATA READINESS ASSESSMENT ---
 
             $machineType = $report->machine?->name;
-            $machineClassification = $report->machine?->classification?->name;
+            $machineClassification = $report->machine?->classification?->name; 
             $filterType = null;
 
             if ($machineClassification === 'Tamping Machine' || $machineClassification === 'Material and Logistic Machine' || $machineClassification === 'Stabilization and Consolidation Machine') {
-                $filterType = 'MTT';
+                $filterType = 'MTT'; 
             } elseif ($machineClassification === 'Ballast Regulator Machine' || $machineClassification === 'Distributing and Profiling') {
-                $filterType = 'PBR';
+                $filterType = 'PBR'; 
             }
 
             $masters = CheckSheetMasterDay::when($filterType, function ($query, $filterType) {
@@ -875,8 +869,8 @@ class WorkingReportController extends Controller
                 return storage_path('app/public/' . $fullPath);
             };
 
-            $pdf = PDF::loadView('working_report_1',
-                compact('report', 'getAttachmentUrl', 'mergedResults', 'masters')
+            $pdf = PDF::loadView('working_report_1', 
+                compact('report', 'getAttachmentUrl', 'mergedResults', 'masters', 'readinessAssessments') 
             )->setPaper('A4', 'portrait');
 
             return $pdf->download('working-report-'.$report->id.'.pdf');

@@ -706,7 +706,98 @@
                     </tbody>
                 </table>
         </div>
+        
+        <div class="page-break"></div>
 
+        <div style="text-align: center; margin-bottom: 15px;">
+            <h3 style="margin: 0; font-size: 11pt;">LAMPIRAN READINESS ASSESSMENT</h3><br>
+            {{-- 1. Kelompokkan Data di View --}}
+            @php
+                // Grouping data ReadinessAssessment di View berdasarkan group_name dan komponen
+                $groupedAssessments = $readinessAssessments->groupBy(function ($item) {
+                    // Gunakan group_name dari masterQuestion, bukan dari assessment itu sendiri
+                    return $item->masterQuestion->group_name ?? 'Lain-lain';
+                });
+            @endphp
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 10px; margin-top: 15px;">
+                <thead>
+                    <tr>
+                        <th style="border: 1px solid #000; padding: 5px; width: 5%; background-color: #e0f2f1; font-weight: bold; text-align: center; text-transform: uppercase; color: #004d40;">No</th>
+                        <th style="border: 1px solid #000; padding: 5px; width: 20%; background-color: #e0f2f1; font-weight: bold; text-align: center; text-transform: uppercase; color: #004d40;">Komponen</th>
+                        <th style="border: 1px solid #000; padding: 5px; width: 40%; background-color: #e0f2f1; font-weight: bold; text-align: center; text-transform: uppercase; color: #004d40;">Pertanyaan</th>
+                        <th style="border: 1px solid #000; padding: 5px; width: 5%; background-color: #e0f2f1; font-weight: bold; text-align: center; text-transform: uppercase; color: #004d40;">Ya</th>
+                        <th style="border: 1px solid #000; padding: 5px; width: 5%; background-color: #e0f2f1; font-weight: bold; text-align: center; text-transform: uppercase; color: #004d40;">Tidak</th>
+                        <th style="border: 1px solid #000; padding: 5px; width: 25%; background-color: #e0f2f1; font-weight: bold; text-align: center; text-transform: uppercase; color: #004d40;">Catatan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($groupedAssessments as $groupName => $assessmentsByGroup)
+                        {{-- Header Grup --}}
+                        <tr>
+                            <td colspan="6" style="border: 1px solid #000; padding: 5px; background-color: #f0f0f0; font-weight: bold; text-align: left; color: #333; text-transform: uppercase;">
+                                {{ $groupName }}
+                            </td>
+                        </tr>
+
+                        @php
+                            // Kelompokkan lagi berdasarkan komponen
+                            $assessmentsByKomponen = $assessmentsByGroup->groupBy(function ($item) {
+                                return $item->masterQuestion->komponen ?? 'Komponen Lain';
+                            });
+                            $rowIndex = 1; // Counter untuk nomor urut
+                        @endphp
+                        
+                        @foreach ($assessmentsByKomponen as $komponenName => $assessments)
+                            @php
+                                $komponenRowspan = count($assessments);
+                            @endphp
+
+                            @foreach ($assessments as $assessmentIndex => $assessment)
+                                <tr>
+                                    {{-- Kolom No (Baris Biasa) --}}
+                                    <td style="border: 1px solid #000; padding: 5px; text-align: center;">{{ $rowIndex++ }}</td>
+
+                                    {{-- Kolom Komponen (Menggunakan Rowspan) --}}
+                                    @if ($assessmentIndex === 0)
+                                        <td style="border: 1px solid #000; padding: 5px; vertical-align: top; text-align: left; font-weight: bold;" rowspan="{{ $komponenRowspan }}">
+                                            {{ $komponenName }}
+                                        </td>
+                                    @endif
+
+                                    {{-- Kolom Pertanyaan --}}
+                                    <td style="border: 1px solid #000; padding: 5px; text-align: left;">
+                                        {{ $assessment->masterQuestion->pertanyaan ?? 'N/A' }}
+                                    </td>
+
+                                    {{-- Kolom Ya --}}
+                                    <td style="border: 1px solid #000; padding: 5px; text-align: center;">
+                                        @if ($assessment->ya == 1) <span style="color: #007bff; font-weight: bold; font-size: 12px;">V</span> @endif
+                                    </td>
+
+                                    {{-- Kolom Tidak --}}
+                                    <td style="border: 1px solid #000; padding: 5px; text-align: center;">
+                                        @if ($assessment->tidak == 1) <span style="color: #007bff; font-weight: bold; font-size: 12px;">V</span> @endif
+                                    </td>
+
+                                    {{-- Kolom Catatan --}}
+                                    <td style="border: 1px solid #000; padding: 5px; text-align: left;">
+                                        {{ $assessment->note }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @endforeach
+
+                    @empty
+                        <tr>
+                            <td colspan="6" style="border: 1px solid #000; padding: 10px; text-align: center; color: #a00;">
+                                Tidak ada data Readiness Assessment untuk tanggal ini.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
 
         <table style="width: 100%; border-collapse: collapse; margin-top: 15px; text-align: center;">
             <thead>
@@ -957,6 +1048,98 @@
                     @endforeach
                 </tbody>
             </table>
+        </div>
+        
+        <div class="page-break"></div>
+
+        <div style="text-align: center; margin-bottom: 15px;">
+            <h3 style="margin: 0; font-size: 11pt;">LAMPIRAN READINESS ASSESSMENT</h3><br>
+            {{-- 1. Kelompokkan Data di View --}}
+                @php
+                    // Grouping data ReadinessAssessment di View berdasarkan group_name dan komponen
+                    $groupedAssessments = $readinessAssessments->groupBy(function ($item) {
+                        // Gunakan group_name dari masterQuestion, bukan dari assessment itu sendiri
+                        return $item->masterQuestion->group_name ?? 'Lain-lain';
+                    });
+                @endphp
+
+                <table style="width: 100%; border-collapse: collapse; font-size: 10px; margin-top: 15px;">
+                    <thead>
+                        <tr>
+                            <th style="border: 1px solid #000; padding: 5px; width: 5%; background-color: #e0f2f1; font-weight: bold; text-align: center; text-transform: uppercase; color: #004d40;">No</th>
+                            <th style="border: 1px solid #000; padding: 5px; width: 20%; background-color: #e0f2f1; font-weight: bold; text-align: center; text-transform: uppercase; color: #004d40;">Komponen</th>
+                            <th style="border: 1px solid #000; padding: 5px; width: 40%; background-color: #e0f2f1; font-weight: bold; text-align: center; text-transform: uppercase; color: #004d40;">Pertanyaan</th>
+                            <th style="border: 1px solid #000; padding: 5px; width: 5%; background-color: #e0f2f1; font-weight: bold; text-align: center; text-transform: uppercase; color: #004d40;">Ya</th>
+                            <th style="border: 1px solid #000; padding: 5px; width: 5%; background-color: #e0f2f1; font-weight: bold; text-align: center; text-transform: uppercase; color: #004d40;">Tidak</th>
+                            <th style="border: 1px solid #000; padding: 5px; width: 25%; background-color: #e0f2f1; font-weight: bold; text-align: center; text-transform: uppercase; color: #004d40;">Catatan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($groupedAssessments as $groupName => $assessmentsByGroup)
+                            {{-- Header Grup --}}
+                            <tr>
+                                <td colspan="6" style="border: 1px solid #000; padding: 5px; background-color: #f0f0f0; font-weight: bold; text-align: left; color: #333; text-transform: uppercase;">
+                                    {{ $groupName }}
+                                </td>
+                            </tr>
+
+                            @php
+                                // Kelompokkan lagi berdasarkan komponen
+                                $assessmentsByKomponen = $assessmentsByGroup->groupBy(function ($item) {
+                                    return $item->masterQuestion->komponen ?? 'Komponen Lain';
+                                });
+                                $rowIndex = 1; // Counter untuk nomor urut
+                            @endphp
+                            
+                            @foreach ($assessmentsByKomponen as $komponenName => $assessments)
+                                @php
+                                    $komponenRowspan = count($assessments);
+                                @endphp
+
+                                @foreach ($assessments as $assessmentIndex => $assessment)
+                                    <tr>
+                                        {{-- Kolom No (Baris Biasa) --}}
+                                        <td style="border: 1px solid #000; padding: 5px; text-align: center;">{{ $rowIndex++ }}</td>
+
+                                        {{-- Kolom Komponen (Menggunakan Rowspan) --}}
+                                        @if ($assessmentIndex === 0)
+                                            <td style="border: 1px solid #000; padding: 5px; vertical-align: top; text-align: left; font-weight: bold;" rowspan="{{ $komponenRowspan }}">
+                                                {{ $komponenName }}
+                                            </td>
+                                        @endif
+
+                                        {{-- Kolom Pertanyaan --}}
+                                        <td style="border: 1px solid #000; padding: 5px; text-align: left;">
+                                            {{ $assessment->masterQuestion->pertanyaan ?? 'N/A' }}
+                                        </td>
+
+                                        {{-- Kolom Ya --}}
+                                        <td style="border: 1px solid #000; padding: 5px; text-align: center;">
+                                            @if ($assessment->ya == 1) <span style="color: #007bff; font-weight: bold; font-size: 12px;">V</span> @endif
+                                        </td>
+
+                                        {{-- Kolom Tidak --}}
+                                        <td style="border: 1px solid #000; padding: 5px; text-align: center;">
+                                            @if ($assessment->tidak == 1) <span style="color: #007bff; font-weight: bold; font-size: 12px;">V</span> @endif
+                                        </td>
+
+                                        {{-- Kolom Catatan --}}
+                                        <td style="border: 1px solid #000; padding: 5px; text-align: left;">
+                                            {{ $assessment->note }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endforeach
+
+                        @empty
+                            <tr>
+                                <td colspan="6" style="border: 1px solid #000; padding: 10px; text-align: center; color: #a00;">
+                                    Tidak ada data Readiness Assessment untuk tanggal ini.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
         </div>
 
         <table style="width: 100%; border-collapse: collapse; margin-top: 15px; text-align: center;">
