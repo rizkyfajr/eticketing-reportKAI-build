@@ -12,10 +12,11 @@ import Button from '@/Components/Button.vue'
 import BtnAttachment from '@/Components/Button/Attachment.vue'
 import axios from 'axios'
 import { Chart } from "chart.js/auto";
+import { Inertia } from '@inertiajs/inertia'
 
 const { user } = usePage().props.value
 
-const { users, hasCompletedAssessment, assessmentData, data_laporin_full, mesin_totals, formatted_mesin_total, formatted_generator_total, formatted_counter_total, formatted_oddometer_total, formatted_hsd_total, maintenanceStats, recentMaintenanceOrders, isAdminOrSupervisor, report } = defineProps({
+const { users, hasCompletedAssessment, assessmentData, data_laporin_full, mesin_totals, formatted_mesin_total, formatted_generator_total, formatted_counter_total, formatted_oddometer_total, formatted_hsd_total, maintenanceStats, recentMaintenanceOrders, isAdminOrSupervisor, report, working_report, machine, maintenance } = defineProps({
   users: Array,
   hasCompletedAssessment: Boolean,
   assessmentData: Object,
@@ -32,6 +33,9 @@ const { users, hasCompletedAssessment, assessmentData, data_laporin_full, mesin_
   count : Number,
   isAdminOrSupervisor: Boolean, // Flag dari controller
   report: Array,
+  working_report: Array,
+  maintenance: Array,
+  machine: Array,
 })
 
 const showAssessmentModal = ref(false);
@@ -557,17 +561,110 @@ const toggleMachine = (machineName) => {
     }
 };
 
+// Ref untuk chart agar bisa dihancurkan jika perlu
+const productivityChartInstance = ref(null);
+const unitChartInstance = ref(null);
+
+onMounted(() => {
+    // Inisialisasi Grafik Utama di dalam onMounted agar canvas sudah tersedia di DOM
+    const ctx = document.getElementById('productivityChart').getContext('2d');
+    
+    // Data dummy sesuai pola gambar 2
+    const labels = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    
+    productivityChartInstance.value = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                { label: 'Tamping', data: [0, 12, 38, 30, 32, 0, 0, 0, 0, 0, 0, 0], borderColor: '#67e8f9', backgroundColor: '#67e8f9', tension: 0 },
+                { label: 'Profiling', data: [12, 4, 20, 15, 50, 0, 0, 0, 0, 0, 0, 0], borderColor: '#22d3ee', backgroundColor: '#22d3ee', tension: 0 },
+                { label: 'Compacting', data: [18, 30, 25, 40, 42, 0, 0, 0, 0, 0, 0, 0], borderColor: '#0ea5e9', backgroundColor: '#0ea5e9', tension: 0 },
+                { label: 'Grinding', data: [4, 8, 17, 18, 34, 0, 0, 0, 0, 0, 0, 0], borderColor: '#3b82f6', backgroundColor: '#3b82f6', tension: 0 }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: true, position: 'top', labels: { usePointStyle: true, font: { weight: 'bold' } } }
+            },
+            scales: {
+                y: { min: 0, max: 50, title: { display: true, text: "M'sp", font: { weight: 'bold' } } },
+                x: { title: { display: true, text: 'Bulan', font: { weight: 'bold' } } }
+            }
+        }
+    });
+
+    // --- KONFIGURASI GRAFIK 2 (Unit/Titik) ---
+    const ctxUnit = document.getElementById('unitChart').getContext('2d');
+    
+    unitChartInstance.value = new Chart(ctxUnit, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                { label: 'Wesel', data: [0, 12, 38, 30, 32, 0, 0, 0, 0, 0, 0, 0], borderColor: '#67e8f9', backgroundColor: '#67e8f9', tension: 0 },
+                { label: 'Welding', data: [12, 4, 20, 15, 50, 0, 0, 0, 0, 0, 0, 0], borderColor: '#22d3ee', backgroundColor: '#22d3ee', tension: 0 },
+                { label: 'Bridge Inspection', data: [18, 30, 25, 40, 42, 0, 0, 0, 0, 0, 0, 0], borderColor: '#0ea5e9', backgroundColor: '#0ea5e9', tension: 0 }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: true, position: 'top', labels: { usePointStyle: true, font: { weight: 'bold' } } }
+            },
+            scales: {
+                y: { min: 0, max: 50, title: { display: true, text: "Unit/Titik", font: { weight: 'bold' } } },
+                x: { title: { display: true, text: 'Bulan', font: { weight: 'bold' } } }
+            }
+        }
+    });
+});
+
+const machineInfo = [
+    {
+        title: "Tamping Machine",
+        description: "KPJR untuk lifting, lining, dan levelling geometri jalan rel.",
+        image: "/assets/tamping.jpeg",
+        classification_id: 1
+    },
+    {
+        title: "Ballast Regulator Machine",
+        description: "xxxxxxxxxxxxxx",
+        image: "/assets/ballast.jpg",
+        classification_id: 2
+    },
+    {
+        title: "Stabilization and Consolidation Machine",
+        description: "xxxxxxxxxxxxxx",
+        image: "/assets/stabil.jpg",
+        classification_id: 3
+    },
+    {
+        title: "Material Logistic and Inspection Machine",
+        description: "xxxxxxxxxxxxxx",
+        image: "/assets/material.jpg",
+        classification_id: 4
+    }
+];
+
+const goToClassification = (id) => {
+    Inertia.visit(route('machines.by-classification', id))
+}
+
 </script>
 
 <template>
     <DashboardLayout title="Dashboard">
         <!-- <main class="p-0 py-0 mb-[1.25rem] ml-[1.25rem] mt-[1.25rem]"> -->
-        <header class="mb-6 p-4 md:p-6 bg-white shadow-md rounded-xl border-l-4 border-blue-500">
+        <header class="mb-6 p-4 md:p-6 bg-white shadow-md rounded-xl border-l-4 border-white-500">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
 
                 <div class="mb-3 sm:mb-0">
                     <h2 class="text-3xl font-extrabold text-gray-800 tracking-tight">
-                        Dashboard
+                        RAMCES
                     </h2>
 
                     <p class="text-lg text-gray-600 mt-1">
@@ -599,7 +696,7 @@ const toggleMachine = (machineName) => {
         <div class="min-h-screen bg-gray-50/50">
         <div class="p-1 ">
             <div class="">
-            <div class="mb-4">
+            <!-- <div class="mb-4">
                 <div class="grid grid-cols-1">
                     <Link
                         :href="route('working-reports.create')"
@@ -631,123 +728,90 @@ const toggleMachine = (machineName) => {
                         </Button>
                     </Link>
                 </div>
-            </div>
+            </div> -->
 
-            <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-5 lg:grid-cols-5 mb-6">
+            <h2 class="text-3xl font-bold text-center mb-8">Informasi KPJR</h2>
 
-                <div class="
-                    bg-gray-700 hover:bg-gray-800 rounded-xl shadow-xl p-5 text-white
-                    transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl
-                    cursor-pointer
-                ">
-                    <div class="flex items-start justify-between">
-                        <div class="w-2/3">
-                            <p class="text-gray-300 text-sm font-medium uppercase tracking-wider">
-                                Process Draft
+                <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-5 mb-10">
+                    <div v-for="(val, label) in { 
+                    'TOTAL KPJR': machine, 
+                    'UNDER MAINTENANCE': report.checksheet_done,
+                    'OPERATIONAL': report.work_done,
+                    'STAND BY': maintenance,
+                    'REPORT': maintenance
+                    }" :key="label" 
+                        class="bg-yellow-500 rounded-xl shadow-md p-4 h-32 flex flex-col justify-between transition hover:scale-105 cursor-pointer">
+                    <p class="text-black text-[11px] font-bold uppercase tracking-wider leading-tight">
+                        {{ label }}
+                    </p>
+                    <p class="text-black text-3xl font-black font-extrabold text-center mb-2">
+                        {{ val || 0 }}
+                    </p>
+                    </div>
+                </div><br></br>
+
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-200">
+                    <div class="text-center mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900">Informasi Produktivitas Kumulatif</h2>
+                    <p class="font-bold text-lg mt-2">Produktifitas KPJR</p>
+                    <p class="text-sm text-gray-500">(M'sp yang dilakukan perawatan)</p>
+                    </div>
+
+                    <div class="h-96">
+                    <canvas id="productivityChart"></canvas>
+                    </div>
+
+                    <hr class="my-10 border-gray-100">
+
+                    <div class="text-center mt-8">
+                    <p class="font-bold text-sm mb-4 text-gray-700">(Unit atau titik yang dilakukan perawatan)</p>
+                    </div>
+
+
+                    <div class="h-96">
+                    <canvas id="unitChart"></canvas>
+                    </div>
+
+                </div><br>
+
+                <div class="mt-12">
+                    <h2 class="text-3xl font-bold text-gray-900 text-center mb-8">
+                        Informasi Produktivitas, Keandalan dan Riwayat Perawatan
+                    </h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-6">
+                        <div v-for="(item, index) in machineInfo" :key="index"  @click="goToClassification(item.classification_id)"
+                            class="bg-white border border-gray-300 rounded-2xl p-5 flex flex-col items-center shadow-sm">
+                            
+                            <div class="w-full h-90 overflow-hidden rounded-xl mb-4 bg-gray-100 border border-gray-100">
+                                <img 
+                                    :src="item.image" 
+                                    :alt="item.title" 
+                                    class="w-50 h-50 object-cover transition-transform duration-300 hover:scale-105"
+                                >
+                            </div>
+
+                            <h3 class="text-lg font-bold text-center mb-3 min-h-[56px] flex items-center">
+                                {{ item.title }}
+                            </h3>
+
+                            <p class="text-sm text-gray-600 text-center leading-relaxed">
+                                {{ item.description }}
                             </p>
-                            <p class="text-4xl font-extrabold mt-1">
-                                {{ report.draft || 0}}
-                            </p>
-                        </div>
-                        <div class="bg-gray-600/50 rounded-full p-3 flex-shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
                         </div>
                     </div>
+                </div><br>
+
+                <div class="mt-12 mb-8 border border-gray-300 rounded-xl p-3 bg-white shadow-sm">
+                    <h2 class="text-xl font-extrabold text-[#00529C] text-center tracking-widest uppercase">
+                        Pojok Literasi
+                    </h2>
                 </div>
 
-                <div class="
-                    bg-yellow-600 hover:bg-yellow-700 rounded-xl shadow-xl p-5 text-white
-                    transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl
-                    cursor-pointer
-                ">
-                    <div class="flex items-start justify-between">
-                        <div class="w-2/3">
-                            <p class="text-yellow-100 text-sm font-medium uppercase tracking-wider">
-                                Process Checksheet
-                            </p>
-                            <p class="text-4xl font-extrabold mt-1">
-                                {{ report.checksheet_done || 0 }}
-                            </p>
-                        </div>
-                        <div class="bg-yellow-500/50 rounded-full p-3 flex-shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="
-                    bg-blue-600 hover:bg-blue-700 rounded-xl shadow-xl p-5 text-white
-                    transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl
-                    cursor-pointer
-                ">
-                    <div class="flex items-start justify-between">
-                        <div class="w-2/3">
-                            <p class="text-blue-100 text-sm font-medium uppercase tracking-wider">
-                                Process Working
-                            </p>
-                            <p class="text-4xl font-extrabold mt-1">
-                                {{ report.work_done || 0 }}
-                            </p>
-                        </div>
-                        <div class="bg-blue-500/50 rounded-full p-3 flex-shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="
-                    bg-orange-600 hover:bg-orange-700 rounded-xl shadow-xl p-5 text-white
-                    transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl
-                    cursor-pointer
-                ">
-                    <div class="flex items-start justify-between">
-                        <div class="w-2/3">
-                            <p class="text-orange-100 text-sm font-medium uppercase tracking-wider">
-                                Process Warming Up
-                            </p>
-                            <p class="text-4xl font-extrabold mt-1">
-                                {{ report.warming_up_done || 0 }}
-                            </p>
-                        </div>
-                        <div class="bg-orange-500/50 rounded-full p-3 flex-shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 0118 10a8 8 0 10-15.657 8.657M18 12h2a2 2 0 012 2v2a2 2 0 01-2 2h-2m-4-2h-4m0 0v-4m0 4h-4m-4-2H2a2 2 0 01-2-2v-2a2 2 0 012-2h2" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="
-                    bg-green-600 hover:bg-green-700 rounded-xl shadow-xl p-5 text-white
-                    transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl
-                    cursor-pointer
-                ">
-                    <div class="flex items-start justify-between">
-                        <div class="w-2/3">
-                            <p class="text-green-100 text-sm font-medium uppercase tracking-wider">
-                                Approve KUPT
-                            </p>
-                            <p class="text-4xl font-extrabold mt-1">
-                                {{ report.finished || 0 }}
-                            </p>
-                        </div>
-                        <div class="bg-green-500/50 rounded-full p-3 flex-shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                <br>
             <!-- Card Components -->
             <!-- <div class="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-3"> -->
-                <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-4 xl:grid-cols-4">
+            <!-- <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-4 xl:grid-cols-4">
 
                 <div class="relative flex flex-col bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100 transition-shadow duration-300 hover:shadow-2xl">
 
@@ -909,7 +973,7 @@ const toggleMachine = (machineName) => {
 
                                 <div v-if="hasValidData(machineName, 'PBR')" class="grid grid-cols-1 gap-4">
 
-                                    <!-- ENGINE HOURS -->
+                                    ENGINE HOURS
                                     <div class="bg-white p-3 rounded-lg shadow-sm border border-blue-100">
                                         <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
                                             <h5 class="text-sm font-semibold text-blue-700 flex items-center space-x-2">
@@ -923,7 +987,7 @@ const toggleMachine = (machineName) => {
                                         </div>
                                     </div>
 
-                                    <!-- GENERATOR HOURS -->
+                                    GENERATOR HOURS
                                     <div v-if="pbrFormattedGeneratorTotals[machineName] !== null" class="bg-white p-3 rounded-lg shadow-sm border border-green-100">
                                         <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
                                             <h5 class="text-sm font-semibold text-green-700 flex items-center space-x-2">
@@ -937,7 +1001,7 @@ const toggleMachine = (machineName) => {
                                         </div>
                                     </div>
 
-                                    <!-- TAMPING COUNTER -->
+                                    TAMPING COUNTER
                                     <div v-if="pbrFormattedCounterTotals[machineName] !== null" class="bg-white p-3 rounded-lg shadow-sm border border-red-100">
                                         <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
                                             <h5 class="text-sm font-semibold text-red-700 flex items-center space-x-2">
@@ -951,7 +1015,7 @@ const toggleMachine = (machineName) => {
                                         </div>
                                     </div>
 
-                                    <!-- ODOMETER -->
+                                    ODOMETER
                                     <div v-if="pbrFormattedOddometerTotals[machineName] !== null" class="bg-white p-3 rounded-lg shadow-sm border border-indigo-100">
                                         <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
                                             <h5 class="text-sm font-semibold text-indigo-700 flex items-center space-x-2">
@@ -965,7 +1029,7 @@ const toggleMachine = (machineName) => {
                                         </div>
                                     </div>
 
-                                    <!-- HSD (LITER) -->
+                                    HSD (LITER)
                                     <div v-if="pbrFormattedHsdTotals[machineName] !== null" class="bg-white p-3 rounded-lg shadow-sm border border-orange-100">
                                         <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-200">
                                             <h5 class="text-sm font-semibold text-orange-700 flex items-center space-x-2">
@@ -1234,10 +1298,10 @@ const toggleMachine = (machineName) => {
                     </div>
                 </div>
 
-            </div>
+            </div> -->
 
             <!-- Dashboard Maintenance Order -->
-            <div class="mb-12">
+            <!-- <div class="mb-12">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -1246,9 +1310,7 @@ const toggleMachine = (machineName) => {
                     Maintenance Order Performance
                 </h2>
 
-                <!-- Statistics Cards -->
                 <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-5 mb-6">
-                    <!-- Total Kerusakan -->
                     <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
                         <div class="flex items-center justify-between">
                             <div>
@@ -1263,7 +1325,6 @@ const toggleMachine = (machineName) => {
                         </div>
                     </div>
 
-                    <!-- Menunggu Follow Up -->
                     <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl shadow-lg p-6 text-white">
                         <div class="flex items-center justify-between">
                             <div>
@@ -1278,7 +1339,6 @@ const toggleMachine = (machineName) => {
                         </div>
                     </div>
 
-                    <!-- Sedang Diperbaiki -->
                     <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg p-6 text-white">
                         <div class="flex items-center justify-between">
                             <div>
@@ -1293,7 +1353,6 @@ const toggleMachine = (machineName) => {
                         </div>
                     </div>
 
-                    <!-- Selesai Diperbaiki -->
                     <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white">
                         <div class="flex items-center justify-between">
                             <div>
@@ -1308,7 +1367,6 @@ const toggleMachine = (machineName) => {
                         </div>
                     </div>
 
-                    <!-- Kerusakan Kritis -->
                     <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg p-6 text-white">
                         <div class="flex items-center justify-between">
                             <div>
@@ -1324,9 +1382,7 @@ const toggleMachine = (machineName) => {
                     </div>
                 </div>
 
-                <!-- MTTR & Response Time & Recent Orders -->
                 <div class="grid gap-6 lg:grid-cols-3">
-                    <!-- MTTR Card -->
                     <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
                         <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -1346,7 +1402,6 @@ const toggleMachine = (machineName) => {
                         </div>
                     </div>
 
-                    <!-- Response Time Card -->
                     <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
                         <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -1366,7 +1421,6 @@ const toggleMachine = (machineName) => {
                         </div>
                     </div>
 
-                    <!-- Recent Maintenance Orders -->
                     <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-semibold text-gray-800 flex items-center">
@@ -1417,7 +1471,7 @@ const toggleMachine = (machineName) => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
             </div>
         </div>
@@ -1510,7 +1564,7 @@ const toggleMachine = (machineName) => {
                         class="px-6 py-2 bg-emerald-600 text-white font-semibold rounded-lg shadow-lg hover:bg-emerald-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <span v-if="assessmentForm.processing">Menyimpan...</span>
-                        <span v-else>Simpan & Lanjutkan</span>
+                        <span v-else>Simpan</span>
                     </button>
                 </div>
 

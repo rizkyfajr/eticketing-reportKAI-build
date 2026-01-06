@@ -96,6 +96,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         ->name('master-machines.download-qr');
     Route::get('/master-machines/{id}/view-qr', [App\Http\Controllers\MasterMachineController::class, 'viewQrCode'])
         ->name('master-machines.view-qr');
+    Route::get('/machines/classification/{id}', [App\Http\Controllers\MasterMachineController::class, 'byClassification'])
+    ->name('machines.by-classification');
 
     Route::resource('master-classifications', App\Http\Controllers\MasterClassificationController::class);
     Route::post('/master-classifications/paginate', [App\Http\Controllers\MasterClassificationController::class, 'paginate'])

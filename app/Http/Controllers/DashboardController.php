@@ -73,11 +73,14 @@ class DashboardController extends Controller
         $allowedRegionId = 3;
     }
 
-    $reports = WorkingReport::with([
+    $reports = WorkingReport::forCurrentUserRegion()->with([
         'machine:id,name,nomor,type',
         'warmingup',
         'workresult',
     ])->get();
+
+    $totalReportsCount = $reports->count();
+    $totalMesin = MasterMachine::forCurrentUserRegion()->count();
 
     if ($allowedRegionId !== null) {
         $reports = $reports->filter(function ($report) use ($allowedRegionId) {
@@ -104,7 +107,7 @@ class DashboardController extends Controller
     // --- FILTER DATA MESIN BERDASARKAN KEDUDUKAN USER YANG LOGIN ---
     $userDivisionId = $user->division_id;
 
-    $machineQuery = MasterMachine::select('id', 'name', 'nomor', 'type', 'region_id');
+    $machineQuery = MasterMachine::forCurrentUserRegion()->select('id', 'name', 'nomor', 'type', 'region_id');
 
     if (in_array($userDivisionId, [1, 3])) {
         $machineQuery->where('region_id', 1);
@@ -330,6 +333,9 @@ class DashboardController extends Controller
     $totalRepairMinutes = 0;
     $repairCount = 0;
 
+    $maintenanceOrder = MaintenanceOrder::get();
+    $maintenance = $maintenanceOrder->count();
+
     foreach ($completedOrders as $order) {
         try {
             $startDate = Carbon::parse($order->start_repair_at);
@@ -395,6 +401,9 @@ class DashboardController extends Controller
 
     return Inertia::render('Dashboard', [
       'report' => $dashboardStats,
+      'working_report'    => $totalReportsCount,
+      'maintenance'    => $maintenance,
+      'machine'    => $totalMesin,      
       'formatted_mesin_total' => $formatted,
       'formatted_generator_total' => $formattedGenerator,
       'formatted_counter_total' => $formattedTamping,

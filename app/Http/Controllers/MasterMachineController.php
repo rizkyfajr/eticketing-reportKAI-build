@@ -294,4 +294,30 @@ class MasterMachineController extends Controller
       'qrCodeUrl' => asset('storage/' . $machine->qr_code),
     ]);
   }
+
+  public function byClassification($id)
+    {
+        $machines = MasterMachine::forCurrentUserRegion()->with(['classification'])
+            ->where('classification_id', $id)
+            ->orderBy('name')
+            ->get([
+                'id',
+                'region_id',
+                'classification_id',
+                'name',
+                'type',
+                'nomor',
+                'tahun_md',
+                'hierarchy_code',
+                'umur',
+                'no_sarana',
+                'keterangan',
+                'qr_code',
+            ]);
+
+        return Inertia::render('Machine/ByClassification', [
+            'classificationId' => $id,
+            'machines' => $machines,
+        ]);
+    }
 }
