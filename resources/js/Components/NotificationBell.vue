@@ -132,7 +132,7 @@ onUnmounted(() => {
         <Link
           v-for="wr in workingReports"
           :key="'wr-' + wr.id"
-          :href="wr.url"
+          :href="route('working-reports.detail', wr.id)"
           class="block px-4 py-3 border-b border-gray-100 hover:bg-gray-50"
         >
           <p class="text-sm font-semibold text-gray-900">
@@ -172,7 +172,7 @@ onUnmounted(() => {
           </Link>
         </div>
 
-        <div v-else class="px-4 py-8 text-center text-gray-500">
+        <div v-if="workingReports.length === 0 && notifications.length === 0" class="px-4 py-8 text-center text-gray-500">
           <span class="text-3xl block mb-2">🔔</span>
           <p class="text-sm">Belum ada notifikasi</p>
         </div>

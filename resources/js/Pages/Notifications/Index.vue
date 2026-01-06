@@ -192,7 +192,7 @@ const filteredWorkingReport = computed(() => {
             </div>
 
             <Link
-              :href="route('working-reports.index', wr.id)"
+              :href="route('working-reports.detail', wr.id)"
               class="inline-block mt-2 text-xs bg-orange-500 text-white px-3 py-1 rounded hover:bg-orange-600"
             >
               Lihat Working Report
