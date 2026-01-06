@@ -14,10 +14,13 @@ async function fetchNotifications() {
     const response = await axios.get(route('notifications.recent'))
     notifications.value = response.data.notifications
     unreadCount.value = response.data.unreadCount
+    workingReports.value = response.data.workingReports ?? []
   } catch (error) {
     console.error('Error fetching notifications:', error)
   }
 }
+
+const workingReports = ref([])
 
 function formatTime(dateString) {
   if (!dateString) return ''
@@ -118,6 +121,29 @@ onUnmounted(() => {
           @click="closeDropdown"
           class="text-sm text-blue-600 hover:text-blue-800">
           Lihat Semua
+        </Link>
+      </div>
+
+      <div v-if="workingReports.length > 0">
+        <div class="px-4 py-2 text-xs font-semibold text-orange-600 bg-orange-50">
+          ⏳ Working Report
+        </div>
+
+        <Link
+          v-for="wr in workingReports"
+          :key="'wr-' + wr.id"
+          :href="wr.url"
+          class="block px-4 py-3 border-b border-gray-100 hover:bg-gray-50"
+        >
+          <p class="text-sm font-semibold text-gray-900">
+            {{ wr.title }}
+          </p>
+          <p class="text-xs text-gray-600 mt-1">
+            {{ wr.message }}
+          </p>
+          <p class="text-xs text-gray-500 mt-1">
+            {{ formatTime(wr.created_at) }}
+          </p>
         </Link>
       </div>
 

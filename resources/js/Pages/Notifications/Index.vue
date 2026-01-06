@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { Link, useForm } from '@inertiajs/inertia-vue3'
 import DashboardLayout from '@/Layouts/DashboardLayout.vue'
 import Card from '@/Components/Card.vue'
@@ -8,6 +8,7 @@ import { Inertia } from '@inertiajs/inertia'
 const props = defineProps({
   notifications: Object,
   unreadCount: Number,
+  notificationWorkingReport: Array
 })
 
 function markAsRead(notificationId) {
@@ -82,6 +83,12 @@ function formatDate(dateString) {
     minute: '2-digit'
   })
 }
+
+const filteredWorkingReport = computed(() => {
+  return props.notificationWorkingReport?.filter(wr =>
+    wr.operator_at3 !== null && wr.kupt_at1 === null
+  ) ?? []
+})
 </script>
 
 <template>
@@ -159,6 +166,37 @@ function formatDate(dateString) {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div v-if="filteredWorkingReport.length > 0" class="mb-6 space-y-3">
+          <h3 class="font-bold text-lg text-orange-600">
+            ⏳ Working Report Menunggu Approve KUPT
+          </h3>
+
+          <div
+            v-for="wr in filteredWorkingReport"
+            :key="wr.id"
+            class="border border-orange-200 bg-orange-50 rounded-lg p-4"
+          >
+            <div class="font-semibold text-gray-800">
+              📄 WR #{{ wr.id }}
+            </div>
+
+            <div class="text-sm text-gray-600">
+              Mesin: {{ wr.machine?.name ?? '-' }} ({{ wr.machine?.nomor ?? '-' }})
+            </div>
+
+            <div class="text-xs text-gray-500">
+              Dibuat: {{ formatDate(wr.created_at) }}
+            </div>
+
+            <Link
+              :href="route('working-reports.index', wr.id)"
+              class="inline-block mt-2 text-xs bg-orange-500 text-white px-3 py-1 rounded hover:bg-orange-600"
+            >
+              Lihat Working Report
+            </Link>
           </div>
         </div>
 

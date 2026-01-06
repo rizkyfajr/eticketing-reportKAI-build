@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\MaintenanceOrderNotificationService;
 use App\Models\MaintenanceOrderNotification;
+use App\Models\WorkingReport;
 use Inertia\Inertia;
 
 class MaintenanceOrderNotificationController extends Controller
@@ -24,6 +25,11 @@ class MaintenanceOrderNotificationController extends Controller
         $userId = auth()->id();
         $limit = $request->input('limit', 20);
 
+        $notificationWorkingReport = WorkingReport::forCurrentUserRegion()
+            ->whereNotNull('operator_at3')
+            ->whereNull('kupt_at1')
+            ->get();
+
         $notifications = MaintenanceOrderNotification::where('user_id', $userId)
             ->with(['maintenanceOrder.machine'])
             ->orderBy('created_at', 'desc')
@@ -34,6 +40,7 @@ class MaintenanceOrderNotificationController extends Controller
         return Inertia::render('Notifications/Index', [
             'notifications' => $notifications,
             'unreadCount' => $unreadCount,
+            'notificationWorkingReport' => $notificationWorkingReport,
         ]);
     }
 
@@ -48,9 +55,26 @@ class MaintenanceOrderNotificationController extends Controller
         $notifications = $this->notificationService->getUserNotifications($userId, $limit);
         $unreadCount = $this->notificationService->getUnreadCount($userId);
 
+        $workingReports = WorkingReport::forCurrentUserRegion()
+        ->whereNotNull('operator_at3')
+        ->whereNull('kupt_at1')
+        ->latest()
+        ->take($limit)
+        ->get()
+        ->map(function ($wr) {
+            return [
+                'id' => $wr->id,
+                'title' => 'Working Report Menunggu Verifikasi',
+                'message' => 'WR #' . $wr->id . ' siap diverifikasi KUPT',
+                'created_at' => $wr->created_at,
+                'url' => route('working-reports.show', $wr->id),
+            ];
+        });
+
         return response()->json([
             'notifications' => $notifications,
             'unreadCount' => $unreadCount,
+            'workingReports' => $workingReports,
         ]);
     }
 
