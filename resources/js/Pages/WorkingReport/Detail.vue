@@ -2534,7 +2534,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                     <Button v-if="!isFirstGroup" class="bg-gray-600 text-white px-4 py-1 rounded disabled:opacity-50 text-xs" @click="prevGroup">   ← Kembali </Button>
                     <div v-else></div> 
                     <Button v-if="!isLastGroup" class="bg-blue-600 text-white px-4 py-1 rounded disabled:opacity-50 text-xs" @click="nextGroup"> Lanjut → </Button>
-                    <div v-if="canChangeMode && isLastGroup && !props.report?.operator_at3" class="flex space-x-3">
+                    <!-- <div v-if="canChangeMode && isLastGroup && !props.report?.operator_at3" class="flex space-x-3">
                         <Button 
                             class="bg-orange-600 hover:bg-orange-700 text-white px-5 py-1 rounded text-xs shadow-md"
                             @click.prevent="setMode('working')">
@@ -2546,7 +2546,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                             @click.prevent="setMode('warmingup')">
                             WarmingUp >>
                         </Button>
-                    </div>
+                    </div> -->
                   </div>
                   <br>
                 </div>
