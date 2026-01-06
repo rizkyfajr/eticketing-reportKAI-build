@@ -614,7 +614,7 @@ class WorkingReportController extends Controller
         $query->orWhereRelation('checksheet', 'working_report_id', 'like', $search);
     })
 
-    ->when(!$user->hasRole(['superuser', 'it', 'admin', 'Kepala UPT Mekanik']), function (Builder $query) use ($user) {
+    ->when(!$user->hasRole(['superuser', 'it', 'admin', 'Kepala UPT Mekanik', 'admin-wilayah']), function (Builder $query) use ($user) {
         $query->where(function (Builder $q) use ($user) {
             // Operator yang buat
             $q->where('created_by_id', $user->id)
