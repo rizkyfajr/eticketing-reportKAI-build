@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Services\MaintenanceOrderNotificationService;
 use App\Models\MaintenanceOrderNotification;
 use App\Models\WorkingReport;
+use App\Models\User;
 use Inertia\Inertia;
 
 class MaintenanceOrderNotificationController extends Controller
@@ -22,13 +23,28 @@ class MaintenanceOrderNotificationController extends Controller
      */
     public function index(Request $request)
     {
+        $user = auth()->user(); 
         $userId = auth()->id();
         $limit = $request->input('limit', 20);
 
-        $notificationWorkingReport = WorkingReport::forCurrentUserRegion()
+        $kupt = User::where('division_id', $user->division_id)
+            ->where('position_id', 1)
+            ->first();
+
+        $workingReportQuery = WorkingReport::forCurrentUserRegion()
+            ->with(['machine', 'createdBy'])
             ->whereNotNull('operator_at3')
-            ->whereNull('kupt_at1')
-            ->get();
+            ->whereNull('kupt_at1');
+
+        if ($kupt && $userId === $kupt->id) {
+            $notificationWorkingReport = $workingReportQuery
+                ->whereHas('createdBy', function ($q) use ($user) {
+                    $q->where('division_id', $user->division_id);
+                })
+                ->get();
+        } else {
+            $notificationWorkingReport = collect();
+        }
 
         $notifications = MaintenanceOrderNotification::where('user_id', $userId)
             ->with(['maintenanceOrder.machine'])
@@ -49,27 +65,39 @@ class MaintenanceOrderNotificationController extends Controller
      */
     public function recent(Request $request)
     {
+        $user   = auth()->user();
         $userId = auth()->id();
         $limit = $request->input('limit', 10);
 
         $notifications = $this->notificationService->getUserNotifications($userId, $limit);
         $unreadCount = $this->notificationService->getUnreadCount($userId);
 
-        $workingReports = WorkingReport::forCurrentUserRegion()
-        ->whereNotNull('operator_at3')
-        ->whereNull('kupt_at1')
-        ->latest()
-        ->take($limit)
-        ->get()
-        ->map(function ($wr) {
-            return [
-                'id' => $wr->id,
-                'title' => 'Working Report Menunggu Verifikasi',
-                'message' => 'WR #' . $wr->id . ' siap diverifikasi KUPT',
-                'created_at' => $wr->created_at,
-                'url' => route('working-reports.show', $wr->id),
-            ];
-        });
+        $kupt = User::where('division_id', $user->division_id)
+            ->where('position_id', 1)
+            ->first();
+
+        $workingReports = collect();
+
+        if ($kupt && $userId === $kupt->id) {
+            $workingReports = WorkingReport::forCurrentUserRegion()
+                ->whereNotNull('operator_at3')
+                ->whereNull('kupt_at1')
+                ->whereHas('createdBy', function ($q) use ($user) {
+                    $q->where('division_id', $user->division_id);
+                })
+                ->latest()
+                ->take($limit)
+                ->get()
+                ->map(function ($wr) {
+                    return [
+                        'id' => $wr->id,
+                        'title' => 'Working Report Menunggu Verifikasi',
+                        'message' => 'WR #' . $wr->id . ' siap diverifikasi KUPT',
+                        'created_at' => $wr->created_at,
+                        'url' => route('working-reports.detail', $wr->id),
+                    ];
+                });
+        }
 
         return response()->json([
             'notifications' => $notifications,
