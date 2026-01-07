@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { Link } from '@inertiajs/inertia-vue3'
 import axios from 'axios'
 
@@ -21,6 +21,10 @@ async function fetchNotifications() {
 }
 
 const workingReports = ref([])
+
+const totalBadgeCount = computed(() => {
+  return unreadCount.value + workingReports.value.length
+})
 
 function formatTime(dateString) {
   if (!dateString) return ''
@@ -102,10 +106,16 @@ onUnmounted(() => {
 
       <!-- Badge untuk unread count -->
       <span
+        v-if="totalBadgeCount > 0"
+        class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-500 rounded-full">
+        {{ totalBadgeCount  > 99 ? '99+' : totalBadgeCount  }}
+      </span>
+
+      <!-- <span
         v-if="unreadCount > 0"
         class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-500 rounded-full">
         {{ unreadCount > 99 ? '99+' : unreadCount }}
-      </span>
+      </span> -->
     </button>
 
     <!-- Dropdown Notifikasi -->
