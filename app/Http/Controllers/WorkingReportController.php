@@ -147,7 +147,7 @@ class WorkingReportController extends Controller
       $user = auth()->user();
 
       // Menampilkan data user yang login sesuai daop division
-      $userQuery = User::select('id', 'name', 'username', 'division_id');
+      $userQuery = User::select('id', 'name', 'username', 'division_id')->whereNotIn('position_id', [1, 2]);
       if ($user->division_id) {
           $userQuery->where('division_id', $user->division_id);
       }
@@ -219,7 +219,7 @@ class WorkingReportController extends Controller
       // Menampilkan data mesin sesuai daop users
 
       // Menampilkan data user yang login sesuai daop division
-      $userQuery = User::select('id', 'name', 'username', 'division_id');
+      $userQuery = User::select('id', 'name', 'username', 'division_id')->whereNotIn('position_id', [1, 2]);
       if ($user->division_id) {
           $userQuery->where('division_id', $user->division_id);
       }
