@@ -1498,7 +1498,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
             }">
           1
         </div>
-        <p class="text-[11px] mt-1 font-bold">Working Order</p>
+        <p class="text-[11px] mt-1 font-bold">Preparation</p>
       </div>
 
       <div class="step-line flex-grow h-1 bg-gray-300 mx-1 mt-4"></div>
