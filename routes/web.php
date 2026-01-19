@@ -144,6 +144,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         ->middleware('regional.access:working_report');
     Route::delete('/working-reports/{working_report}', [App\Http\Controllers\WorkingReportController::class, 'destroy'])
         ->middleware('regional.access:working_report');
+    Route::delete('/working-reports/{report}', [App\Http\Controllers\WorkingReportController::class, 'destroy'])
+        ->name('working-reports.destroy');
     Route::post('/working-reports/paginate', [App\Http\Controllers\WorkingReportController::class, 'paginate'])
         ->name('working-reports.paginate');
 
