@@ -266,29 +266,42 @@ const validateForms = () => {
 
 const submit = () => {
   Swal.fire({
-    title: 'Menyimpan data...',
-    didOpen: () => Swal.showLoading(),
-    allowOutsideClick: false,
-  })
-
-  form.post(route('working-reports.store'), {
-    onSuccess: () => {
+    title: 'Konfirmasi Simpan',
+    text: "Apakah Anda yakin data yang dimasukkan sudah benar dan lengkap?",
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonColor: '#16a34a',
+    cancelButtonColor: '#4b5563', 
+    confirmButtonText: 'Ya, Simpan!',
+    cancelButtonText: 'Batal'
+  }).then((result) => {
+    if (result.isConfirmed) {
       Swal.fire({
-        icon: 'success',
-        title: 'Berhasil!',
-        text: 'Working Report berhasil disimpan.',
-        timer: 1200,
-        showConfirmButton: false,
-      });
-      setTimeout(() => window.location.reload(), 1000);
-    },
-    onError: () => {
-      Swal.fire({
-        icon: 'error',
-        title: 'Gagal!',
-        text: 'Terjadi kesalahan saat menyimpan data.',
+        title: 'Menyimpan data...',
+        didOpen: () => Swal.showLoading(),
+        allowOutsideClick: false,
       })
-    },
+
+      form.post(route('working-reports.store'), {
+        onSuccess: () => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: 'Working Report berhasil disimpan.',
+            timer: 1200,
+            showConfirmButton: false,
+          });
+          setTimeout(() => window.location.reload(), 1000);
+        },
+        onError: () => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Gagal!',
+            text: 'Terjadi kesalahan saat menyimpan data.',
+          })
+        },
+      })
+    }
   })
 }
 
@@ -575,6 +588,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       type="time"
                       class="w-full border rounded-md px-2 py-2 text-xs"
                       placeholder="Isi Waktu Start Engine"
+                      required
                     />
                   </div>
 
@@ -585,6 +599,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       type="text"
                       class="w-full border rounded-md px-2 py-2 text-xs"
                       placeholder="Isi Jam Traveling Awal"
+                      required
                     />
                   </div>
 
@@ -595,6 +610,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       type="time"
                       class="w-full border rounded-md px-2 py-2 text-xs"
                       placeholder="Isi Awal Jam Kerja Operator"
+                      required
                     />
                   </div>
 
@@ -605,6 +621,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       type="text"
                       class="w-full border rounded-md px-2 py-2 text-xs"
                       placeholder="Isi Jam Mesin Awal"
+                      required
                     />
                   </div>
 
@@ -615,6 +632,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       type="text"
                       class="w-full border rounded-md px-2 py-2 text-xs"
                       placeholder="Isi Jam Generator Awal"
+                      required
                     />
                   </div>
 
@@ -625,6 +643,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       type="number"
                       class="w-full border rounded-md px-2 py-2 text-xs"
                       placeholder="Isi Counter Tamping Awal"
+                      required
                     />
                   </div>
 
@@ -635,6 +654,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       type="number"
                       class="w-full border rounded-md px-2 py-2 text-xs"
                       placeholder="Isi Oddometer Awal"
+                      required
                     />
                   </div>
 
@@ -645,6 +665,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       type="number"
                       class="w-full border rounded-md px-2 py-2 text-xs"
                       placeholder="Isi HSD Awal Kerja"
+                      required
                     />
                   </div>
 
@@ -662,6 +683,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       :searchable="true"
                       placeholder="Pilih Operator 1"
                       style="font-size: 0.7rem;"
+                      required
                     >
                       <template #option="{ option }">
                         <span class="text-xs antialiased">
@@ -686,6 +708,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       :searchable="true"
                       placeholder="Pilih Operator 2"
                       style="font-size: 0.7rem;"
+                      required
                     >
                       <template #option="{ option }">
                         <span class="text-xs antialiased">
@@ -710,6 +733,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       :searchable="true"
                       placeholder="Pilih Operator 3"
                       style="font-size: 0.7rem;"
+                      required
                     >
                       <template #option="{ option }">
                         <span class="text-xs antialiased">
@@ -727,6 +751,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       type="number"
                       class="w-full border rounded-md px-2 py-2 text-xs"
                       placeholder="Isi NIPP Pengawal 1"
+                      required
                     />
                   </div>
 
@@ -737,6 +762,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       type="text"
                       class="w-full border rounded-md px-2 py-2 text-xs"
                       placeholder="Isi Nama Pengawal 1"
+                      required
                     />
                   </div>
 
@@ -747,6 +773,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       type="number"
                       class="w-full border rounded-md px-2 py-2 text-xs"
                       placeholder="Isi NIPP Pengawal 2"
+                      required
                     />
                   </div>
 
@@ -757,6 +784,7 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                       type="text"
                       class="w-full border rounded-md px-2 py-2 text-xs"
                       placeholder="Isi Nama Pengawal 2"
+                      required
                     />
                   </div>
 
