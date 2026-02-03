@@ -224,15 +224,15 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                             >
                                                 {{
                                                 report.status === 'draft'
-                                                    ? 'Process Working Order'
+                                                    ? 'Process Preparation'
                                                     : report.status === 'checksheet_done'
-                                                    ? 'Process Checksheet'
+                                                    ? 'Process Daily Check'
                                                     : report.status === 'warming_up_done'
                                                     ? 'Process Warming Up'
                                                     : report.status === 'photo_uploaded'
                                                     ? 'Process Upload'
                                                     : report.status === 'work_done'
-                                                    ? 'Process Work Result'
+                                                    ? 'Process Working'
                                                     : report.status === 'finished'
                                                     ? 'Approve KUPT'
                                                     : report.status === 'selesai'
