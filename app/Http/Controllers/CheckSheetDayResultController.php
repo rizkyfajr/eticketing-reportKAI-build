@@ -17,6 +17,7 @@ class CheckSheetDayResultController extends Controller
           'check_sheet_master_day_id' => 'required|integer|exists:check_sheet_master_days,id',
           'cek' => 'nullable|integer|in:0,1',
           'tambahan' => 'nullable|integer|in:0,1',
+          'service' => 'nullable|integer|in:0,1',
           'ganti' => 'nullable|integer|in:0,1',
           'kiri_depan' => 'nullable|string',
           'kanan_depan' => 'nullable|string',
@@ -31,6 +32,7 @@ class CheckSheetDayResultController extends Controller
           $result->update([
               'cek' => $validated['cek'] ?? 0,
               'tambahan' => $validated['tambahan'] ?? 0,
+              'service' => $validated['service'] ?? 0,
               'ganti' => $validated['ganti'] ?? 0,
               'kiri_depan' => $validated['kiri_depan'] ?? '',
               'kanan_depan' => $validated['kanan_depan'] ?? '',
@@ -42,6 +44,7 @@ class CheckSheetDayResultController extends Controller
               'check_sheet_master_day_id' => $validated['check_sheet_master_day_id'],
               'cek' => $validated['cek'] ?? 0,
               'tambahan' => $validated['tambahan'] ?? 0,
+              'service' => $validated['service'] ?? 0,
               'ganti' => $validated['ganti'] ?? 0,
               'kiri_depan' => $validated['kiri_depan'] ?? '',
               'kanan_depan' => $validated['kanan_depan'] ?? '',

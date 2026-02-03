@@ -16,6 +16,7 @@ class CheckSheetDayResult extends Model
         'check_sheet_master_day_id',
         'cek',
         'tambahan',
+        'service',
         'ganti',
         'kiri_depan',
         'kanan_depan',
