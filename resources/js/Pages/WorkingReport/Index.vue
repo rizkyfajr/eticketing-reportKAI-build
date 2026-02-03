@@ -185,11 +185,15 @@ onUnmounted(() => window.removeEventListener('keydown', esc))
                                         </td>
                                         
                                         <td class="border-b border-gray-300 px-4 py-3 text-center text-xs font-medium whitespace-nowrap">
-                                            {{ 
+                                            <!-- {{ 
                                                 report.machine 
                                                 ? `${report.machine.name}${report.machine.type ? ' - ' + report.machine.type : ''}${report.machine.region && report.machine.region.name ? ' (' + report.machine.region.name + ')' : ''}` 
                                                 : '-' 
-                                            }}
+                                            }} -->
+                                            <div v-if="report?.klasifikasi">
+                                                {{ report.klasifikasi }} - {{ report.jenis_kpjr }} - {{ report.nomor_sarana }} - {{ report.nomor_mesin }}
+                                            </div>
+                                            <div v-else class="text-gray-400">-</div>
                                         </td>
                                         
                                         <!-- <td class="border-b border-gray-300 px-4 py-3 text-center text-xs whitespace-nowrap">
