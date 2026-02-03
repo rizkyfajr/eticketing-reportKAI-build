@@ -109,12 +109,12 @@ class WorkingReportController extends Controller
         // })
         ->orderByRaw("
             CASE
-                WHEN LOWER(group_name) LIKE 'engine%' THEN 1
-                WHEN LOWER(group_name) LIKE 'mekanik%' THEN 2
-                WHEN LOWER(group_name) LIKE 'pneumatic%' THEN 3
-                WHEN LOWER(group_name) LIKE 'hydraulic%' OR LOWER(group_name) LIKE 'hidrolik%' THEN 4
-                WHEN LOWER(group_name) LIKE 'elektrik%' OR LOWER(group_name) LIKE 'electrical%' THEN 5
-                WHEN LOWER(group_name) LIKE 'peralatan keselamatan%' THEN 6
+                WHEN TRIM(LOWER(group_name)) LIKE 'hydraul%' OR TRIM(LOWER(group_name)) LIKE 'hidrolik%' THEN 1
+                WHEN TRIM(LOWER(group_name)) LIKE 'elek%' THEN 2
+                WHEN TRIM(LOWER(group_name)) LIKE 'mekanik%' THEN 3
+                WHEN TRIM(LOWER(group_name)) LIKE 'engine%' THEN 4
+                WHEN TRIM(LOWER(group_name)) LIKE 'pneumat%' THEN 5
+                WHEN TRIM(LOWER(group_name)) LIKE 'peralatan keselamatan%' THEN 6
                 ELSE 7
             END
         ")->get();
@@ -136,6 +136,7 @@ class WorkingReportController extends Controller
             'urutan' => $master->urutan,
             'cek' => $result ? (int) $result->cek : 0,
             'tambahan' => $result ? (int) $result->tambahan : 0,
+            'service' => $result ? (int) $result->service : 0,
             'ganti' => $result ? (int) $result->ganti : 0,
             'kiri_depan' => $result ? $result->kiri_depan : '',
             'kanan_depan' => $result ? $result->kanan_depan : '',
@@ -152,6 +153,25 @@ class WorkingReportController extends Controller
           $userQuery->where('division_id', $user->division_id);
       }
 
+      // Menampilkan data mesin sesuai daop user
+      $user = auth()->user();
+
+      $machineQuery = MasterMachine::with('region', 'classification')->select('id', 'name', 'type', 'nomor', 'no_sarana', 'region_id', 'classification_id');
+
+      if ($user->division_id == 4) {
+        $machineQuery->where('region_id', 2);
+      } elseif (in_array($user->division_id, [1, 3])) {
+        $machineQuery->where('region_id', 1);
+      }
+      // Menampilkan data mesin sesuai daop users
+
+      // Menampilkan data user yang login sesuai daop division
+      $userQuery = User::select('id', 'name', 'username', 'division_id')->whereNotIn('position_id', [1, 2]);
+      if ($user->division_id) {
+          $userQuery->where('division_id', $user->division_id);
+      }
+      // Menampilkan data user yang login sesuai daop division
+
       return Inertia::render('WorkingReport/Detail')->with([
           'report'      => $report,
           'masters'     => $masters,
@@ -164,7 +184,8 @@ class WorkingReportController extends Controller
           'warmingup_user'  => $report->warmingup_user ?? null,
           'workresult'  => $report->workresult ?? null,
           'workresult_user'  => $report->workresult_user ?? null,
-          'machines'    => MasterMachine::with('region')->select('id', 'name', 'type', 'nomor', 'no_sarana', 'region_id')->get(),
+        //   'machines'    => MasterMachine::with('region')->select('id', 'name', 'type', 'nomor', 'no_sarana', 'region_id')->get(),
+          'machines' => $machineQuery->get(),
           'regions'     => MasterRegion::select('id', 'name')->get(),
           'users' => $userQuery->get(),
           'mglurusanawal' => $report->mglurusanawal,
@@ -195,16 +216,89 @@ class WorkingReportController extends Controller
   *
   * @return \Illuminate\Http\Response
   */
-  public function create(WorkingReport $report)
+  public function create(DataTableRequest $request, WorkingReport $report, WorkResult $workresult)
   {
       $report->load(
+        'dayresults',
+        'checksheetday.checksheetworkresult',
+        'machine',
         'mglurusanawal.attachments',
         'mglengkunganawal.attachments',
         'mgweselawal.attachments',
         'pemeriksaansilangkpjr.attachments',
         'pemeriksaansilanglahan.attachments',
-        'perekamanawal.attachments'
+        'perekamanawal.attachments',
+        'mglurusanakhir.attachments',
+        'mglengkunganakhir.attachments',
+        'mgweselakhir.attachments',
+        'perekamanakhir.attachments',
+        'maintenanceOrders.machine',
       );
+      
+      $machineType = $report->machine?->name;
+
+        // DAILY CHECK SHEET BERDASARKAN TIPE MESIN
+        $machineClassification = $report->machine?->classification?->name; 
+        $filterType = null;
+
+        if ($machineClassification === 'Tamping Machine' || $machineClassification === 'Material and Logistic Machine' || $machineClassification === 'Stabilization and Consolidation Machine') {
+            $filterType = 'MTT'; 
+        } elseif ($machineClassification === 'Ballast Regulator Machine' || $machineClassification === 'Distributing and Profiling') {
+            $filterType = 'PBR'; 
+        }
+
+        $masters = CheckSheetMasterDay::when($filterType, function ($query, $filterType) {
+            $query->where('jenis_mesin', $filterType);
+        })
+
+        // $masters = CheckSheetMasterDay::when($machineType, function ($query, $machineType) {
+        //     $query->where('jenis_mesin', $machineType);
+        // })
+        ->orderByRaw("
+            CASE
+                WHEN TRIM(LOWER(group_name)) LIKE 'hydraul%' OR TRIM(LOWER(group_name)) LIKE 'hidrolik%' THEN 1
+                WHEN TRIM(LOWER(group_name)) LIKE 'elek%' THEN 2
+                WHEN TRIM(LOWER(group_name)) LIKE 'mekanik%' THEN 3
+                WHEN TRIM(LOWER(group_name)) LIKE 'engine%' THEN 4
+                WHEN TRIM(LOWER(group_name)) LIKE 'pneumat%' THEN 5
+                WHEN TRIM(LOWER(group_name)) LIKE 'peralatan keselamatan%' THEN 6
+                ELSE 7
+            END
+        ")->get();
+
+      $existingResults = $report->dayresults
+        ? $report->dayresults->keyBy('check_sheet_master_day_id')
+        : collect();
+
+       $mergedResults = $masters->map(function ($master) use ($existingResults) {
+       $result = $existingResults->get($master->id);
+
+       return [
+            'check_sheet_master_day_id' => $master->id,
+            'group_name' => $master->group_name,
+            'komponen' => $master->komponen,
+            'rujukan' => $master->rujukan,
+            'nilai_rujukan' => $master->nilai_rujukan,
+            'satuan' => $master->satuan,
+            'urutan' => $master->urutan,
+            'cek' => $result ? (int) $result->cek : 0,
+            'tambahan' => $result ? (int) $result->tambahan : 0,
+            'service' => $result ? (int) $result->service : 0,
+            'ganti' => $result ? (int) $result->ganti : 0,
+            'kiri_depan' => $result ? $result->kiri_depan : '',
+            'kanan_depan' => $result ? $result->kanan_depan : '',
+            'keterangan' => $result ? $result->keterangan : '',
+        ];
+      });
+      $checksheetworkresult = $report->checksheetday?->checksheetworkresult()->first();
+
+      $user = auth()->user();
+
+      // Menampilkan data user yang login sesuai daop division
+      $userQuery = User::select('id', 'name', 'username', 'division_id')->whereNotIn('position_id', [1, 2]);
+      if ($user->division_id) {
+          $userQuery->where('division_id', $user->division_id);
+      }
 
       // Menampilkan data mesin sesuai daop user
       $user = auth()->user();
@@ -226,22 +320,41 @@ class WorkingReportController extends Controller
       // Menampilkan data user yang login sesuai daop division
 
       return Inertia::render('WorkingReport/Create', [
-        'report' => $report,
+        'report'      => $report,
+        'masters'     => $masters,
+        'results'     => $mergedResults,
+    //   'checksheet'  => $report->checksheet ?? null,
+    //   'checksheetday'  => $report->checksheetday ?? null,
+        'upload'      => $report->upload ?? null,
+        'checksheetworkresult' => $checksheetworkresult,
+        'warmingup'   => $report->warmingup ?? null,
+        'warmingup_user'  => $report->warmingup_user ?? null,
+        'workresult'  => $report->workresult ?? null,
+        'workresult_user'  => $report->workresult_user ?? null,
+        // 'machines'    => MasterMachine::with('region')->select('id', 'name', 'type', 'nomor', 'no_sarana', 'region_id')->get(),
+        'machines' => $machineQuery->get(),
+        'regions'     => MasterRegion::select('id', 'name')->get(),
+        'users' => $userQuery->get(),
         'mglurusanawal' => $report->mglurusanawal,
         'mglengkunganawal' => $report->mglengkunganawal,
         'mgweselawal' => $report->mgweselawal,
         'pemeriksaansilangkpjr' => $report->pemeriksaansilangkpjr,
         'pemeriksaansilanglahan' => $report->pemeriksaansilanglahan,
         'perekamanawal' => $report->perekamanawal,
+        'mglurusanakhir' => $report->mglurusanakhir,
+        'mglengkunganakhir' => $report->mglengkunganakhir,
+        'mgweselakhir' => $report->mgweselakhir,
+        'perekamanakhir' => $report->perekamanakhir,
         'mglurusanawal_attachments' => $report->mglurusanawal?->attachments ?? collect(),
         'mglengkunganawal_attachments' => $report->mglengkunganawal?->attachments ?? collect(),
         'mgweselawal_attachments' => $report->mgweselawal?->attachments ?? collect(),
         'pemeriksaansilangkpjr_attachments' => $report->pemeriksaansilangkpjr?->attachments ?? collect(),
         'pemeriksaansilanglahan_attachments' => $report->pemeriksaansilanglahan?->attachments ?? collect(),
         'perekamanawal_attachments' => $report->perekamanawal?->attachments ?? collect(),
-        'machines' => $machineQuery->get(),
-        'regions' => MasterRegion::select('id', 'name')->get(),
-        'users' => $userQuery->get(),
+        'mglurusanakhir_attachments' => $report->mglurusanakhir?->attachments ?? collect(),
+        'mglengkunganakhir_attachments' => $report->mglengkunganakhir?->attachments ?? collect(),
+        'mgweselakhir_attachments' => $report->mgweselakhir?->attachments ?? collect(),
+        'perekamanakhir_attachments' => $report->perekamanakhir?->attachments ?? collect(),
       ]);
   }
 
@@ -311,7 +424,7 @@ class WorkingReportController extends Controller
         // Jika mode adalah WARMING UP, tidak perlu membuat record opname (MG1-MG6)
         // dan langsung redirect ke halaman detail.
         return redirect()
-            ->route('working-reports.detail', $report->id)
+            // ->route('working-reports.detail', $report->id)
             ->with('success', 'Working report (Warming Up) berhasil disimpan.');
 
     } else {
@@ -327,7 +440,7 @@ class WorkingReportController extends Controller
         // Redirect ke halaman pengisian form (create.withid)
         return redirect()
             ->route('working-reports.create.withid', $report->id)
-            ->with('success', 'Working report berhasil disimpan. Lanjutkan pengisian data opname awal.');
+            ->with('success', 'Berhasil Disimpan');
     }
 
         // MgLurusanAwal::create([
@@ -405,7 +518,13 @@ class WorkingReportController extends Controller
         );
     }
 
-    return response()->json(['success' => true,'redirect' => route('working-reports.detail', $wr_id)]);
+    // return response()->json(['success' => true,'redirect' => route('working-reports.detail', $wr_id)]);
+    // return response()->json([ 'success' => true, 'message' => "Berhasil disimpan" ]);
+    return response()->json([ 
+        'success' => true, 
+        'message' => "Berhasil disimpan",
+        'redirect' => url("/working-reports/create/{$wr_id}")
+    ]);
   }
 
   public function approve($reportId, $level)
@@ -857,6 +976,7 @@ class WorkingReportController extends Controller
                     'urutan' => $master->urutan,
                     'cek' => $result ? (int) $result->cek : 0,
                     'tambahan' => $result ? (int) $result->tambahan : 0,
+                    'service' => $result ? (int) $result->service : 0,
                     'ganti' => $result ? (int) $result->ganti : 0,
                     'kiri_depan' => $result ? $result->kiri_depan : '',
                     'kanan_depan' => $result ? $result->kanan_depan : '',
@@ -894,8 +1014,8 @@ class WorkingReportController extends Controller
 
         WorkingReport::where('id', $request->working_report_id)
             ->update(['mode' => $request->mode]);
-
-        return response()->json(['message' => 'Mode updated']);
+        
+        return response()->json([ 'success' => true, 'message' => "Berhasil diperbarui" ]);
 
     }
 
