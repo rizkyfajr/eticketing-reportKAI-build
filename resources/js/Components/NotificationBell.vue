@@ -107,7 +107,7 @@ onUnmounted(() => {
       <!-- Badge untuk unread count -->
       <span
         v-if="totalBadgeCount > 0"
-        class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-500 rounded-full">
+        class="absolute top-0 right-0 inline-flex items-center justify-center min-w-[19px] h-[19px] px-1 text-[9px] font-black leading-none text-white bg-red-500 rounded-full">
         {{ totalBadgeCount  > 99 ? '99+' : totalBadgeCount  }}
       </span>
 
