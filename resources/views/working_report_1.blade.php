@@ -99,7 +99,7 @@
               <td style="width: 30%; border-bottom: 1px solid black; padding: 1px 3px;">{{ optional($report->workresult)->wilayah ?? '-' }}</td>
               <td style="width: 5px;"></td>
 
-              <td style="width: 20%; font-weight: bold; padding: 1px 3px 1px 0;">Lokasi Stabling Awal</td>
+              <td style="width: 20%; font-weight: bold; padding: 1px 3px 1px 0;">Lokasi Stabling</td>
               <td style="width: 1%; text-align: center; font-weight: bold;">:</td>
               <td style="width: 33%; border-bottom: 1px solid black; padding: 1px 3px;">{{ optional($report->workresult)->lokasi_stabling_awal ?? '-' }}</td>
           </tr>
@@ -109,19 +109,21 @@
               <td style="border-bottom: 1px solid black; padding: 1px 3px;">{{ optional($report->workresult)->petak_jalan ?? '-' }}</td>
               <td></td>
 
-              <td style="font-weight: bold; padding: 1px 3px 1px 0;">Lokasi Stabling Akhir</td>
+              <!-- <td style="font-weight: bold; padding: 1px 3px 1px 0;">Lokasi Stabling Akhir</td>
               <td style="text-align: center; font-weight: bold;">:</td>
-              <td style="border-bottom: 1px solid black; padding: 1px 3px;">{{ optional($report->workresult)->lokasi_stabling_akhir ?? '-' }}</td>
+              <td style="border-bottom: 1px solid black; padding: 1px 3px;">{{ optional($report->workresult)->lokasi_stabling_akhir ?? '-' }}</td> -->
           </tr>
           <tr>
-              <td style="font-weight: bold; padding: 1px 3px 1px 0;">Kelas Jalan</td>
+              <!-- <td style="font-weight: bold; padding: 1px 3px 1px 0;">Kelas Jalan</td>
               <td style="text-align: center; font-weight: bold;">:</td>
               <td style="border-bottom: 1px solid black; padding: 1px 3px;">{{ optional($report->workresult)->kelas_jalan ?? '-' }}</td>
-              <td></td>
+              <td></td> -->
               
               <td colspan="3"></td>
           </tr>
       </table>
+
+      <br>
 
       <table style="width: 100%; border-collapse: collapse; margin-top: 5px;">
           <tr>
@@ -233,6 +235,61 @@
               <td>Unit</td>
           </tr>
       </table>
+
+      <table style="width: 100%; border-collapse: collapse; margin-top: 5px;">
+          <tr>
+              <td style="width: 20%; font-weight: bold;">No. Lengkung</td>
+              <td style="width: 1%;">:</td>
+              <td style="width: 20%; border-bottom: 1px solid black; text-align: center;">{{ optional($report->workresult)->no_lengkung1 ?? '-' }}</td>
+              <td style="width: 2%; text-align: center;">Km/Hm</td>
+              <td style="width: 20%; border-bottom: 1px solid black; text-align: center;">{{ optional($report->workresult)->radius1 ?? '-' }}</td>
+              <td style="width: 5%;">{{ optional($report->workresult)->hu_hi7 ?? '-' }}</td>
+              
+              <td style="width: 15%; text-align: right;">Jumlah Lengkung</td>
+              <td style="width: 1%;">:</td>
+              <td style="width: 20%; border-bottom: 1px solid black; text-align: center;">{{ optional($report->workresult)->jumlah_lengkung1 ?? '' }}</td>
+              <td>Unit</td>
+          </tr>
+          <tr>
+              <td style="width: 15%;"></td>
+              <td style="width: 1%;">:</td>
+              <td style="width: 20%; border-bottom: 1px solid black; text-align: center;">{{ optional($report->workresult)->no_lengkung2 ?? '-' }}</td>
+              <td style="width: 2%; text-align: center;">Km/Hm</td>
+              <td style="width: 20%; border-bottom: 1px solid black; text-align: center;">{{ optional($report->workresult)->radius2 ?? '-' }}</td>
+              <td style="width: 5%;">{{ optional($report->workresult)->hu_hi8 ?? '-' }}</td>
+              
+              <td style="text-align: right;">Jumlah Lengkung</td>
+              <td>:</td>
+              <td style="border-bottom: 1px solid black; text-align: center;">{{ optional($report->workresult)->jumlah_lengkung2 ?? '' }} </td>
+              <td>Unit</td>
+          </tr>
+          <tr>
+              <td style="width: 15%;"></td>
+              <td style="width: 1%;">:</td>
+              <td style="width: 20%; border-bottom: 1px solid black; text-align: center;">{{ optional($report->workresult)->no_lengkung3 ?? '-' }}</td>
+              <td style="width: 2%; text-align: center;">Km/Hm</td>
+              <td style="width: 20%; border-bottom: 1px solid black; text-align: center;">{{ optional($report->workresult)->radius3 ?? '-' }}</td>
+              <td style="width: 5%;">{{ optional($report->workresult)->hu_hi9 ?? '-' }}</td>
+              
+              <td style="text-align: right;">Jumlah Lengkung</td>
+              <td>:</td>
+              <td style="border-bottom: 1px solid black; text-align: center;">{{ optional($report->workresult)->jumlah_lengkung3 ?? '' }} </td>
+              <td>Unit</td>
+          </tr>
+          <tr>          
+              <td style="width: 15%;"></td>
+              <td style="width: 1%;"></td>
+              <td style=""></td>
+              <td style="text-align: center;"></td>
+              <td style=""></td>
+              <td></td>
+
+              <td style="text-align: right;">Total Lengkung</td>
+              <td>:</td>
+              <td style="border-bottom: 1px solid black; text-align: center;">{{ optional($report->workresult)->total_lengkung ?? '' }} </td>
+              <td>Unit</td>
+          </tr>
+      </table>
       
       <br>
 
@@ -327,7 +384,7 @@
           </tr>
       </table>
 
-      <div style="font-weight: bold; margin-bottom: 3px;">3. Data Perekaman (Awal)</div>
+      <!-- <div style="font-weight: bold; margin-bottom: 3px;">3. Data Perekaman (Awal)</div>
       <table style="width: 100%; border-collapse: collapse; margin-bottom: 5px;">
           <tr>
               <td style="width: 5px;"></td> 
@@ -347,9 +404,9 @@
                   </span>
               </td>
           </tr>
-      </table>
+      </table> -->
 
-      <div style="font-weight: bold; margin-bottom: 3px;">4. Data Opname Resor Jalan Rel (Akhir):</div>
+      <div style="font-weight: bold; margin-bottom: 3px;">3. Data Opname Resor Jalan Rel (Akhir):</div>
       <table style="width: 100%; border-collapse: collapse; margin-bottom: 5px;">
           <tr>
               <td style="width: 5px;">a.</td>
@@ -407,7 +464,7 @@
           </tr>
       </table>
 
-      <div style="font-weight: bold; margin-bottom: 3px;">5. Data Perekaman (Akhir)</div>
+      <div style="font-weight: bold; margin-bottom: 3px;">4. Data Perekaman (Akhir)</div>
       <table style="width: 100%; border-collapse: collapse; margin-bottom: 5px;">
           <tr>
               <td style="width: 5px;"></td>
@@ -445,12 +502,12 @@
           <tr>
               <td style="font-weight: bold;">Jam Travelling Awal</td>
               <td style="text-align: center;">:</td>
-              <td style="border-bottom: 1px solid black;">{{ $report->jam_traveling_awal ?? '-' }}</td>
+              <td style="border-bottom: 1px solid black;">{{ $report->jam_traveling_awal ?? '-' }} WIB</td>
               <td></td>
               
               <td style="font-weight: bold;">Jam Travelling Akhir</td>
               <td style="text-align: center;">:</td>
-              <td style="border-bottom: 1px solid black;">{{ optional($report->workresult)->jam_traveling_akhir ?? '-' }}</td>
+              <td style="border-bottom: 1px solid black;">{{ optional($report->workresult)->jam_traveling_akhir ?? '-' }} WIB</td>
           </tr>
           <tr>
               <td style="font-weight: bold;">Awal Jam Kerja Operator</td>
@@ -465,22 +522,22 @@
           <tr>
               <td style="font-weight: bold;">Jam Mesin Awal</td>
               <td style="text-align: center;">:</td>
-              <td style="border-bottom: 1px solid black;">{{ $report->jam_mesin_awal ?? '-' }}</td>
+              <td style="border-bottom: 1px solid black;">{{ $report->jam_mesin_awal ?? '-' }} Hours</td>
               <td></td>
               
               <td style="font-weight: bold;">Jam Mesin Akhir</td>
               <td style="text-align: center;">:</td>
-              <td style="border-bottom: 1px solid black;">{{ optional($report->workresult)->jam_mesin_akhir ?? '-' }}</td>
+              <td style="border-bottom: 1px solid black;">{{ optional($report->workresult)->jam_mesin_akhir ?? '-' }} Hours</td>
           </tr>
           <tr>
               <td style="font-weight: bold;">Jam Generator Awal</td>
               <td style="text-align: center;">:</td>
-              <td style="border-bottom: 1px solid black;">{{ $report->jam_generator_awal ?? '-' }}</td>
+              <td style="border-bottom: 1px solid black;">{{ $report->jam_generator_awal ?? '-' }} Hours</td>
               <td></td>
               
               <td style="font-weight: bold;">Jam Generator Akhir</td>
               <td style="text-align: center;">:</td>
-              <td style="border-bottom: 1px solid black;">{{ optional($report->workresult)->jam_generator_akhir ?? '-' }}</td>
+              <td style="border-bottom: 1px solid black;">{{ optional($report->workresult)->jam_generator_akhir ?? '-' }} Hours</td>
           </tr>
           <tr>
               <td style="font-weight: bold;">Counter Tamping Awal</td>
@@ -512,14 +569,14 @@
               <td style="text-align: center;">:</td>
               <td style="border-bottom: 1px solid black;">{{ optional($report->workresult)->hsd_akhir_kerja ?? '-' }} %</td>
           </tr>
-          <!-- <tr>
+          <tr>
               <td style="font-weight: bold;">Konsumsi H&D</td>
               <td style="text-align: center;">:</td>
-              <td style="border-bottom: 1px solid black;">{{ optional($report->workresult)->konsumsi_hsd ?? '-' }} Liter</td>
+              <td style="border-bottom: 1px solid black;">{{ optional($report->workresult)->konsumsi_hsd ?? '-' }} Ltr</td>
               <td></td>
               
               <td colspan="3"></td>
-          </tr> -->
+          </tr>
       </table>
 
       <div style="font-weight: bold; padding: 3px 0; border-top: 1px solid black; border-bottom: 1px solid black; background-color: #f0f0f0; margin-top: 5px; margin-bottom: 5px; background-color: #ccc;">C. DATA PERSONEL</div>
@@ -637,11 +694,11 @@
                             <th style="width: 3%; border: 1px solid black; padding: 4px; background-color: #ccc;">No</th>
                             <th style="width: 25%; border: 1px solid black; padding: 4px; background-color: #ccc; text-align: left;">Komponen</th>
                             <th style="width: 10%; border: 1px solid black; padding: 4px; background-color: #ccc;">Rujukan</th>
-                            <th colspan="3" style="width: 15%; border: 1px solid black; padding: 4px; background-color: #ccc;">Kondisi</th>
+                            <th colspan="4" style="width: 15%; border: 1px solid black; padding: 4px; background-color: #ccc;">Kondisi</th>
                             <th style="width: 10%; border: 1px solid black; padding: 4px; background-color: #ccc;">Nilai Rujukan</th>
-                            <th colspan="2" style="width: 15%; border: 1px solid black; padding: 4px; background-color: #ccc;">Hasil Cek</th>
+                            <th colspan="1" style="width: 15%; border: 1px solid black; padding: 4px; background-color: #ccc;">Hasil Cek</th>
                             <th style="width: 5%; border: 1px solid black; padding: 4px; background-color: #ccc;">Sat.</th>
-                            <th style="width: 17%; border: 1px solid black; padding: 4px; background-color: #ccc;">Keterangan (App.)</th>
+                            <th style="width: 17%; border: 1px solid black; padding: 4px; background-color: #ccc;">Ket</th>
                         </tr>
                         <tr>
                             <th style="border: 1px solid black; padding: 4px; background-color: #eee;"></th>
@@ -649,10 +706,10 @@
                             <th style="border: 1px solid black; padding: 4px; background-color: #eee;"></th>
                             <th style="border: 1px solid black; padding: 4px; background-color: #eee;">Cek</th>
                             <th style="border: 1px solid black; padding: 4px; background-color: #eee;">Tambah</th>
+                            <th style="border: 1px solid black; padding: 4px; background-color: #eee;">Service</th>
                             <th style="border: 1px solid black; padding: 4px; background-color: #eee;">Ganti</th>
                             <th style="border: 1px solid black; padding: 4px; background-color: #eee;"></th>
-                            <th style="border: 1px solid black; padding: 4px; background-color: #eee;">Kr/Dpn</th>
-                            <th style="border: 1px solid black; padding: 4px; background-color: #eee;">Kn/Dpn</th>
+                            <th style="border: 1px solid black; padding: 4px; background-color: #eee;">Realisasi</th>
                             <th style="border: 1px solid black; padding: 4px; background-color: #eee;"></th>
                             <th style="border: 1px solid black; padding: 4px; background-color: #eee;"></th>
                         </tr>
@@ -687,16 +744,16 @@
                                     <td style="border: 1px solid black; padding: 4px; text-align: left;">{{ $item->komponen }}</td>
                                     <td style="border: 1px solid black; padding: 4px;">{{ $item->rujukan }}</td>
                                     
-                                    {{-- Kondisi (Cek, Tambah, Ganti) --}}
+                                    {{-- Kondisi (Cek, Tambah, Service, Ganti) --}}
                                     <td style="border: 1px solid black; padding: 4px;" class="check">{!! $result['cek'] == 1 ? '✓' : '-' !!}</td>
                                     <td style="border: 1px solid black; padding: 4px;" class="check">{!! $result['tambahan'] == 1 ? '✓' : '-' !!}</td>
+                                    <td style="border: 1px solid black; padding: 4px;" class="check">{!! $result['service'] == 1 ? '✓' : '-' !!}</td>
                                     <td style="border: 1px solid black; padding: 4px;" class="check">{!! $result['ganti'] == 1 ? '✓' : '-' !!}</td>
                                     
                                     <td style="border: 1px solid black; padding: 4px;">{{ $item->nilai_rujukan }}</td>
                                     
                                     {{-- Hasil Cek (Kr/Dpn, Kn/Dpn) --}}
                                     <td style="border: 1px solid black; padding: 4px;">{{ $result['kiri_depan'] ?? '-' }}</td>
-                                    <td style="border: 1px solid black; padding: 4px;">{{ $result['kanan_depan'] ?? '-' }}</td>
                                     
                                     <td style="border: 1px solid black; padding: 4px;">{{ $item->satuan }}</td>
                                     <td style="border: 1px solid black; padding: 4px; text-align: left;">{{ $result['keterangan'] ?? '-' }}</td>
@@ -867,22 +924,22 @@
           <tr>
               <td style="font-weight: bold;">Jam Mesin Awal</td>
               <td style="text-align: center;">:</td>
-              <td style="border-bottom: 1px solid black;">{{ $report->jam_mesin_awal ?? '-' }}</td>
+              <td style="border-bottom: 1px solid black;">{{ $report->jam_mesin_awal ?? '-' }} Hours</td>
               <td></td>
               
               <td style="font-weight: bold;">Jam Mesin Akhir</td>
               <td style="text-align: center;">:</td>
-              <td style="border-bottom: 1px solid black;">{{ optional($report->warmingup)->jam_mesin_akhir ?? '-' }}</td>
+              <td style="border-bottom: 1px solid black;">{{ optional($report->warmingup)->jam_mesin_akhir ?? '-' }} Hours</td>
           </tr>
           <tr>
               <td style="font-weight: bold;">Jam Generator Awal</td>
               <td style="text-align: center;">:</td>
-              <td style="border-bottom: 1px solid black;">{{ $report->jam_generator_awal ?? '-' }}</td>
+              <td style="border-bottom: 1px solid black;">{{ $report->jam_generator_awal ?? '-' }} Hours</td>
               <td></td>
               
               <td style="font-weight: bold;">Jam Generator Akhir</td>
               <td style="text-align: center;">:</td>
-              <td style="border-bottom: 1px solid black;">{{ optional($report->warmingup)->jam_generator_akhir ?? '-' }}</td>
+              <td style="border-bottom: 1px solid black;">{{ optional($report->warmingup)->jam_generator_akhir ?? '-' }} Hours</td>
           </tr>
           <tr>
               <td style="font-weight: bold;">Counter Tamping Awal</td>
@@ -914,14 +971,209 @@
               <td style="text-align: center;">:</td>
               <td style="border-bottom: 1px solid black;">{{ optional($report->warmingup)->hsd_akhir_kerja ?? '-' }} %</td>
           </tr>
-          <!-- <tr>
+          <tr>
               <td style="font-weight: bold;">Konsumsi H&D</td>
               <td style="text-align: center;">:</td>
-              <td style="border-bottom: 1px solid black;">{{ optional($report->warmingup)->konsumsi_hsd ?? '-' }} Liter</td>
+              <td style="border-bottom: 1px solid black;">{{ optional($report->warmingup)->konsumsi_hsd ?? '-' }} Ltr</td>
               <td></td>
               
               <td colspan="3"></td>
-          </tr> -->
+          </tr>
+      </table>
+
+      <br>
+
+      <div style="font-weight: bold; margin-bottom: 3px;">1. Data Opname Resor Jalan Rel (Awal):</div>
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 5px;">
+          <tr>
+              <td style="width: 5px;">a.</td>
+              <td style="width: 250px;">IP 2 (Lurusan)</td>
+              <td style="width: 80px; text-align: right; white-space: nowrap;">Ada 
+                  <span style="border: 1px solid black; padding: 0 0 0 0; margin-left: 5px; font-family: 'DejaVu Sans', sans-serif; display: inline-block; width: 10px; height: 10px; line-height: 1; vertical-align: middle;">
+                      {!! optional($report->mglurusanawal)->ada == 1 ? '&#10003;' : '&nbsp;&nbsp;&nbsp;' !!}
+                  </span>
+              </td>
+              
+              <td style="width: 100px; text-align: left; white-space: nowrap;">Tidak ada
+                  <span style="border: 1px solid black; padding: 0 0 0 0; margin-left: 5px; font-family: 'DejaVu Sans', sans-serif; display: inline-block; width: 10px; height: 10px; line-height: 1; vertical-align: middle;">
+                      {!! optional($report->mglurusanawal)->ada == 0 ? '&#10003;' : '&nbsp;&nbsp;&nbsp;' !!}
+                  </span>
+              </td>
+          </tr>
+          <tr>
+              <td>b.</td>
+              <td>IG 2 (Lengkung)</td>
+              
+              <td style="text-align: right; white-space: nowrap;">Ada 
+                  <span style="border: 1px solid black; padding: 0 0 0 0; margin-left: 5px; font-family: 'DejaVu Sans', sans-serif; display: inline-block; width: 10px; height: 10px; line-height: 1; vertical-align: middle;">
+                      {!! optional($report->mglengkunganawal)->ada == 1 ? '&#10003;' : '&nbsp;&nbsp;&nbsp;' !!}
+                  </span>
+              </td>
+              
+              <td style="text-align: left; white-space: nowrap;">Tidak ada
+                  <span style="border: 1px solid black; padding: 0 0 0 0; margin-left: 5px; font-family: 'DejaVu Sans', sans-serif; display: inline-block; width: 10px; height: 10px; line-height: 1; vertical-align: middle;">
+                      {!! optional($report->mglengkunganawal)->ada == 0 ? '&#10003;' : '&nbsp;&nbsp;&nbsp;' !!}
+                  </span>
+              </td>
+          </tr>
+          <tr>
+              <td>c.</td>
+              <td>IG 3 (Wesel)</td>
+              
+              <td style="text-align: right; white-space: nowrap;">Ada 
+                  <span style="border: 1px solid black; padding: 0 0 0 0; margin-left: 5px; font-family: 'DejaVu Sans', sans-serif; display: inline-block; width: 10px; height: 10px; line-height: 1; vertical-align: middle;">
+                      {!! optional($report->mgweselawal)->ada == 1 ? '&#10003;' : '&nbsp;&nbsp;&nbsp;' !!}
+                  </span>
+              </td>
+              
+              <td style="text-align: left; white-space: nowrap;">Tidak ada
+                  <span style="border: 1px solid black; padding: 0 0 0 0; margin-left: 5px; font-family: 'DejaVu Sans', sans-serif; display: inline-block; width: 10px; height: 10px; line-height: 1; vertical-align: middle;">
+                      {!! optional($report->mgweselawal)->ada == 0 ? '&#10003;' : '&nbsp;&nbsp;&nbsp;' !!}
+                  </span>
+              </td>
+          </tr>
+      </table>
+
+      <div style="font-weight: bold; margin-bottom: 3px;">2. Data Pemeriksaan Silang</div>
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 5px;">
+          <tr>
+              <td style="width: 5px;">a.</td>
+              <td style="width: 250px;">KPJR</td>
+              
+              <td style="width: 80px; text-align: right; white-space: nowrap;">Ada 
+                  {{-- Kotak Ceklis Ada --}}
+                  <span style="border: 1px solid black; padding: 0 0 0 0; margin-left: 5px; font-family: 'DejaVu Sans', sans-serif; display: inline-block; width: 10px; height: 10px; line-height: 1; vertical-align: middle;">
+                      {!! optional($report->pemeriksaansilangkpjr)->ada == 1 ? '&#10003;' : '' !!}
+                  </span>
+              </td>
+              
+              <td style="width: 100px; text-align: left; white-space: nowrap;">Tidak ada
+                  {{-- Kotak Ceklis Tidak Ada --}}
+                  <span style="border: 1px solid black; padding: 0 0 0 0; margin-left: 5px; font-family: 'DejaVu Sans', sans-serif; display: inline-block; width: 10px; height: 10px; line-height: 1; vertical-align: middle;">
+                      {!! optional($report->pemeriksaansilangkpjr)->ada == 0 ? '&#10003;' : '' !!}
+                  </span>
+              </td>
+          </tr>
+          <tr>
+              <td>b.</td>
+              <td>Lahan</td>
+              
+              <td style="text-align: right; white-space: nowrap;">Ada 
+                  {{-- Kotak Ceklis Ada --}}
+                  <span style="border: 1px solid black; padding: 0 0 0 0; margin-left: 5px; font-family: 'DejaVu Sans', sans-serif; display: inline-block; width: 10px; height: 10px; line-height: 1; vertical-align: middle;">
+                      {!! optional($report->pemeriksaansilanglahan)->ada == 1 ? '&#10003;' : '' !!}
+                  </span>
+              </td>
+              
+              <td style="text-align: left; white-space: nowrap;">Tidak ada
+                  {{-- Kotak Ceklis Tidak Ada --}}
+                  <span style="border: 1px solid black; padding: 0 0 0 0; margin-left: 5px; font-family: 'DejaVu Sans', sans-serif; display: inline-block; width: 10px; height: 10px; line-height: 1; vertical-align: middle;">
+                      {!! optional($report->pemeriksaansilanglahan)->ada == 0 ? '&#10003;' : '' !!}
+                  </span>
+              </td>
+          </tr>
+      </table>
+
+      <!-- <div style="font-weight: bold; margin-bottom: 3px;">3. Data Perekaman (Awal)</div>
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 5px;">
+          <tr>
+              <td style="width: 5px;"></td> 
+              <td style="width: 250px;">Perekaman Awal</td>
+              
+              <td style="width: 80px; text-align: right; white-space: nowrap;">Ada 
+                  {{-- Kotak Ceklis Ada --}}
+                  <span style="border: 1px solid black; padding: 0 0 0 0; margin-left: 5px; font-family: 'DejaVu Sans', sans-serif; display: inline-block; width: 10px; height: 10px; line-height: 1; vertical-align: middle;">
+                      {!! optional($report->perekamanawal)->ada == 1 ? '&#10003;' : '' !!}
+                  </span>
+              </td>
+              
+              <td style="width: 100px; text-align: left; white-space: nowrap;">Tidak ada
+                  {{-- Kotak Ceklis Tidak Ada --}}
+                  <span style="border: 1px solid black; padding: 0 0 0 0; margin-left: 5px; font-family: 'DejaVu Sans', sans-serif; display: inline-block; width: 10px; height: 10px; line-height: 1; vertical-align: middle;">
+                      {!! optional($report->perekamanawal)->ada == 0 ? '&#10003;' : '' !!}
+                  </span>
+              </td>
+          </tr>
+      </table> -->
+
+      <div style="font-weight: bold; margin-bottom: 3px;">3. Data Opname Resor Jalan Rel (Akhir):</div>
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 5px;">
+          <tr>
+              <td style="width: 5px;">a.</td>
+              <td style="width: 250px;">IP 2 (Lurusan)</td>
+              
+              <td style="width: 80px; text-align: right; white-space: nowrap;">Ada 
+                  {{-- Kotak Ceklis Ada --}}
+                  <span style="border: 1px solid black; padding: 0 0 0 0; margin-left: 5px; font-family: 'DejaVu Sans', sans-serif; display: inline-block; width: 10px; height: 10px; line-height: 1; vertical-align: middle;">
+                      {!! optional($report->mglurusanakhir)->ada == 1 ? '&#10003;' : '' !!}
+                  </span>
+              </td>
+              
+              <td style="width: 100px; text-align: left; white-space: nowrap;">Tidak ada
+                  {{-- Kotak Ceklis Tidak Ada --}}
+                  <span style="border: 1px solid black; padding: 0 0 0 0; margin-left: 5px; font-family: 'DejaVu Sans', sans-serif; display: inline-block; width: 10px; height: 10px; line-height: 1; vertical-align: middle;">
+                      {!! optional($report->mglurusanakhir)->ada == 0 ? '&#10003;' : '' !!}
+                  </span>
+              </td>
+          </tr>
+          <tr>
+              <td>b.</td>
+              <td>IG 2 (Lengkung)</td>
+              
+              <td style="text-align: right; white-space: nowrap;">Ada 
+                  {{-- Kotak Ceklis Ada --}}
+                  <span style="border: 1px solid black; padding: 0 0 0 0; margin-left: 5px; font-family: 'DejaVu Sans', sans-serif; display: inline-block; width: 10px; height: 10px; line-height: 1; vertical-align: middle;">
+                      {!! optional($report->mglengkunganakhir)->ada == 1 ? '&#10003;' : '' !!}
+                  </span>
+              </td>
+              
+              <td style="text-align: left; white-space: nowrap;">Tidak ada
+                  {{-- Kotak Ceklis Tidak Ada --}}
+                  <span style="border: 1px solid black; padding: 0 0 0 0; margin-left: 5px; font-family: 'DejaVu Sans', sans-serif; display: inline-block; width: 10px; height: 10px; line-height: 1; vertical-align: middle;">
+                      {!! optional($report->mglengkunganakhir)->ada == 0 ? '&#10003;' : '' !!}
+                  </span>
+              </td>
+          </tr>
+          <tr>
+              <td>c.</td>
+              <td>IG 3 (Wesel)</td>
+              
+              <td style="text-align: right; white-space: nowrap;">Ada 
+                  {{-- Kotak Ceklis Ada --}}
+                  <span style="border: 1px solid black; padding: 0 0 0 0; margin-left: 5px; font-family: 'DejaVu Sans', sans-serif; display: inline-block; width: 10px; height: 10px; line-height: 1; vertical-align: middle;">
+                      {!! optional($report->mgweselakhir)->ada == 1 ? '&#10003;' : '' !!}
+                  </span>
+              </td>
+              
+              <td style="text-align: left; white-space: nowrap;">Tidak ada
+                  {{-- Kotak Ceklis Tidak Ada --}}
+                  <span style="border: 1px solid black; padding: 0 0 0 0; margin-left: 5px; font-family: 'DejaVu Sans', sans-serif; display: inline-block; width: 10px; height: 10px; line-height: 1; vertical-align: middle;">
+                      {!! optional($report->mgweselakhir)->ada == 0 ? '&#10003;' : '' !!}
+                  </span>
+              </td>
+          </tr>
+      </table>
+
+      <div style="font-weight: bold; margin-bottom: 3px;">4. Data Perekaman (Akhir)</div>
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 5px;">
+          <tr>
+              <td style="width: 5px;"></td>
+              <td style="width: 250px;">Perekaman Akhir</td>
+              
+              <td style="width: 80px; text-align: right; white-space: nowrap;">Ada 
+                  {{-- Kotak Ceklis Ada --}}
+                  <span style="border: 1px solid black; padding: 0 0 0 0; margin-left: 5px; font-family: 'DejaVu Sans', sans-serif; display: inline-block; width: 10px; height: 10px; line-height: 1; vertical-align: middle;">
+                      {!! optional($report->perekamanakhir)->ada == 1 ? '&#10003;' : '' !!}
+                  </span>
+              </td>
+              
+              <td style="width: 100px; text-align: left; white-space: nowrap;">Tidak ada
+                  {{-- Kotak Ceklis Tidak Ada --}}
+                  <span style="border: 1px solid black; padding: 0 0 0 0; margin-left: 5px; font-family: 'DejaVu Sans', sans-serif; display: inline-block; width: 10px; height: 10px; line-height: 1; vertical-align: middle;">
+                      {!! optional($report->perekamanakhir)->ada == 0 ? '&#10003;' : '' !!}
+                  </span>
+              </td>
+          </tr>
       </table>
 
       <div style="font-weight: bold; padding: 3px 0; border-top: 1px solid black; border-bottom: 1px solid black; background-color: #f0f0f0; margin-top: 5px; margin-bottom: 5px; background-color: #ccc;">B. DATA PERSONEL</div>
@@ -935,11 +1187,11 @@
             </td>
             <td style="width: 5px;"></td>
 
-            <!-- <td style="width: 20%; font-weight: bold;">Pengawal 1</td>
+            <td style="width: 20%; font-weight: bold;">Pengawal 1</td>
             <td style="width: 1%; text-align: center;">:</td>
             <td style="width: 33%; border-bottom: 1px solid black;">
                 {{ ucwords(strtolower($report->nama_pengawal) ?? '-') }}
-            </td> -->
+            </td>
         </tr>
 
         <tr>
@@ -950,11 +1202,11 @@
             </td>
             <td></td>
 
-            <!-- <td style="font-weight: bold;">Pengawal 2</td>
+            <td style="font-weight: bold;">Pengawal 2</td>
             <td style="text-align: center;">:</td>
             <td style="border-bottom: 1px solid black;">
                 {{ ucwords(strtolower($report->nama_pengawal1) ?? '-') }}
-            </td> -->
+            </td>
         </tr>
 
         <tr>
@@ -970,6 +1222,67 @@
       </table>
 
       <div class="page-break"></div>
+      
+        @php
+            $checkpointRelations = [
+                'mglurusanawal' => '1. Foto IP 2 (Lurusan) - Awal',
+                'mglengkunganawal' => '2. Foto IG 2 (Lengkung) - Awal',
+                'mgweselawal' => '3. Foto IG 3 (Wesel) - Awal',
+                'pemeriksaansilangkpjr' => '4. Foto Pemeriksaan Silang KPJR',
+                'pemeriksaansilanglahan' => '5. Foto Pemeriksaan Silang Lahan',
+                'perekamanawal' => '6. Foto Perekaman Awal',
+                'mglurusanakhir' => '7. Foto IP 2 (Lurusan) - Akhir',
+                'mglengkunganakhir' => '8. Foto IG 2 (Lengkung) - Akhir',
+                'mgweselakhir' => '9. Foto IG 3 (Wesel) - Akhir',
+                'perekamanakhir' => '10. Foto Perekaman Akhir',
+            ];
+        @endphp
+
+        <div style="text-align: center; margin-bottom: 15px;">
+            <h3 style="margin: 0; font-size: 11pt;">DOKUMENTASI FOTO HASIL PEKERJAAN</h3>
+        </div>
+
+        @foreach ($checkpointRelations as $relationName => $title)
+            @php
+                $checkpoint = optional($report)->{$relationName};
+                $attachments = optional($checkpoint)->attachments; 
+            @endphp
+
+            <div style="margin-top: 10px;">
+                <h4 style="margin: 5px 0; border-bottom: 1px dashed #ccc; padding-bottom: 2px; font-size: 9pt;">{{ $title }}</h4>
+                
+                @if (optional($checkpoint)->ada == 1 && optional($attachments)->isNotEmpty())
+                    {{-- ADA FOTO → tampil 1 foto per baris --}}
+                    @foreach ($attachments as $attachment)
+                        @php
+                            $imageUrl = $getAttachmentUrl($attachment);
+                        @endphp
+                        <div style="margin: 20px 0; text-align: center;">
+                            <img src="{{ $imageUrl }}" 
+                                style="width: 60%; max-width: 500px; height: 400px; display: block; margin: 0 auto;">
+                            <p style="font-size: 8pt; margin-top: 5px;">
+                                {{ $loop->iteration }} {{ $attachment->description ?? '' }}
+                            </p>
+                        </div>
+                    @endforeach
+
+                    @else
+                        {{-- TIDAK ADA FOTO → tampil 2 kolom, isi TULISAN di tengah halaman --}}
+                        <div style="margin: 20px 0; text-align: center;">
+                            <div>
+                                <div style="width: 60%; max-width: 500px; height: 400px; display: block; margin: 0 auto;">
+                                    <span style="font-size: 10pt; color: #555;">Tidak ada foto lampiran</span>
+                                </div>
+                            </div>
+                        </div>
+                @endif
+
+            </div>
+        @endforeach
+
+      <div class="page-break"></div>
+
+      <div class="page-break"></div>
 
         <div style="text-align: center; margin-bottom: 15px;">
             <h3 style="margin: 0; font-size: 11pt;">LAMPIRAN DAILY CHECK RESULTS</h3><br>
@@ -980,11 +1293,11 @@
                         <th style="width: 3%; border: 1px solid black; padding: 4px; background-color: #ccc;">No</th>
                         <th style="width: 25%; border: 1px solid black; padding: 4px; background-color: #ccc; text-align: left;">Komponen</th>
                         <th style="width: 10%; border: 1px solid black; padding: 4px; background-color: #ccc;">Rujukan</th>
-                        <th colspan="3" style="width: 15%; border: 1px solid black; padding: 4px; background-color: #ccc;">Kondisi</th>
+                        <th colspan="4" style="width: 15%; border: 1px solid black; padding: 4px; background-color: #ccc;">Kondisi</th>
                         <th style="width: 10%; border: 1px solid black; padding: 4px; background-color: #ccc;">Nilai Rujukan</th>
-                        <th colspan="2" style="width: 15%; border: 1px solid black; padding: 4px; background-color: #ccc;">Hasil Cek</th>
+                        <th colspan="1" style="width: 15%; border: 1px solid black; padding: 4px; background-color: #ccc;">Hasil Cek</th>
                         <th style="width: 5%; border: 1px solid black; padding: 4px; background-color: #ccc;">Sat.</th>
-                        <th style="width: 17%; border: 1px solid black; padding: 4px; background-color: #ccc;">Keterangan (App.)</th>
+                        <th style="width: 17%; border: 1px solid black; padding: 4px; background-color: #ccc;">Ket</th>
                     </tr>
                     <tr>
                         <th style="border: 1px solid black; padding: 4px; background-color: #eee;"></th>
@@ -992,10 +1305,10 @@
                         <th style="border: 1px solid black; padding: 4px; background-color: #eee;"></th>
                         <th style="border: 1px solid black; padding: 4px; background-color: #eee;">Cek</th>
                         <th style="border: 1px solid black; padding: 4px; background-color: #eee;">Tambah</th>
+                        <th style="border: 1px solid black; padding: 4px; background-color: #eee;">Service</th>
                         <th style="border: 1px solid black; padding: 4px; background-color: #eee;">Ganti</th>
                         <th style="border: 1px solid black; padding: 4px; background-color: #eee;"></th>
-                        <th style="border: 1px solid black; padding: 4px; background-color: #eee;">Kr/Dpn</th>
-                        <th style="border: 1px solid black; padding: 4px; background-color: #eee;">Kn/Dpn</th>
+                        <th style="border: 1px solid black; padding: 4px; background-color: #eee;">Realisasi</th>
                         <th style="border: 1px solid black; padding: 4px; background-color: #eee;"></th>
                         <th style="border: 1px solid black; padding: 4px; background-color: #eee;"></th>
                     </tr>
@@ -1030,16 +1343,16 @@
                                 <td style="border: 1px solid black; padding: 4px; text-align: left;">{{ $item->komponen }}</td>
                                 <td style="border: 1px solid black; padding: 4px;">{{ $item->rujukan }}</td>
                                 
-                                {{-- Kondisi (Cek, Tambah, Ganti) --}}
+                                {{-- Kondisi (Cek, Tambah, Service, Ganti) --}}
                                 <td style="border: 1px solid black; padding: 4px;" class="check">{!! $result['cek'] == 1 ? '✓' : '-' !!}</td>
                                 <td style="border: 1px solid black; padding: 4px;" class="check">{!! $result['tambahan'] == 1 ? '✓' : '-' !!}</td>
+                                <td style="border: 1px solid black; padding: 4px;" class="check">{!! $result['service'] == 1 ? '✓' : '-' !!}</td>
                                 <td style="border: 1px solid black; padding: 4px;" class="check">{!! $result['ganti'] == 1 ? '✓' : '-' !!}</td>
                                 
                                 <td style="border: 1px solid black; padding: 4px;">{{ $item->nilai_rujukan }}</td>
                                 
                                 {{-- Hasil Cek (Kr/Dpn, Kn/Dpn) --}}
                                 <td style="border: 1px solid black; padding: 4px;">{{ $result['kiri_depan'] ?? '-' }}</td>
-                                <td style="border: 1px solid black; padding: 4px;">{{ $result['kanan_depan'] ?? '-' }}</td>
                                 
                                 <td style="border: 1px solid black; padding: 4px;">{{ $item->satuan }}</td>
                                 <td style="border: 1px solid black; padding: 4px; text-align: left;">{{ $result['keterangan'] ?? '-' }}</td>
