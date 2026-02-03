@@ -159,6 +159,19 @@ class WorkResultController extends Controller
                 'km_hm3'                 => 'nullable|string|max:255',
                 'jumlah_wesel3'          => 'nullable|integer',
                 'total_wesel'            => 'nullable|integer',
+                'no_lengkung1'           => 'nullable|string|max:255',
+                'radius1'                => 'nullable|string|max:255',
+                'jumlah_lengkung1'       => 'nullable|integer',
+                'no_lengkung2'           => 'nullable|string|max:255',
+                'radius2'                => 'nullable|string|max:255',
+                'jumlah_lengkung2'       => 'nullable|integer',
+                'no_lengkung3'           => 'nullable|string|max:255',
+                'radius3'                => 'nullable|string|max:255',
+                'jumlah_lengkung3'       => 'nullable|integer',
+                'total_lengkung'         => 'nullable|integer',
+                'km_hm_lengkung1'        => 'nullable|string|max:255',
+                'km_hm_lengkung2'        => 'nullable|string|max:255',
+                'km_hm_lengkung3'        => 'nullable|string|max:255',
                 'waktu_stop_engine'      => 'nullable|date_format:H:i',
                 'jam_traveling_akhir'    => 'nullable|string|max:255',
                 'jam_kerja_akhir'        => 'nullable|date_format:H:i',
@@ -174,6 +187,9 @@ class WorkResultController extends Controller
                 'hu_hi4'                 => 'nullable|string|max:255',
                 'hu_hi5'                 => 'nullable|string|max:255',
                 'hu_hi6'                 => 'nullable|string|max:255',
+                'hu_hi7'                 => 'nullable|string|max:255',
+                'hu_hi8'                 => 'nullable|string|max:255',
+                'hu_hi9'                 => 'nullable|string|max:255',
                 'operator_by1'           => 'nullable|exists:users,id',
                 'operator_by2'           => 'nullable|exists:users,id',
                 'operator_by3'           => 'nullable|exists:users,id',
@@ -189,6 +205,11 @@ class WorkResultController extends Controller
                 ($request->jumlah_wesel1 ?? 0) +
                 ($request->jumlah_wesel2 ?? 0) +
                 ($request->jumlah_wesel3 ?? 0);
+
+            $totalLengkung =
+                ($request->jumlah_lengkung1 ?? 0) +
+                ($request->jumlah_lengkung2 ?? 0) +
+                ($request->jumlah_lengkung3 ?? 0);
 
             $workResult = WorkResult::create([
                 'working_report_id'      => $validated['working_report_id'],
@@ -219,7 +240,20 @@ class WorkResultController extends Controller
                 'jumlah_wesel3'          => $request->jumlah_wesel3,
                 'total_wesel'            => $totalWesel,
                 // 'total_wesel'            => $request->total_wesel,
+                'no_lengkung1'           => $request->no_lengkung1,
+                'radius1'                => $request->radius1,
+                'jumlah_lengkung1'       => $request->jumlah_lengkung1,
+                'no_lengkung2'           => $request->no_lengkung2,
+                'radius2'                => $request->radius2,
+                'jumlah_lengkung2'       => $request->jumlah_lengkung2,
+                'no_lengkung3'           => $request->no_lengkung3,
+                'radius3'                => $request->radius3,
+                'jumlah_lengkung3'       => $request->jumlah_lengkung3,
+                'total_lengkung'         => $totalLengkung,
                 'waktu_stop_engine'      => $request->waktu_stop_engine,
+                'km_hm_lengkung1'        => $request->km_hm_lengkung1,
+                'km_hm_lengkung2'        => $request->km_hm_lengkung2,
+                'km_hm_lengkung3'        => $request->km_hm_lengkung3,
                 'jam_traveling_akhir'    => $request->jam_traveling_akhir,
                 'jam_kerja_akhir'        => $request->jam_kerja_akhir,
                 'jam_mesin_akhir'        => $request->jam_mesin_akhir,
@@ -234,6 +268,9 @@ class WorkResultController extends Controller
                 'hu_hi4'                 => $request->hu_hi4,
                 'hu_hi5'                 => $request->hu_hi5,
                 'hu_hi6'                 => $request->hu_hi6,
+                'hu_hi7'                 => $request->hu_hi7,
+                'hu_hi8'                 => $request->hu_hi8,
+                'hu_hi9'                 => $request->hu_hi9,
                 'operator_by1'           => $request->operator_by1,
                 'operator_by2'           => $request->operator_by2,
                 'operator_by3'           => $request->operator_by3,
