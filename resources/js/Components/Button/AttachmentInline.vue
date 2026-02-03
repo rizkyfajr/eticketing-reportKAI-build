@@ -169,16 +169,12 @@ const closePreview = () => {
   
   <Button
     @click.prevent="open = ! open"
-    class="
-      flex items-center justify-center 
-      px-2 py-1 
-      text-xs font-semibold rounded-md 
-      text-white 
-      bg-blue-600 
-      hover:bg-blue-700 
-      focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none
-      whitespace-nowrap
-    "
+    :class="[
+      'flex items-center justify-center px-2 py-1 text-xs font-semibold rounded-md text-white focus:ring-2 focus:ring-offset-2 focus:outline-none whitespace-nowrap',
+      model.ada == 1 
+        ? 'bg-green-600 hover:bg-green-700 focus:ring-green-500' 
+        : 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'
+    ]"
   >
     <Icon name="cloud-upload" class="w-3 h-3 mr-1" />
     <span class="capitalize">
