@@ -33,8 +33,19 @@ class MaintenanceOrderNotificationController extends Controller
 
         $workingReportQuery = WorkingReport::forCurrentUserRegion()
             ->with(['machine', 'createdBy'])
-            ->whereNotNull('operator_at3')
-            ->whereNull('kupt_at1');
+            ->whereNull('kupt_at1') // Pastikan KUPT belum approve
+            ->whereIn('status', ['work_done', 'warming_up_done'])
+            ->where(function ($query) {
+                $query->where(function ($q) {
+                    // Skenario 1: Ada Operator 3 dan sudah approve
+                    $q->whereNotNull('operator_by3')
+                    ->whereNotNull('operator_at3');
+                })->orWhere(function ($q) {
+                    // Skenario 2: Tidak ada Operator 3, tapi Operator 2 sudah approve
+                    $q->whereNull('operator_by3')
+                    ->whereNotNull('operator_at2');
+                });
+            });
 
         if ($kupt && $userId === $kupt->id) {
             $notificationWorkingReport = $workingReportQuery
@@ -80,8 +91,19 @@ class MaintenanceOrderNotificationController extends Controller
 
         if ($kupt && $userId === $kupt->id) {
             $workingReports = WorkingReport::forCurrentUserRegion()
-                ->whereNotNull('operator_at3')
-                ->whereNull('kupt_at1')
+                ->whereNull('kupt_at1') 
+                ->whereIn('status', ['work_done', 'warming_up_done']) 
+                ->where(function ($query) {
+                    $query->where(function ($q) {
+                        // Skenario 1: Ada Operator 3 dan sudah approve
+                        $q->whereNotNull('operator_by3')
+                        ->whereNotNull('operator_at3');
+                    })->orWhere(function ($q) {
+                        // Skenario 2: Tidak ada Operator 3, cukup Operator 2 sudah approve
+                        $q->whereNull('operator_by3')
+                        ->whereNotNull('operator_at2');
+                    });
+                })
                 ->whereHas('createdBy', function ($q) use ($user) {
                     $q->where('division_id', $user->division_id);
                 })
