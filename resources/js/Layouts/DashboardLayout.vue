@@ -76,14 +76,14 @@ onUnmounted(() => document.removeEventListener('keyup', q))
       </div>
     </div>
 
-    <div class="sticky top-0 z-30 w-full border-b border-gray-200 bg-gradient-to-r from-white to-gray-50 shadow-sm md:pl-16 lg:pl-64">
+    <!-- <div class="sticky top-0 z-30 w-full border-b border-gray-200 bg-gradient-to-r from-white to-gray-50 shadow-sm md:pl-16 lg:pl-64">
       <div class="flex items-center justify-between px-4 py-3">
         <div class="flex items-center space-x-2 text-gray-700 text-sm font-semibold tracking-wide">
           <i class="text-gray-400 text-xs"></i>
           <span>{{ displayTitle }}</span>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <div
       class="sidebar fixed top-0 left-0 z-40 flex h-full flex-col bg-white border-r border-gray-200 transition-all duration-300"
