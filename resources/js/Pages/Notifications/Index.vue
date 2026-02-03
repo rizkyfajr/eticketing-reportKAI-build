@@ -84,11 +84,42 @@ function formatDate(dateString) {
   })
 }
 
+// const filteredWorkingReport = computed(() => {
+//   return props.notificationWorkingReport?.filter(wr =>
+//     wr.operator_at3 !== null && wr.kupt_at1 === null
+//   ) ?? []
+// })
+
 const filteredWorkingReport = computed(() => {
-  return props.notificationWorkingReport?.filter(wr =>
-    wr.operator_at3 !== null && wr.kupt_at1 === null
-  ) ?? []
-})
+  // Ambil array dari props, jika kosong berikan array kosong []
+  const reports = props.notificationWorkingReport || [];
+
+  return reports.filter(wr => {
+    // 1. Cek KUPT Belum Approve (Cek null atau string kosong)
+    const isNotApprovedByKupt = wr.kupt_at1 === null || wr.kupt_at1 === '';
+
+    // 2. Cek Eksistensi Operator 3 
+    const hasOperator3 = wr.operator_by3 !== null && 
+                         wr.operator_by3 !== undefined && 
+                         wr.operator_by3 !== 'null' && 
+                         wr.operator_by3 !== '' && 
+                         wr.operator_by3 !== 0 &&
+                         wr.operator_by3 !== '0';
+
+    // 3. Tentukan status "Selesai" berdasarkan kondisi di atas
+    let isLastOperatorDone = false;
+
+    if (hasOperator3) {
+      // Jika ID 26: ada Op3, maka lihat operator_at3
+      isLastOperatorDone = wr.operator_at3 !== null && wr.operator_at3 !== '';
+    } else {
+      // Jika ID 27: Op3 null, maka lihat operator_at2
+      isLastOperatorDone = wr.operator_at2 !== null && wr.operator_at2 !== '';
+    }
+
+    return isNotApprovedByKupt && isLastOperatorDone;
+  });
+});
 </script>
 
 <template>
