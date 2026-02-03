@@ -101,6 +101,7 @@ class WarmingUpController extends Controller
             'counter_tamping_akhir' => 'nullable|integer',
             'oddometer_akhir'       => 'nullable|integer',
             'hsd_akhir_kerja'       => 'nullable|integer',
+            'satuan'                => 'nullable|string',
             'operator_by1'          => 'nullable|exists:users,id',
             'operator_by2'          => 'nullable|exists:users,id',
             'operator_by3'          => 'nullable|exists:users,id',
@@ -111,7 +112,19 @@ class WarmingUpController extends Controller
             'note'                  => 'nullable|string',
             'user_id'               => 'nullable|array',
             'user_id.*'             => 'exists:users,id',
+            'mode'                  => 'nullable|in:warmingup,working',
         ]);
+
+        // 1. Ambil data WorkingReport untuk mendapatkan hsd_awal_kerja
+        $report = WorkingReport::findOrFail($validated['working_report_id']);
+
+        // 2. LOGIKA KALKULASI HSD
+        // Pastikan nilai adalah integer untuk menghindari error matematika
+        $hsdAwal = (int) ($report->hsd_awal_kerja ?? 0);
+        $hsdAkhir = (int) ($request->hsd_akhir_kerja ?? 0);
+        
+        // Hasil pengurangan
+        $selisihHsd = $hsdAwal - $hsdAkhir;
 
         $warmingup = WarmingUp::create([
             'working_report_id'     => $validated['working_report_id'],
@@ -128,7 +141,8 @@ class WarmingUpController extends Controller
             'counter_tamping_awal'  => $request->counter_tamping_awal,
             'oddometer_awal'        => $request->oddometer_awal,
             'hsd_awal_kerja'        => $request->hsd_awal_kerja,
-            'konsumsi_hsd'          => $request->konsumsi_hsd,
+            // 'konsumsi_hsd'          => $request->konsumsi_hsd,
+            'konsumsi_hsd'          => (string) $selisihHsd,
             'waktu_stop_engine'     => $request->waktu_stop_engine,
             'jam_traveling_akhir'   => $request->jam_traveling_akhir,
             'jam_kerja_akhir'       => $request->jam_kerja_akhir,
@@ -137,6 +151,7 @@ class WarmingUpController extends Controller
             'counter_tamping_akhir' => $request->counter_tamping_akhir,
             'oddometer_akhir'       => $request->oddometer_akhir,
             'hsd_akhir_kerja'       => $request->hsd_akhir_kerja,
+            'satuan'                => $request->satuan,
             'operator_by1'          => $request->operator_by1,
             'operator_by2'          => $request->operator_by2,
             'operator_by3'          => $request->operator_by3,
@@ -147,7 +162,16 @@ class WarmingUpController extends Controller
         ]);
 
         WorkingReport::where('id', $validated['working_report_id'])
-            ->update(['status' => 'warming_up_done']);
+            ->update(['status' => 'warming_up_done', 'mode'   => $request->mode]);
+
+        // 2. LOGIKA BARU: Update WorkingReport hanya jika mode diisi
+        if ($request->filled('mode')) {
+            WorkingReport::where('id', $validated['working_report_id'])
+                ->update([
+                    'status' => 'warming_up_done', 
+                    'mode'   => $request->mode
+                ]);
+        }
 
         if (!empty($validated['user_id'])) {
             $crewPivotData = collect($validated['user_id'])->map(function ($userId) use ($warmingup) {
@@ -241,6 +265,7 @@ class WarmingUpController extends Controller
             'counter_tamping_akhir' => 'nullable|integer',
             'oddometer_akhir'       => 'nullable|integer',
             'hsd_akhir_kerja'       => 'nullable|integer',
+            'satuan'                => 'nullable|string',
             'operator_by1'          => 'nullable|exists:users,id',
             'operator_by2'          => 'nullable|exists:users,id',
             'operator_by3'          => 'nullable|exists:users,id',
@@ -277,6 +302,7 @@ class WarmingUpController extends Controller
             'counter_tamping_akhir' => $request->counter_tamping_akhir,
             'oddometer_akhir'       => $request->oddometer_akhir,
             'hsd_akhir_kerja'       => $request->hsd_akhir_kerja,
+            'satuan'                => $request->satuan,
             'operator_by1'          => $request->operator_by1,
             'operator_by2'          => $request->operator_by2,
             'operator_by3'          => $request->operator_by3,

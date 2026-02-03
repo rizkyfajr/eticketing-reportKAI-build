@@ -35,6 +35,7 @@ class WarmingUp extends Model
         'counter_tamping_akhir',
         'oddometer_akhir',
         'hsd_akhir_kerja',
+        'satuan',
         'operator_by1',
         'operator_at1',
         'operator_by2',
